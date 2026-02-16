@@ -12,3 +12,6 @@ Button style is an enum with the following values:
 - tonal
 - outlined
 - text
+
+## Style
+Style according to Material Design 3 

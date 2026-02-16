@@ -17,9 +17,9 @@ function cn(...inputs: ClassValue[]) {
 }
 
 const STYLE_MAP: Record<ButtonStyle, string> = {
-    [ButtonStyle.FILLED]: 'bg-primary text-on-primary hover:shadow-level-1 focus:ring-primary',
-    [ButtonStyle.ELEVATED]: 'bg-surface-container-low text-primary shadow-level-1 hover:shadow-level-2 focus:ring-primary',
-    [ButtonStyle.TONAL]: 'bg-secondary-container text-on-secondary-container hover:shadow-level-1 focus:ring-secondary',
+    [ButtonStyle.FILLED]: 'bg-primary text-on-primary hover:elevation-1 focus:ring-primary shadow-sm',
+    [ButtonStyle.ELEVATED]: 'bg-surface text-primary elevation-1 hover:elevation-2 focus:ring-primary',
+    [ButtonStyle.TONAL]: 'bg-secondary-container text-on-secondary-container hover:elevation-1 focus:ring-secondary',
     [ButtonStyle.OUTLINED]: 'bg-transparent border border-outline text-primary hover:bg-primary/5 focus:ring-primary',
     [ButtonStyle.TEXT]: 'bg-transparent text-primary hover:bg-primary/5 focus:ring-primary',
 };
@@ -58,9 +58,9 @@ export class ButtonBuilder implements ComponentBuilder {
 
     build(): HTMLButtonElement {
         const button = document.createElement('button');
-        button.className = cn(
-            'px-px-24 py-px-10 rounded-extra-large font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed text-label-large'
-        );
+        const BASE_CLASSES = 'px-px-24 py-px-12 rounded-small font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed text-label-large inline-flex items-center justify-center gap-2';
+
+        button.className = cn(BASE_CLASSES);
 
         // Default style if none provided
         STYLE_MAP[ButtonStyle.FILLED].split(' ').forEach(c => button.classList.add(c));
@@ -82,15 +82,15 @@ export class ButtonBuilder implements ComponentBuilder {
         }) : null;
 
         const classSub = this.className$ ? this.className$.subscribe(cls => {
-            button.className = cn(
-                'px-px-24 py-px-10 rounded-extra-large font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed text-label-large',
-                cls
-            );
-            // Re-apply current style
-            const currentStyle = Object.entries(STYLE_MAP).find(([_, classes]) =>
+            button.className = cn(BASE_CLASSES, cls);
+            // Re-apply current style logic
+            const currentStyle = (this.style$ as any)?._value || ButtonStyle.FILLED; // Simplified for now as we don't have access to current observable value easily here without extra state
+            // Better: find which style's classes are currently applied
+            const appliedStyle = Object.entries(STYLE_MAP).find(([_, classes]) =>
                 classes.split(' ').every(c => button.classList.contains(c))
             )?.[0] as ButtonStyle || ButtonStyle.FILLED;
-            STYLE_MAP[currentStyle].split(' ').forEach(c => button.classList.add(c));
+
+            STYLE_MAP[appliedStyle].split(' ').forEach(c => button.classList.add(c));
         }) : null;
 
         if (this.click$) {

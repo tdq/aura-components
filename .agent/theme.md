@@ -1,69 +1,68 @@
-# Material Design 3 Theme (Fixed Tokens)
+# Modern Professional Financial Theme
 
-All UI must strictly follow these tokens.  
-Do NOT use hardcoded colors, sizes, or radii outside this file.
+All UI must strictly follow these tokens to maintain professional trust, clarity, and data-centric aesthetics.
 
 ## 1. Color System
 
-Seed: #6750A4
+Primary palette: Sapphire Blue & Slate Gray.
 
 ### Light Theme
 
-primary: #6750A4  
+primary: #0F52BA  
 onPrimary: #FFFFFF  
-primaryContainer: #EADDFF  
-onPrimaryContainer: #21005D  
+primaryContainer: #D1E1F8  
+onPrimaryContainer: #001B3D  
 
-secondary: #625B71  
+secondary: #475569  
 onSecondary: #FFFFFF  
-secondaryContainer: #E8DEF8  
-onSecondaryContainer: #1D192B  
+secondaryContainer: #F1F5F9  
+onSecondaryContainer: #0F172A  
 
-tertiary: #7D5260  
+tertiary: #0891B2  
 onTertiary: #FFFFFF  
-tertiaryContainer: #FFD8E4  
-onTertiaryContainer: #31111D  
+tertiaryContainer: #CFFAFE  
+onTertiaryContainer: #083344  
 
-background: #FFFBFE  
-onBackground: #1C1B1F  
+background: #FFFFFF  
+onBackground: #0F172A  
 
-surface: #FFFBFE  
-onSurface: #1C1B1F  
-surfaceVariant: #E7E0EC  
-onSurfaceVariant: #49454F  
+surface: #FFFFFF  
+onSurface: #0F172A  
+surfaceVariant: #E2E8F0  
+onSurfaceVariant: #334155  
 
-outline: #79747E  
-error: #B3261E  
+outline: #94A3B8  
+error: #DC2626  
 onError: #FFFFFF  
 
 ### Dark Theme
 
-primary: #D0BCFF  
-onPrimary: #381E72  
-primaryContainer: #4F378B  
-onPrimaryContainer: #EADDFF  
+primary: #60A5FA  
+onPrimary: #002D5F  
+primaryContainer: #1E3A8A  
+onPrimaryContainer: #DBEAFE  
 
-secondary: #CCC2DC  
-onSecondary: #332D41  
-secondaryContainer: #4A4458  
-onSecondaryContainer: #E8DEF8  
+secondary: #94A3B8  
+onSecondary: #0F172A  
+secondaryContainer: #1E293B  
+onSecondaryContainer: #F1F5F9  
 
-tertiary: #EFB8C8  
-onTertiary: #492532  
-tertiaryContainer: #633B48  
-onTertiaryContainer: #FFD8E4  
+tertiary: #22D3EE  
+onTertiary: #083344  
+tertiaryContainer: #155E75  
+onTertiaryContainer: #CFFAFE  
 
-background: #1C1B1F  
-onBackground: #E6E1E5  
+background: #0F172A  
+onBackground: #F8FAFC  
 
-surface: #1C1B1F  
-onSurface: #E6E1E5  
-surfaceVariant: #49454F  
-onSurfaceVariant: #CAC4D0  
+surface: #1E293B  
+onSurface: #F8FAFC  
+surfaceVariant: #334155  
+onSurfaceVariant: #CBD5E1  
 
-outline: #938F99  
-error: #F2B8B5  
-onError: #601410  
+outline: #475569  
+error: #EF4444  
+onError: #450A0A  
 
 ## 2. State Layers (Opacity Tokens)
 
@@ -73,88 +72,62 @@ Pressed: 0.12
 Dragged: 0.16
 
 State layers must use the foreground color with these opacities.
-Do NOT introduce custom opacity values.
 
-## 3. Typography (MD3 Scale)
+## 3. Typography (Financial Professional Scale)
 
-Font: Roboto, system-ui, sans-serif
+Preferred: 'Inter', system-ui, sans-serif
 
 Format: font-size / line-height / font-weight
 
-displayLarge: 57px / 64px / 400
-headlineLarge: 32px / 40px / 400
-headlineMedium: 28px / 36px / 400
-titleLarge: 22px / 28px / 400
-titleMedium: 16px / 24px / 500
-titleSmall: 14px / 20px / 500
+displayLarge: 57px / 64px / 600
+headlineLarge: 32px / 40px / 600
+headlineMedium: 28px / 36px / 600
+titleLarge: 20px / 28px / 600
+titleMedium: 16px / 24px / 600
+titleSmall: 14px / 20px / 600
 
 bodyLarge: 16px / 24px / 400
 bodyMedium: 14px / 20px / 400
 
-labelLarge: 16px / 24px / 500
-labelMedium: 14px / 20px / 500
-labelSmall: 12px / 16px / 500
-
-Letter spacing must follow Material 3 defaults:
-
-labelLarge: 0.1px
-labelMedium: 0.5px
-labelSmall: 0.5px
+labelLarge: 14px / 20px / 600
+labelMedium: 12px / 16px / 600
+labelSmall: 11px / 16px / 600
 
 ## 4. Shape
 
 small: 4px  
-medium: 8px  
-large: 16px  
-extraLarge: 28px  
+medium: 6px  
+large: 12px  
+extraLarge: 24px  
 
-Buttons: medium  
+Buttons: small  
 Cards: medium  
 Dialogs: large  
-Bottom Sheets: extraLarge (top corners only)
-
-No other radius values allowed.
 
 ## 5. Spacing (4px Grid)
 
-4  
-8  
-12  
-16  
-24  
-32  
-40  
-48  
-
-No other spacing values allowed.
+4, 8, 12, 16, 24, 32, 40, 48
 
 ## 6. Elevation
 
 level0: none  
-level1: 1dp  
-level2: 3dp  
-level3: 6dp  
-level4: 8dp  
-level5: 12dp  
+level1: 0 1px 2px 0 rgb(0 0 0 / 0.05)
+level2: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)
+level3: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)
 
-Prefer tonal elevation over heavy shadows.
+Prefer subtle borders over heavy shadows in financial UIs.
 
 ## 7. Component Rules
 
-Minimum touch target: 48px  
+Minimum touch target: 44px (Compact Professional)
 
 Buttons:
-- Primary action: Filled
-- Secondary: Filled Tonal
-- Tertiary: Outlined
-- Low emphasis: Text
-
-Icons:
-- Material Symbols
-- Default size: 24px
+- Primary: Filled Sapphire
+- Secondary: Soft Slate
+- Tertiary: Ghost/Text
 
 ## 8. Accessibility
 
-Minimum contrast: WCAG AA  
-Touch target ≥ 48px  
-No color-only meaning  
+Minimum contrast: WCAG AA (Target AAA for financial data)
+Touch target ≥ 44px
+No color-only meaning (use icons for status)

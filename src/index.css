@@ -10,35 +10,35 @@
   /* ================= COLOR ================= */
 
   /* Primary */
-  --md-sys-color-primary: #6750A4;
+  --md-sys-color-primary: #0F52BA;
   --md-sys-color-on-primary: #FFFFFF;
-  --md-sys-color-primary-container: #EADDFF;
-  --md-sys-color-on-primary-container: #21005D;
+  --md-sys-color-primary-container: #D1E1F8;
+  --md-sys-color-on-primary-container: #001B3D;
 
   /* Secondary */
-  --md-sys-color-secondary: #625B71;
+  --md-sys-color-secondary: #475569;
   --md-sys-color-on-secondary: #FFFFFF;
-  --md-sys-color-secondary-container: #E8DEF8;
-  --md-sys-color-on-secondary-container: #1D192B;
+  --md-sys-color-secondary-container: #F1F5F9;
+  --md-sys-color-on-secondary-container: #0F172A;
 
   /* Tertiary */
-  --md-sys-color-tertiary: #7D5260;
+  --md-sys-color-tertiary: #0891B2;
   --md-sys-color-on-tertiary: #FFFFFF;
-  --md-sys-color-tertiary-container: #FFD8E4;
-  --md-sys-color-on-tertiary-container: #31111D;
+  --md-sys-color-tertiary-container: #CFFAFE;
+  --md-sys-color-on-tertiary-container: #083344;
 
   /* Surface */
-  --md-sys-color-background: #FFFBFE;
-  --md-sys-color-on-background: #1C1B1F;
-  --md-sys-color-surface: #FFFBFE;
-  --md-sys-color-on-surface: #1C1B1F;
-  --md-sys-color-surface-variant: #E7E0EC;
-  --md-sys-color-on-surface-variant: #49454F;
-  --md-sys-color-surface-container-low: #F7F2FA;
+  --md-sys-color-background: #FFFFFF;
+  --md-sys-color-on-background: #0F172A;
+  --md-sys-color-surface: #FFFFFF;
+  --md-sys-color-on-surface: #0F172A;
+  --md-sys-color-surface-variant: #E2E8F0;
+  --md-sys-color-on-surface-variant: #334155;
+  --md-sys-color-surface-container-low: #F8FAFC;
 
   /* Outline & Error */
-  --md-sys-color-outline: #79747E;
-  --md-sys-color-error: #B3261E;
+  --md-sys-color-outline: #94A3B8;
+  --md-sys-color-error: #DC2626;
   --md-sys-color-on-error: #FFFFFF;
 
   /* ================= STATE LAYERS ================= */
@@ -51,9 +51,9 @@
   /* ================= SHAPE ================= */
 
   --md-sys-shape-small: 4px;
-  --md-sys-shape-medium: 8px;
-  --md-sys-shape-large: 16px;
-  --md-sys-shape-extra-large: 28px;
+  --md-sys-shape-medium: 6px;
+  --md-sys-shape-large: 12px;
+  --md-sys-shape-extra-large: 24px;
 
   /* ================= SPACING (4px grid) ================= */
 
@@ -69,15 +69,15 @@
   /* ================= ELEVATION ================= */
 
   --md-sys-elevation-level0: none;
-  --md-sys-elevation-level1: 0px 1px 2px rgba(0, 0, 0, 0.30);
-  --md-sys-elevation-level2: 0px 1px 3px rgba(0, 0, 0, 0.30), 0px 2px 6px rgba(0, 0, 0, 0.15);
-  --md-sys-elevation-level3: 0px 4px 8px rgba(0, 0, 0, 0.15);
-  --md-sys-elevation-level4: 0px 6px 10px rgba(0, 0, 0, 0.15);
-  --md-sys-elevation-level5: 0px 8px 12px rgba(0, 0, 0, 0.15);
+  --md-sys-elevation-level1: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --md-sys-elevation-level2: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --md-sys-elevation-level3: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --md-sys-elevation-level4: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --md-sys-elevation-level5: 0 25px 50px -12px rgb(0 0 0 / 0.25);
 
   /* ================= TYPOGRAPHY BASE ================= */
 
-  font-family: Roboto, system-ui, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -96,32 +96,32 @@
 /* ===================================================== */
 
 .dark {
-  --md-sys-color-primary: #D0BCFF;
-  --md-sys-color-on-primary: #381E72;
-  --md-sys-color-primary-container: #4F378B;
-  --md-sys-color-on-primary-container: #EADDFF;
+  --md-sys-color-primary: #60A5FA;
+  --md-sys-color-on-primary: #002D5F;
+  --md-sys-color-primary-container: #1E3A8A;
+  --md-sys-color-on-primary-container: #DBEAFE;
 
-  --md-sys-color-secondary: #CCC2DC;
-  --md-sys-color-on-secondary: #332D41;
-  --md-sys-color-secondary-container: #4A4458;
-  --md-sys-color-on-secondary-container: #E8DEF8;
+  --md-sys-color-secondary: #94A3B8;
+  --md-sys-color-on-secondary: #0F172A;
+  --md-sys-color-secondary-container: #1E293B;
+  --md-sys-color-on-secondary-container: #F1F5F9;
 
-  --md-sys-color-tertiary: #EFB8C8;
-  --md-sys-color-on-tertiary: #492532;
-  --md-sys-color-tertiary-container: #633B48;
-  --md-sys-color-on-tertiary-container: #FFD8E4;
+  --md-sys-color-tertiary: #22D3EE;
+  --md-sys-color-on-tertiary: #083344;
+  --md-sys-color-tertiary-container: #155E75;
+  --md-sys-color-on-tertiary-container: #CFFAFE;
 
-  --md-sys-color-background: #1C1B1F;
-  --md-sys-color-on-background: #E6E1E5;
-  --md-sys-color-surface: #1C1B1F;
-  --md-sys-color-on-surface: #E6E1E5;
-  --md-sys-color-surface-variant: #49454F;
-  --md-sys-color-on-surface-variant: #CAC4D0;
-  --md-sys-color-surface-container-low: #25232A;
+  --md-sys-color-background: #0F172A;
+  --md-sys-color-on-background: #F8FAFC;
+  --md-sys-color-surface: #1E293B;
+  --md-sys-color-on-surface: #F8FAFC;
+  --md-sys-color-surface-variant: #334155;
+  --md-sys-color-on-surface-variant: #CBD5E1;
+  --md-sys-color-surface-container-low: #1E293B;
 
-  --md-sys-color-outline: #938F99;
-  --md-sys-color-error: #F2B8B5;
-  --md-sys-color-on-error: #601410;
+  --md-sys-color-outline: #475569;
+  --md-sys-color-error: #EF4444;
+  --md-sys-color-on-error: #450A0A;
 }
 
 /* ===================================================== */
