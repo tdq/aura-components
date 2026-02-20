@@ -119,3 +119,25 @@ export const DynamicStyle = () => {
 
     return container;
 };
+
+export const Glass = () => {
+    const layout = new LayoutBuilder()
+        .asHorizontal()
+        .withGap(LayoutGap.LARGE);
+
+    const styles = Object.values(ButtonStyle);
+
+    styles.forEach(style => {
+        layout.addSlot().withContent(
+            new ButtonBuilder()
+                .withCaption(of(`GLASS ${style.toUpperCase()}`))
+                .withStyle(of(style))
+                .asGlass()
+        );
+    });
+
+    const container = layout.build();
+    container.classList.add('flex-wrap', 'p-8', 'bg-gradient-to-br', 'from-blue-500', 'to-purple-600', 'min-h-[200px]');
+
+    return container;
+};

@@ -1,9 +1,9 @@
 Layout component is a component which is used for layout of the page. It has the following methods:
 - addSlot(): SlotBuilder - adds new slot to the layout. IT can have one child component.
-- asVertical(): LayoutBuilder - sets layout to vertical.
-- asHorizontal(): LayoutBuilder - sets layout to horizontal.
-- withGap(gap: LayoutGap): LayoutBuilder - sets gap between slots.
-- withClass(className: Observable<string>): LayoutBuilder - sets class css name of the layout.
+- asVertical(): this - sets layout to vertical.
+- asHorizontal(): this - sets layout to horizontal.
+- withGap(gap: LayoutGap): this - sets gap between slots.
+- withClass(className: Observable<string>): this - sets class css name of the layout.
 
 Layout omponent should have full width.
 
@@ -16,9 +16,9 @@ LayoutGap is a enum with values:
 LayoutGap defines the gap between slots. Default value is MEDIUM.
 
 SlotBuilder has the following methods:
-- withContent(content: ComponentBuilder): SlotBuilder - sets content of the slot.
-- withSize(size: SlotSize): SlotBuilder - sets size of the slot.
-- withVisible(visible: Observable<boolean>): SlotBuilder - sets visibility of the slot.
+- withContent(content: ComponentBuilder): this - sets content of the slot.
+- withSize(size: SlotSize): this - sets size of the slot.
+- withVisible(visible: Observable<boolean>): this - sets visibility of the slot.
 
 SlotSize is a enum with values:
 - QUARTER. 1/4 of available space

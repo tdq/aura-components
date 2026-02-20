@@ -1,4 +1,4 @@
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, BehaviorSubject, combineLatest } from 'rxjs';
 import { ComponentBuilder } from '../../core/component-builder';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -30,6 +30,12 @@ export class ButtonBuilder implements ComponentBuilder {
     private click$?: Subject<void>;
     private style$?: Observable<ButtonStyle>;
     private className$?: Observable<string>;
+    private isGlass$ = new BehaviorSubject<boolean>(false);
+
+    asGlass(): ButtonBuilder {
+        this.isGlass$.next(true);
+        return this;
+    }
 
     withCaption(caption: Observable<string>): ButtonBuilder {
         this.caption$ = caption;
@@ -73,24 +79,59 @@ export class ButtonBuilder implements ComponentBuilder {
             button.disabled = !enabled;
         }) : null;
 
-        const styleSub = this.style$ ? this.style$.subscribe(style => {
+        const style$ = this.style$ || new BehaviorSubject<ButtonStyle>(ButtonStyle.FILLED);
+        const styleSub = combineLatest([style$, this.isGlass$]).subscribe(([style, isGlass]) => {
             // Remove existing style classes before adding new one
             Object.values(STYLE_MAP).forEach(cls => {
                 cls.split(' ').forEach(c => button.classList.remove(c));
             });
-            STYLE_MAP[style].split(' ').forEach(c => button.classList.add(c));
-        }) : null;
+
+            // Remove glass classes
+            const glassClasses = ['bg-white/10', 'backdrop-blur-md', 'border', 'border-white/20', 'hover:bg-white/20'];
+            glassClasses.forEach(c => button.classList.remove(c));
+
+            if (isGlass) {
+                // Apply glass effect
+                button.classList.add('bg-white/10', 'backdrop-blur-md', 'border', 'border-white/20', 'hover:bg-white/20');
+                // Keep the text color and focus ring from the original style if possible
+                const originalClasses = STYLE_MAP[style].split(' ');
+                originalClasses.forEach(c => {
+                    if (c.startsWith('text-') || c.startsWith('focus:ring-')) {
+                        button.classList.add(c);
+                    }
+                });
+            } else {
+                STYLE_MAP[style].split(' ').forEach(c => button.classList.add(c));
+            }
+        });
 
         const classSub = this.className$ ? this.className$.subscribe(cls => {
             button.className = cn(BASE_CLASSES, cls);
-            // Re-apply current style logic
-            const currentStyle = (this.style$ as any)?._value || ButtonStyle.FILLED; // Simplified for now as we don't have access to current observable value easily here without extra state
-            // Better: find which style's classes are currently applied
-            const appliedStyle = Object.entries(STYLE_MAP).find(([_, classes]) =>
-                classes.split(' ').every(c => button.classList.contains(c))
-            )?.[0] as ButtonStyle || ButtonStyle.FILLED;
 
-            STYLE_MAP[appliedStyle].split(' ').forEach(c => button.classList.add(c));
+            // Re-apply style and glass classes
+            const isGlass = this.isGlass$.value;
+            // Get current style from style$ if possible, otherwise find applied
+            let style = ButtonStyle.FILLED;
+            if (this.style$ && (this.style$ as any).value) {
+                style = (this.style$ as any).value;
+            } else {
+                // Heuristic to find applied style
+                style = (Object.entries(STYLE_MAP).find(([_, classes]) =>
+                    classes.split(' ').every(c => button.classList.contains(c))
+                )?.[0] as ButtonStyle) || ButtonStyle.FILLED;
+            }
+
+            if (isGlass) {
+                button.classList.add('bg-white/10', 'backdrop-blur-md', 'border', 'border-white/20', 'hover:bg-white/20');
+                const originalClasses = STYLE_MAP[style].split(' ');
+                originalClasses.forEach(c => {
+                    if (c.startsWith('text-') || c.startsWith('focus:ring-')) {
+                        button.classList.add(c);
+                    }
+                });
+            } else {
+                STYLE_MAP[style].split(' ').forEach(c => button.classList.add(c));
+            }
         }) : null;
 
         if (this.click$) {

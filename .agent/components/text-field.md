@@ -1,12 +1,13 @@
 TextField component is a component that allows the user to enter and edit text.
 It has the folowing methods:
-- withValue(value: Subject<string>): TextBuilder - sets value of the text field.
-- withPlaceholder(placeholder: Observable<string>): TextBuilder - sets placeholder of the text field.
-- withEnabled(enabled: Observable<boolean>): TextBuilder - sets enabled state of the text field.
-- withStyle(style: Observable<ButtonStyle>): TextBuilder - sets style of the text field.
-- withError(error: Observable<string>): TextBuilder - sets error of the text field.
-- withLabel(label: Observable<string>): TextBuilder - sets label of the text field.
-- withClass(className: Observable<string>): TextBuilder - sets class css name of the text field.
+- withValue(value: Subject<string>): this - sets value of the text field.
+- withPlaceholder(placeholder: Observable<string>): this - sets placeholder of the text field.
+- withEnabled(enabled: Observable<boolean>): this - sets enabled state of the text field.
+- withStyle(style: Observable<ButtonStyle>): this - sets style of the text field.
+- withError(error: Observable<string>): this - sets error of the text field.
+- withLabel(label: Observable<string>): this - sets label of the text field.
+- withClass(className: Observable<string>): this - sets class css name of the text field.
+- asGlass(): this - sets special styling option for textfield and its popup with items as transparent with blur background (glass effect). 
 
 ## Style
 Style according to Material Design 3 

@@ -12,6 +12,12 @@ It should implement ComponentBuilder interface.
 Components are styled by using Tailwind CSS.
 Logic and state are managed by RxJS.
 
+## Requirements
+Make components as a pieces of single task. 
+Split complex components into a composition of simple components. 
+Keep them under the same folder.
+Each component should be defined in its own file.
+Try to reuse existing components for building more complex components.
 
 ## Types of components
 

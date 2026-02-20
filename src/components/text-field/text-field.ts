@@ -1,4 +1,4 @@
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, BehaviorSubject, combineLatest } from 'rxjs';
 import { ComponentBuilder } from '../../core/component-builder';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -26,6 +26,12 @@ export class TextFieldBuilder implements ComponentBuilder {
     private error$?: Observable<string>;
     private label$?: Observable<string>;
     private className$?: Observable<string>;
+    private isGlass$ = new BehaviorSubject<boolean>(false);
+
+    asGlass(): TextFieldBuilder {
+        this.isGlass$.next(true);
+        return this;
+    }
 
     withValue(value: Subject<string>): TextFieldBuilder {
         this.value$ = value;
@@ -93,11 +99,26 @@ export class TextFieldBuilder implements ComponentBuilder {
             input.disabled = !enabled;
         });
 
-        const styleSub = this.style$?.subscribe(style => {
+        const style$ = this.style$ || new BehaviorSubject<TextFieldStyle>(TextFieldStyle.FILLED);
+        const styleSub = combineLatest([style$, this.isGlass$]).subscribe(([style, isGlass]) => {
             Object.values(STYLE_MAP).forEach(cls => {
                 cls.split(' ').forEach(c => input.classList.remove(c));
             });
-            STYLE_MAP[style].split(' ').forEach(c => input.classList.add(c));
+
+            // Remove glass classes
+            const glassClasses = ['bg-white/10', 'backdrop-blur-md', 'border', 'border-white/20', 'focus:bg-white/20', 'rounded-small', 'rounded-t-small'];
+            glassClasses.forEach(c => input.classList.remove(c));
+
+            if (isGlass) {
+                input.classList.add('bg-white/10', 'backdrop-blur-md', 'border', 'border-white/20', 'focus:bg-white/20');
+                if (style === TextFieldStyle.OUTLINED) {
+                    input.classList.add('rounded-small');
+                } else {
+                    input.classList.add('rounded-t-small');
+                }
+            } else {
+                STYLE_MAP[style].split(' ').forEach(c => input.classList.add(c));
+            }
         });
 
         const valueSub = this.value$?.subscribe(val => {
@@ -122,16 +143,28 @@ export class TextFieldBuilder implements ComponentBuilder {
 
 
         const classSub = this.className$?.subscribe(cls => {
-            input.className = cn(
-                'px-px-16 py-px-12 w-full outline-none transition-all body-large placeholder:text-on-surface-variant text-on-surface',
-                'disabled:opacity-38 disabled:cursor-not-allowed',
-                cls
-            );
-            // Re-apply current style
-            const currentStyle = input.classList.contains(STYLE_MAP[TextFieldStyle.OUTLINED].split(' ')[0])
-                ? TextFieldStyle.OUTLINED
-                : TextFieldStyle.FILLED;
-            STYLE_MAP[currentStyle].split(' ').forEach(c => input.classList.add(c));
+            const BASE_INPUT_CLASSES = 'px-px-16 py-px-12 w-full outline-none transition-all body-large placeholder:text-on-surface-variant text-on-surface disabled:opacity-38 disabled:cursor-not-allowed';
+            input.className = cn(BASE_INPUT_CLASSES, cls);
+
+            // Re-apply style and glass
+            const isGlass = this.isGlass$.value;
+            let style = TextFieldStyle.FILLED;
+            if (this.style$ && (this.style$ as any).value) {
+                style = (this.style$ as any).value;
+            } else {
+                style = input.classList.contains('rounded-small') ? TextFieldStyle.OUTLINED : TextFieldStyle.FILLED;
+            }
+
+            if (isGlass) {
+                input.classList.add('bg-white/10', 'backdrop-blur-md', 'border', 'border-white/20', 'focus:bg-white/20');
+                if (style === TextFieldStyle.OUTLINED) {
+                    input.classList.add('rounded-small');
+                } else {
+                    input.classList.add('rounded-t-small');
+                }
+            } else {
+                STYLE_MAP[style].split(' ').forEach(c => input.classList.add(c));
+            }
         });
 
         if (this.value$) {

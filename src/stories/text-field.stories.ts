@@ -158,3 +158,30 @@ export const LabelsAndErrors = () => {
     return container;
 };
 
+export const Glass = () => {
+    const layout = new LayoutBuilder()
+        .asVertical()
+        .withGap(LayoutGap.EXTRA_LARGE);
+
+    layout.addSlot().withContent(
+        new TextFieldBuilder()
+            .withLabel(of('Glass Filled'))
+            .withPlaceholder(of('Glass filled text field...'))
+            .asGlass()
+            .withStyle(of(TextFieldStyle.FILLED))
+    );
+
+    layout.addSlot().withContent(
+        new TextFieldBuilder()
+            .withLabel(of('Glass Outlined'))
+            .withPlaceholder(of('Glass outlined text field...'))
+            .asGlass()
+            .withStyle(of(TextFieldStyle.OUTLINED))
+    );
+
+    const container = layout.build();
+    container.classList.add('p-8', 'bg-gradient-to-br', 'from-blue-500', 'to-purple-600', 'min-h-[400px]');
+
+    return container;
+};
+
