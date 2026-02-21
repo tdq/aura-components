@@ -146,4 +146,36 @@ describe('FormBuilder', () => {
         expect(visibleError).toBeTruthy();
         expect(visibleError?.parentElement?.style.display).toBe('');
     });
+
+    it('should support addPasswordField and addEmailField', () => {
+        const fb = new FormBuilder();
+        const fields = fb.withFields();
+        fields.addPasswordField();
+        fields.addEmailField();
+        
+        const formEl = fb.build();
+        const inputs = formEl.querySelectorAll('input');
+        
+        expect(inputs[0].type).toBe('password');
+        expect(inputs[1].type).toBe('email');
+    });
+
+    it('should support email validation in form field', () => {
+        const fb = new FormBuilder();
+        const fields = fb.withFields();
+        const value$ = new BehaviorSubject('');
+        fields.addEmailField().withValue(value$);
+        
+        const formEl = fb.build();
+        const input = formEl.querySelector('input') as HTMLInputElement;
+        const errorSpan = formEl.querySelector('span:last-child') as HTMLElement;
+        
+        input.value = 'invalid';
+        input.dispatchEvent(new Event('input'));
+        expect(errorSpan.textContent).toBe('Invalid email address');
+        
+        input.value = 'valid@example.com';
+        input.dispatchEvent(new Event('input'));
+        expect(errorSpan.textContent).toBe('');
+    });
 });

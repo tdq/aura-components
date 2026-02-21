@@ -1,4 +1,4 @@
-import { BehaviorSubject, Subject } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { TextFieldBuilder, TextFieldStyle } from './text-field';
 
 describe('TextFieldBuilder', () => {
@@ -156,5 +156,43 @@ describe('TextFieldBuilder', () => {
 
         expect(input.classList.contains('bg-white/10')).toBe(true);
         expect(input.classList.contains('backdrop-blur-md')).toBe(true);
+    });
+
+    test('should validate value and display error', () => {
+        const value$ = new BehaviorSubject('');
+        const container = builder
+            .withValue(value$)
+            .withValidator(v => v.length < 3 ? 'Too short' : null)
+            .build();
+        const input = container.querySelector('input') as HTMLInputElement;
+        const errorEl = container.querySelector('span:last-child') as HTMLElement;
+
+        input.value = 'hi';
+        input.dispatchEvent(new Event('input'));
+        expect(errorEl.textContent).toBe('Too short');
+        expect(errorEl.classList.contains('hidden')).toBe(false);
+
+        input.value = 'hello';
+        input.dispatchEvent(new Event('input'));
+        expect(errorEl.textContent).toBe('');
+        expect(errorEl.classList.contains('hidden')).toBe(true);
+    });
+
+    test('should validate email format', () => {
+        const value$ = new BehaviorSubject('');
+        const container = builder
+            .withValue(value$)
+            .withEmailValidation('Invalid email')
+            .build();
+        const input = container.querySelector('input') as HTMLInputElement;
+        const errorEl = container.querySelector('span:last-child') as HTMLElement;
+
+        input.value = 'invalid-email';
+        input.dispatchEvent(new Event('input'));
+        expect(errorEl.textContent).toBe('Invalid email');
+
+        input.value = 'test@example.com';
+        input.dispatchEvent(new Event('input'));
+        expect(errorEl.textContent).toBe('');
     });
 });

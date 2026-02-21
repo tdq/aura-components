@@ -21,7 +21,8 @@ export const RegistrationForm = () => {
     
     fields.addTextField(1, 1).withLabel(of('First Name')).withValue(firstName$);
     fields.addTextField(2, 1).withLabel(of('Last Name')).withValue(lastName$);
-    fields.addTextField(1, 2).withLabel(of('Email'));
+    fields.addEmailField(1, 2).withLabel(of('Email'));
+    fields.addPasswordField(1, 2).withLabel(of('Password'));
 
     const toolbar = form.withToolbar();
     toolbar.addTextButton().withCaption(of('Cancel'));
@@ -65,8 +66,8 @@ export const GlassForm = () => {
         .withError(of('This is a global error message.'));
 
     const fields = form.withFields(2);
-    fields.addTextField(1, 1).withLabel(of('Field 1'));
-    fields.addNumberField(2, 1).withLabel(of('Field 2'));
+    fields.addEmailField(1, 1).withLabel(of('Email Address'));
+    fields.addPasswordField(2, 1).withLabel(of('Password'));
     fields.addComboBoxField(1, 2).withCaption(of('Selection'));
     fields.addCheckBox(1, 2).withCaption(of('I agree to the terms'));
 

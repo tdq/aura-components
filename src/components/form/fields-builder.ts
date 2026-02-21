@@ -34,6 +34,14 @@ export class FieldsBuilder implements IFieldsBuilder {
         return this.addField(new TextFieldBuilder(), column, colspan);
     }
 
+    addPasswordField(column?: number, colspan?: number): TextFieldBuilder {
+        return this.addField(new TextFieldBuilder().asPassword(), column, colspan);
+    }
+
+    addEmailField(column?: number, colspan?: number): TextFieldBuilder {
+        return this.addField(new TextFieldBuilder().asEmail().withEmailValidation(), column, colspan);
+    }
+
     addNumberField(column?: number, colspan?: number): NumberFieldBuilder {
         return this.addField(new NumberFieldBuilder(), column, colspan);
     }

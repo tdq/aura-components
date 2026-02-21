@@ -1,5 +1,5 @@
-import { Observable, Subject, combineLatest, of, fromEvent } from 'rxjs';
-import { map, startWith, distinctUntilChanged, tap } from 'rxjs/operators';
+import { Observable, Subject, combineLatest, of, fromEvent, BehaviorSubject } from 'rxjs';
+import { map, distinctUntilChanged } from 'rxjs/operators';
 import { ComponentBuilder } from '../../core/component-builder';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -28,6 +28,8 @@ export class TextFieldBuilder implements ComponentBuilder {
     private enabled$ = of(true);
     private style$ = of(TextFieldStyle.TONAL);
     private error$ = of('');
+    private internalError$ = new BehaviorSubject<string>('');
+    private validators: ((value: string) => string | null)[] = [];
     private label$ = of('');
     private className$ = of('');
     private isGlass: boolean = false;
@@ -54,6 +56,19 @@ export class TextFieldBuilder implements ComponentBuilder {
     asEmail(): TextFieldBuilder {
         this.type$ = of('email');
         return this;
+    }
+
+    withValidator(validator: (value: string) => string | null): TextFieldBuilder {
+        this.validators.push(validator);
+        return this;
+    }
+
+    withEmailValidation(message: string = 'Invalid email address'): TextFieldBuilder {
+        return this.withValidator((value: string) => {
+            if (!value) return null;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(value) ? null : message;
+        });
     }
 
     withName(name: string): TextFieldBuilder {
@@ -158,7 +173,9 @@ export class TextFieldBuilder implements ComponentBuilder {
         const visualState$ = combineLatest({
             style: this.style$,
             extraClass: this.className$,
-            errorText: this.error$,
+            errorText: combineLatest([this.error$, this.internalError$]).pipe(
+                map(([err, internalErr]) => err || internalErr)
+            ),
             enabled: this.enabled$,
             type: this.type$,
             placeholder: this.placeholder$,
@@ -189,12 +206,6 @@ export class TextFieldBuilder implements ComponentBuilder {
             input.placeholder = state.placeholder;
 
             // Type handling (password masking)
-            // Note: browser handles password masking for type="password"
-            // If the spec means custom masking logic, we would need to handle it differently.
-            // But usually "password mode" means type="password".
-            // The spec says: "Implement password masking logic (display `*` symbols) when in password mode."
-            // Standard type="password" displays dots/bullets. If it MUST be `*`, we'd need more logic.
-            // Let's assume type="password" is what's intended for standard web components unless specified otherwise.
             input.type = state.type;
             if (state.type === 'password') {
                 input.style.setProperty('-webkit-text-security', 'asterisk');
@@ -240,6 +251,19 @@ export class TextFieldBuilder implements ComponentBuilder {
                 distinctUntilChanged()
             ).subscribe(val => {
                 this.value$?.next(val);
+                
+                // Real-time validation
+                if (this.validators.length > 0) {
+                    let errorMsg = '';
+                    for (const validator of this.validators) {
+                        const result = validator(val);
+                        if (result) {
+                            errorMsg = result;
+                            break;
+                        }
+                    }
+                    this.internalError$.next(errorMsg);
+                }
             });
             registerDestroy(container, () => inputSub.unsubscribe());
         }

@@ -3,8 +3,9 @@ import { BehaviorSubject, combineLatest, of, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { FormBuilder } from '../components/form';
 import { PanelBuilder, PanelGap } from '../components/panel';
-import { ButtonStyle } from '../components/button';
+import { ButtonBuilder, ButtonStyle } from '../components/button';
 import { Alignment, LayoutBuilder } from '../components/layout';
+import { DialogBuilder } from '../components/dialog';
 
 export default {
     title: 'Examples/Forms',
@@ -109,7 +110,7 @@ export const PersonInformationForm = () => {
         .withError(lastNameError$)
         .withStyle(of(TextFieldStyle.TONAL));
 
-    fields.addTextField()
+    fields.addEmailField()
         .withLabel(of('Email'))
         .withPlaceholder(of('example@domain.com'))
         .withValue(email$)
@@ -332,7 +333,7 @@ export const CombinedForm = () => {
         .withError(lastNameError$)
         .withStyle(of(TextFieldStyle.TONAL));
 
-    fields.addTextField(1, 2)
+    fields.addEmailField(1, 2)
         .withLabel(of('Email'))
         .withPlaceholder(of('john.doe@example.com'))
         .withValue(email$)
@@ -403,14 +404,14 @@ export const GlassLoginForm = () => {
         .withDescription(of('Enter your credentials to access your account'));
 
     const fields = form.withFields();
-    fields.addTextField()
+    fields.addEmailField()
         .withLabel(of('Email'))
         .withPlaceholder(of('your@email.com'))
         .withValue(email$)
         .withError(emailError$)
         .withStyle(of(TextFieldStyle.OUTLINED));
 
-    fields.addTextField()
+    fields.addPasswordField()
         .withLabel(of('Password'))
         .withPlaceholder(of('••••••••'))
         .withValue(password$)
@@ -452,19 +453,19 @@ export const GlassSignupForm = () => {
         .withValue(name$)
         .withStyle(of(TextFieldStyle.OUTLINED));
 
-    fields.addTextField(1, 2)
+    fields.addEmailField(1, 2)
         .withLabel(of('Email Address'))
         .withPlaceholder(of('john@example.com'))
         .withValue(email$)
         .withStyle(of(TextFieldStyle.OUTLINED));
 
-    fields.addTextField(1, 1)
+    fields.addPasswordField(1, 1)
         .withLabel(of('Password'))
         .withPlaceholder(of('Min. 8 characters'))
         .withValue(password$)
         .withStyle(of(TextFieldStyle.OUTLINED));
 
-    fields.addTextField(2, 1)
+    fields.addPasswordField(2, 1)
         .withLabel(of('Confirm'))
         .withPlaceholder(of('Repeat password'))
         .withValue(confirmPassword$)
@@ -482,4 +483,102 @@ export const GlassSignupForm = () => {
         .withEnabled(isFormValid$);
 
     return withExampleControls(form, 'max-w-xl', true);
+};
+
+export const GlassRegistrationDialog = () => {
+    // Form state
+    const name$ = new BehaviorSubject('');
+    const email$ = new BehaviorSubject('');
+    const password$ = new BehaviorSubject('');
+
+    // Validation
+    const isFormValid$ = combineLatest([name$, email$, password$]).pipe(
+        map(([n, e, p]) => n.length > 0 && e.includes('@') && p.length >= 8)
+    );
+
+    const showDialog = () => {
+        const form = new FormBuilder()
+            .withDescription(of('Enter your information to create an account.'));
+
+        const fields = form.withFields();
+        fields.addTextField()
+            .withLabel(of('Full Name'))
+            .withPlaceholder(of('John Doe'))
+            .withValue(name$)
+            .withStyle(of(TextFieldStyle.OUTLINED));
+
+        fields.addEmailField()
+            .withLabel(of('Email Address'))
+            .withPlaceholder(of('john@example.com'))
+            .withValue(email$)
+            .withStyle(of(TextFieldStyle.OUTLINED));
+
+        fields.addPasswordField()
+            .withLabel(of('Password'))
+            .withPlaceholder(of('At least 8 characters'))
+            .withValue(password$)
+            .withStyle(of(TextFieldStyle.OUTLINED));
+
+        const dialog = new DialogBuilder()
+            .withCaption(of('Create Account'))
+            .asGlass()
+            .withContent(form);
+
+        const close$ = new Subject<void>();
+        close$.subscribe(() => dialog.close());
+
+        const register$ = new Subject<void>();
+        register$.subscribe(() => {
+            alert(`Successfully registered ${name$.value}!`);
+            dialog.close();
+        });
+
+        const toolbar = dialog.withToolbar();
+        toolbar.addSecondaryButton()
+            .withCaption(of('Cancel'))
+            .withClick(close$);
+
+        toolbar.withPrimaryButton()
+            .withCaption(of('Register'))
+            .withEnabled(isFormValid$)
+            .withClick(register$);
+
+        dialog.show();
+    };
+
+    const container = document.createElement('div');
+    container.className = 'p-10 min-h-[600px] w-full relative overflow-hidden flex items-center justify-center rounded-xl';
+    
+    // Add a colorful background to showcase the glass effect
+    const bg = document.createElement('div');
+    bg.className = 'absolute inset-0 -z-10 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500';
+    container.appendChild(bg);
+
+    // Add some decorative elements
+    for (let i = 0; i < 5; i++) {
+        const circle = document.createElement('div');
+        const size = Math.random() * 150 + 100;
+        circle.className = 'absolute rounded-full opacity-40 blur-2xl';
+        circle.style.width = `${size}px`;
+        circle.style.height = `${size}px`;
+        circle.style.left = `${Math.random() * 100}%`;
+        circle.style.top = `${Math.random() * 100}%`;
+        circle.style.backgroundColor = ['#4F46E5', '#7C3AED', '#DB2777', '#F59E0B', '#10B981'][i % 5];
+        container.appendChild(circle);
+    }
+
+    const btnClick$ = new Subject<void>();
+    btnClick$.subscribe(() => showDialog());
+
+    const btn = new ButtonBuilder()
+        .withCaption(of('Open Registration Dialog'))
+        .withClick(btnClick$)
+        .build();
+    
+    container.appendChild(btn);
+
+    // Auto-open for convenience
+    setTimeout(() => showDialog(), 500);
+
+    return container;
 };
