@@ -104,3 +104,76 @@ export const Scrollable = () => {
     return container;
 };
 
+export const GlassEffect = () => {
+    const container = document.createElement('div');
+    container.className = 'p-10 min-h-[600px] w-full relative overflow-hidden flex items-center justify-center rounded-xl';
+    
+    // Add a colorful background to showcase the glass effect
+    const bg = document.createElement('div');
+    bg.className = 'absolute inset-0 -z-10 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 opacity-50';
+    container.appendChild(bg);
+
+    // Add some decorative elements for blur visibility
+    for (let i = 0; i < 8; i++) {
+        const circle = document.createElement('div');
+        const size = Math.random() * 150 + 100;
+        circle.className = 'absolute rounded-full opacity-40 blur-2xl animate-pulse';
+        circle.style.width = `${size}px`;
+        circle.style.height = `${size}px`;
+        circle.style.left = `${Math.random() * 100}%`;
+        circle.style.top = `${Math.random() * 100}%`;
+        circle.style.backgroundColor = ['#4F46E5', '#7C3AED', '#DB2777', '#F59E0B', '#10B981'][i % 5];
+        circle.style.animationDelay = `${Math.random() * 5}s`;
+        circle.style.animationDuration = `${Math.random() * 5 + 5}s`;
+        container.appendChild(circle);
+    }
+
+    const showDialog = () => {
+        const dialog = new DialogBuilder()
+            .withCaption(of('Glass Effect Dialog'))
+            .withDescription(of('This dialog demonstrates the semi-transparent glass effect with backdrop blur.'))
+            .asGlass()
+            .withContent({
+                build: () => {
+                    const div = document.createElement('div');
+                    div.className = 'flex flex-col gap-4';
+                    div.innerHTML = `
+                        <p class="text-body-medium">The glass effect uses:</p>
+                        <ul class="list-disc list-inside text-body-small space-y-1">
+                            <li><code>bg-white/10</code> for transparency</li>
+                            <li><code>backdrop-blur-md</code> for the blur</li>
+                            <li><code>border-white/20</code> for the subtle edge</li>
+                        </ul>
+                    `;
+                    return div;
+                }
+            });
+
+        const close$ = new Subject<void>();
+        close$.subscribe(() => dialog.close());
+
+        const toolbar = dialog.withToolbar();
+        
+        toolbar.addSecondaryButton()
+            .withCaption(of('Close'))
+            .withClick(close$);
+
+        toolbar.withPrimaryButton()
+            .withCaption(of('Action'))
+            .withClick(close$);
+
+        dialog.show();
+    };
+
+    const btnClick$ = new Subject<void>();
+    btnClick$.subscribe(showDialog);
+
+    const btn = new ButtonBuilder()
+        .withCaption(of('Open Glass Dialog'))
+        .withClick(btnClick$)
+        .build();
+    
+    container.appendChild(btn);
+    return container;
+};
+

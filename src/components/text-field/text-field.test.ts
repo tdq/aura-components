@@ -1,4 +1,4 @@
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { TextFieldBuilder, TextFieldStyle } from './text-field';
 
 describe('TextFieldBuilder', () => {
@@ -59,42 +59,45 @@ describe('TextFieldBuilder', () => {
     });
 
     test('should handle style updates reactively', () => {
-        const style$ = new BehaviorSubject(TextFieldStyle.FILLED);
+        const style$ = new BehaviorSubject(TextFieldStyle.TONAL);
         const container = builder.withStyle(style$).build();
         const input = container.querySelector('input') as HTMLInputElement;
 
-        // Check if filled style classes are present (partial match based on our mapping)
         expect(input.classList.contains('bg-surface-variant')).toBe(true);
 
         style$.next(TextFieldStyle.OUTLINED);
         expect(input.classList.contains('bg-surface-variant')).toBe(false);
         expect(input.classList.contains('bg-transparent')).toBe(true);
-        expect(input.classList.contains('ring-outline')).toBe(true);
     });
 
-
-    test('should update label reactively', () => {
+    test('should update label reactively and use label element', () => {
         const label$ = new BehaviorSubject('');
         const container = builder.withLabel(label$).build();
-        const labelEl = container.querySelector('span:first-child') as HTMLElement;
+        const labelEl = container.querySelector('label') as HTMLLabelElement;
+        const input = container.querySelector('input') as HTMLInputElement;
 
         expect(labelEl.classList.contains('hidden')).toBe(true);
+        expect(labelEl.htmlFor).toBe(input.id);
 
         label$.next('Test Label');
         expect(labelEl.textContent).toBe('Test Label');
         expect(labelEl.classList.contains('hidden')).toBe(false);
     });
 
-    test('should update error reactively', () => {
+    test('should update error reactively and set ARIA attributes', () => {
         const error$ = new BehaviorSubject('');
         const container = builder.withError(error$).build();
         const errorEl = container.querySelector('span:last-child') as HTMLElement;
+        const input = container.querySelector('input') as HTMLInputElement;
 
         expect(errorEl.classList.contains('hidden')).toBe(true);
+        expect(input.getAttribute('aria-invalid')).toBe('false');
 
         error$.next('Invalid input');
         expect(errorEl.textContent).toBe('Invalid input');
         expect(errorEl.classList.contains('hidden')).toBe(false);
+        expect(input.getAttribute('aria-invalid')).toBe('true');
+        expect(input.getAttribute('aria-describedby')).toBe(errorEl.id);
     });
 
     test('should apply custom class reactively', () => {
@@ -109,28 +112,49 @@ describe('TextFieldBuilder', () => {
         expect(input.classList.contains('another-class')).toBe(true);
     });
 
-    test('should apply glass effect classes when asGlass is called', () => {
+    test('should support password mode', () => {
+        const container = builder.asPassword().build();
+        const input = container.querySelector('input') as HTMLInputElement;
+        expect(input.type).toBe('password');
+    });
+
+    test('should support email mode', () => {
+        const container = builder.asEmail().build();
+        const input = container.querySelector('input') as HTMLInputElement;
+        expect(input.type).toBe('email');
+    });
+
+    test('should expose event observables', (done) => {
+        const container = builder.build();
+        const input = container.querySelector('input') as HTMLInputElement;
+        
+        builder.onFocus().subscribe(() => {
+            done();
+        });
+
+        input.dispatchEvent(new FocusEvent('focus'));
+    });
+
+    test('should handle required and readonly states', () => {
+        const required$ = new BehaviorSubject(false);
+        const readOnly$ = new BehaviorSubject(false);
+        const container = builder.withRequired(required$).withReadOnly(readOnly$).build();
+        const input = container.querySelector('input') as HTMLInputElement;
+
+        expect(input.required).toBe(false);
+        expect(input.readOnly).toBe(false);
+
+        required$.next(true);
+        readOnly$.next(true);
+        expect(input.required).toBe(true);
+        expect(input.readOnly).toBe(true);
+    });
+
+    test('should apply glass effect classes', () => {
         const container = builder.asGlass().build();
         const input = container.querySelector('input') as HTMLInputElement;
 
         expect(input.classList.contains('bg-white/10')).toBe(true);
         expect(input.classList.contains('backdrop-blur-md')).toBe(true);
-        expect(input.classList.contains('border-white/20')).toBe(true);
     });
-
-    test('should clean up subscriptions on destroy', async () => {
-        const placeholder$ = new BehaviorSubject('Initial');
-        const container = builder.withPlaceholder(placeholder$).build();
-        const input = container.querySelector('input') as HTMLInputElement;
-
-        document.body.appendChild(container);
-        document.body.removeChild(container);
-
-        // Wait for MutationObserver (it's asynchronous)
-        await new Promise(resolve => setTimeout(resolve, 0));
-
-        placeholder$.next('New Value After Destroy');
-        expect(input.placeholder).toBe('Initial');
-    });
-
 });

@@ -44,9 +44,10 @@ describe('DialogBuilder', () => {
         expect(dialog).toHaveClass('w-[75vw]');
     });
 
-    it('should apply base classes including border radius', () => {
+    it('should apply base classes including border radius and white backdrop', () => {
         const dialog = new DialogBuilder().build();
         expect(dialog).toHaveClass('rounded-large');
+        expect(dialog).toHaveClass('backdrop:bg-white/50');
     });
 
     it('should apply constant gap classes to content container', () => {
@@ -64,6 +65,19 @@ describe('DialogBuilder', () => {
 
         const content = dialog.querySelector('.flex-1');
         expect(content).toHaveClass('overflow-y-auto');
+    });
+
+    it('should apply glass classes when asGlass is called', () => {
+        const dialog = new DialogBuilder()
+            .asGlass()
+            .build();
+
+        expect(dialog).toHaveClass('bg-white/10');
+        expect(dialog).toHaveClass('backdrop-blur-md');
+        expect(dialog).toHaveClass('border');
+        expect(dialog).toHaveClass('border-white/20');
+        expect(dialog).not.toHaveClass('bg-surface');
+        expect(dialog).not.toHaveClass('border-none');
     });
 
     it('should apply height reactively', () => {
@@ -84,6 +98,21 @@ describe('DialogBuilder', () => {
         
         const dialog = dialogBuilder.build();
         expect(dialog.querySelector('button')?.textContent).toBe('OK');
+    });
+
+    it('should apply glass classes to toolbar when asGlass is called', () => {
+        const dialogBuilder = new DialogBuilder().asGlass();
+        dialogBuilder.withToolbar().withPrimaryButton().withCaption(of('OK'));
+        
+        const dialog = dialogBuilder.build();
+        const toolbarWrapper = dialog.querySelector('.flex-none.px-6.py-4:last-child');
+        expect(toolbarWrapper).toHaveClass('bg-white/5');
+        expect(toolbarWrapper).toHaveClass('border-t');
+        expect(toolbarWrapper).toHaveClass('border-white/10');
+
+        const button = toolbarWrapper?.querySelector('button');
+        // Button glass effect adds bg-white/10
+        expect(button).toHaveClass('bg-white/10');
     });
 
     it('should apply custom class reactively', () => {

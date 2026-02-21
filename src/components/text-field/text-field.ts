@@ -1,11 +1,12 @@
-import { Observable, Subject, combineLatest, of } from 'rxjs';
+import { Observable, Subject, combineLatest, of, fromEvent } from 'rxjs';
+import { map, startWith, distinctUntilChanged, tap } from 'rxjs/operators';
 import { ComponentBuilder } from '../../core/component-builder';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { registerDestroy } from '@/core/destroyable-element';
 
 export enum TextFieldStyle {
-    FILLED = 'filled',
+    TONAL = 'tonal',
     OUTLINED = 'outlined'
 }
 
@@ -13,23 +14,65 @@ function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
+let nextId = 0;
+const generateId = () => `text-field-${nextId++}`;
+
 const STYLE_MAP: Record<TextFieldStyle, string> = {
-    [TextFieldStyle.FILLED]: 'bg-surface-variant rounded-t-small shadow-[inset_0_-1px_0_0_var(--md-sys-color-outline-variant)] focus:shadow-[inset_0_-2px_0_0_var(--md-sys-color-primary)]',
-    [TextFieldStyle.OUTLINED]: 'bg-transparent rounded-small ring-1 ring-inset ring-outline focus:ring-2 focus:ring-inset focus:ring-primary',
+    [TextFieldStyle.TONAL]: 'bg-surface-variant rounded-t-small outline outline-1 -outline-offset-1 outline-outline-variant focus:outline-2 focus:outline-primary',
+    [TextFieldStyle.OUTLINED]: 'bg-transparent rounded-small outline outline-1 -outline-offset-1 outline-outline focus:outline-2 focus:outline-primary',
 };
 
 export class TextFieldBuilder implements ComponentBuilder {
     private value$?: Subject<string>;
-    private placeholder$?: Observable<string>;
-    private enabled$?: Observable<boolean>;
-    private style$?: Observable<TextFieldStyle>;
-    private error$?: Observable<string>;
-    private label$?: Observable<string>;
-    private className$?: Observable<string>;
+    private placeholder$ = of('');
+    private enabled$ = of(true);
+    private style$ = of(TextFieldStyle.TONAL);
+    private error$ = of('');
+    private label$ = of('');
+    private className$ = of('');
     private isGlass: boolean = false;
+    private type$ = of('text');
+    private name$ = of('');
+    private required$ = of(false);
+    private readOnly$ = of(false);
+    private autocomplete$ = of('off');
+
+    private focusSubject = new Subject<FocusEvent>();
+    private blurSubject = new Subject<FocusEvent>();
+    private changeSubject = new Subject<Event>();
 
     asGlass(isGlass: boolean = true): TextFieldBuilder {
         this.isGlass = isGlass;
+        return this;
+    }
+
+    asPassword(): TextFieldBuilder {
+        this.type$ = of('password');
+        return this;
+    }
+
+    asEmail(): TextFieldBuilder {
+        this.type$ = of('email');
+        return this;
+    }
+
+    withName(name: string): TextFieldBuilder {
+        this.name$ = of(name);
+        return this;
+    }
+
+    withRequired(required: Observable<boolean> = of(true)): TextFieldBuilder {
+        this.required$ = required;
+        return this;
+    }
+
+    withReadOnly(readOnly: Observable<boolean> = of(true)): TextFieldBuilder {
+        this.readOnly$ = readOnly;
+        return this;
+    }
+
+    withAutocomplete(autocomplete: string): TextFieldBuilder {
+        this.autocomplete$ = of(autocomplete);
         return this;
     }
 
@@ -68,86 +111,150 @@ export class TextFieldBuilder implements ComponentBuilder {
         return this;
     }
 
-    build(): HTMLElement {
-        const container = document.createElement('div');
-        container.className = 'flex flex-col gap-px-4 w-full';
+    onFocus(): Observable<FocusEvent> {
+        return this.focusSubject.asObservable();
+    }
 
-        const label = document.createElement('span');
-        label.className = 'md-label-small text-on-surface-variant px-px-16 hidden';
+    onBlur(): Observable<FocusEvent> {
+        return this.blurSubject.asObservable();
+    }
+
+    onChange(): Observable<Event> {
+        return this.changeSubject.asObservable();
+    }
+
+    private getValidationClasses(error: string): string {
+        if (!error) return '';
+        return 'outline-error focus:outline-error';
+    }
+
+    build(): HTMLElement {
+        const id = generateId();
+        const errorId = `${id}-error`;
+
+        const container = document.createElement('div');
+        container.className = 'flex flex-col gap-1 w-full';
+
+        const label = document.createElement('label');
+        label.htmlFor = id;
+        label.className = 'md-label-small text-on-surface-variant px-4 hidden';
         container.appendChild(label);
 
         const input = document.createElement('input');
-        input.type = 'text';
+        input.id = id;
         input.className = cn(
-            'px-px-16 py-px-12 w-full outline-none transition-all body-large placeholder:text-on-surface-variant text-on-surface',
+            'px-4 py-3 w-full outline-none transition-all body-large placeholder:text-on-surface-variant text-on-surface',
             'disabled:opacity-38 disabled:cursor-not-allowed'
         );
         container.appendChild(input);
 
         const error = document.createElement('span');
-        error.className = 'md-label-small text-error px-px-16 hidden';
+        error.id = errorId;
+        error.className = 'md-label-small text-error px-4 hidden';
+        error.setAttribute('aria-live', 'polite');
         container.appendChild(error);
 
-        const placeholderSub = this.placeholder$?.subscribe(placeholder => {
-            input.placeholder = placeholder;
+        // Visual state stream
+        const visualState$ = combineLatest({
+            style: this.style$,
+            extraClass: this.className$,
+            errorText: this.error$,
+            enabled: this.enabled$,
+            type: this.type$,
+            placeholder: this.placeholder$,
+            label: this.label$,
+            name: this.name$,
+            required: this.required$,
+            readOnly: this.readOnly$,
+            autocomplete: this.autocomplete$
         });
 
-        const enabledSub = this.enabled$?.subscribe(enabled => {
-            input.disabled = !enabled;
-        });
+        const visualSub = visualState$.subscribe(state => {
+            // Update label
+            label.textContent = state.label;
+            label.classList.toggle('hidden', !state.label);
 
-        const style$ = this.style$ || of(TextFieldStyle.FILLED);
-        const className$ = this.className$ || of('');
-        const error$ = this.error$ || of('');
+            // Update error
+            error.textContent = state.errorText;
+            error.classList.toggle('hidden', !state.errorText);
+            
+            // A11y
+            input.setAttribute('aria-invalid', state.errorText ? 'true' : 'false');
+            input.setAttribute('aria-describedby', state.errorText ? errorId : '');
+            input.disabled = !state.enabled;
+            input.required = state.required;
+            input.readOnly = state.readOnly;
+            input.name = state.name;
+            input.setAttribute('autocomplete', state.autocomplete);
+            input.placeholder = state.placeholder;
 
-        const combinedSub = combineLatest([style$, className$, error$]).subscribe(([style, extraClass, errorText]) => {
-            const BASE_INPUT_CLASSES = 'px-px-16 py-px-12 w-full outline-none transition-all body-large placeholder:text-on-surface-variant text-on-surface disabled:opacity-38 disabled:cursor-not-allowed';
+            // Type handling (password masking)
+            // Note: browser handles password masking for type="password"
+            // If the spec means custom masking logic, we would need to handle it differently.
+            // But usually "password mode" means type="password".
+            // The spec says: "Implement password masking logic (display `*` symbols) when in password mode."
+            // Standard type="password" displays dots/bullets. If it MUST be `*`, we'd need more logic.
+            // Let's assume type="password" is what's intended for standard web components unless specified otherwise.
+            input.type = state.type;
+            if (state.type === 'password') {
+                input.style.setProperty('-webkit-text-security', 'asterisk');
+            } else {
+                input.style.removeProperty('-webkit-text-security');
+            }
+
+            // Styling
+            const baseClasses = 'px-4 py-3 w-full outline-none transition-all body-large placeholder:text-on-surface-variant text-on-surface disabled:opacity-38 disabled:cursor-not-allowed';
+            const validationClasses = this.getValidationClasses(state.errorText);
             
             input.className = cn(
-                BASE_INPUT_CLASSES,
-                extraClass,
-                !!errorText && 'ring-error focus:ring-error shadow-[inset_0_-1px_0_0_var(--md-sys-color-error)] focus:shadow-[inset_0_-2px_0_0_var(--md-sys-color-error)]'
+                baseClasses,
+                state.extraClass,
+                validationClasses
             );
-
-            error.textContent = errorText;
-            error.classList.toggle('hidden', !errorText);
 
             if (this.isGlass) {
                 input.classList.add('bg-white/10', 'backdrop-blur-md', 'border', 'border-white/20', 'focus:bg-white/20');
-                if (style === TextFieldStyle.OUTLINED) {
+                if (state.style === TextFieldStyle.OUTLINED) {
                     input.classList.add('rounded-small');
                 } else {
                     input.classList.add('rounded-t-small');
                 }
             } else {
-                STYLE_MAP[style].split(' ').forEach(c => input.classList.add(c));
+                STYLE_MAP[state.style].split(' ').forEach(c => input.classList.add(c));
             }
         });
 
-        const valueSub = this.value$?.subscribe(val => {
-            if (input.value !== val) {
-                input.value = val;
-            }
-        });
-
-        const labelSub = this.label$?.subscribe(text => {
-            label.textContent = text;
-            label.classList.toggle('hidden', !text);
-        });
-
+        // Value handling
+        let valueSub: { unsubscribe: () => void } | undefined;
         if (this.value$) {
-            input.oninput = (e) => {
-                const target = e.target as HTMLInputElement;
-                this.value$?.next(target.value);
-            };
+            valueSub = this.value$.pipe(
+                distinctUntilChanged()
+            ).subscribe(val => {
+                if (input.value !== val) {
+                    input.value = val;
+                }
+            });
+
+            const inputSub = fromEvent(input, 'input').pipe(
+                map(e => (e.target as HTMLInputElement).value),
+                distinctUntilChanged()
+            ).subscribe(val => {
+                this.value$?.next(val);
+            });
+            registerDestroy(container, () => inputSub.unsubscribe());
         }
 
+        // Event handling
+        const focusSub = fromEvent<FocusEvent>(input, 'focus').subscribe(e => this.focusSubject.next(e));
+        const blurSub = fromEvent<FocusEvent>(input, 'blur').subscribe(e => this.blurSubject.next(e));
+        const changeSub = fromEvent<Event>(input, 'change').subscribe(e => this.changeSubject.next(e));
+
         registerDestroy(container, () => {
-            placeholderSub?.unsubscribe();
-            enabledSub?.unsubscribe();
-            combinedSub.unsubscribe();
+            visualSub.unsubscribe();
             valueSub?.unsubscribe();
-            labelSub?.unsubscribe();
+            focusSub.unsubscribe();
+            blurSub.unsubscribe();
+            changeSub.unsubscribe();
         });
 
         return container;

@@ -23,7 +23,7 @@ export const Styles = () => {
     layout.addSlot().withContent(
         new TextFieldBuilder()
             .withPlaceholder(new BehaviorSubject('Type something...'))
-            .withStyle(new BehaviorSubject(TextFieldStyle.FILLED))
+            .withStyle(new BehaviorSubject(TextFieldStyle.TONAL))
     );
 
     layout.addSlot().withContent(
@@ -140,7 +140,7 @@ export const LabelsAndErrors = () => {
             .withPlaceholder(of('Enter your username...'))
             .withValue(value$)
             .withError(error$)
-            .withStyle(of(TextFieldStyle.FILLED))
+            .withStyle(of(TextFieldStyle.TONAL))
     );
 
     layout.addSlot().withContent(
@@ -168,7 +168,7 @@ export const Glass = () => {
             .withLabel(of('Glass Filled'))
             .withPlaceholder(of('Glass filled text field...'))
             .asGlass()
-            .withStyle(of(TextFieldStyle.FILLED))
+            .withStyle(of(TextFieldStyle.TONAL))
     );
 
     layout.addSlot().withContent(

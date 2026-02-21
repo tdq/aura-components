@@ -8,6 +8,7 @@ It has the following methods:
 - asScrollable(): this - sets content of the dialog scrollable.
 - withHeight(height: Observable<number>): this - if defined then limits height of the dialog. Otherwise height is defined by the content.
 - withToolbar(): ToolbarBuilder - defines toolbar in the dialog.
+- asGlass(): this - sets special styling option for dialog and its content as transparent with blur background (glass effect). 
 
 DialogSize is an enum with values:
 - SMALL. 30vw
@@ -29,3 +30,5 @@ Toolbar should be on the bottom of the dialog.
 Only content is scrollable.
 Dialog drops large shadow.
 Dialog border radius is rounded-large.
+Glass effect applied also for toolbar.
+Backdrop color is white with 50% opacity.

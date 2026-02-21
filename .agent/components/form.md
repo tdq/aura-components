@@ -16,6 +16,8 @@ It has the folowing methods:
 - addComboBoxField(column?: number, colspan?: number): ComboBoxBuilder - adds dropdown field component into the form.
 - addDatePickerField(column?: number, colspan?: number): DatePickerBuilder - adds datepicker component into the form.
 - addCheckBox(column?: number, colspan?: number): CheckBoxBuilder - adds checkbox field component into the form.
+- addPasswordField(column?: number, colspan?: number): TextFieldBuilder - adds password field into the form.
+- addEmailField(column?: number, colspan?: number): TextFieldBuilder - adds email field with validation into the form.
 
 "column" - defines number of column in which this component should be displayed.
 "colspan" - defines amount of columns this component takes (width in columns amount).
@@ -28,4 +30,4 @@ FormBuilder should use LayoutBuilder as a basis.
 LayoutBuilder should have large gap.
 Form error message should be displayed above toolbar.
 Toolbar should be on the bottom of the form.
-Glass effect applied only for fields and toolbar. Form itself is not affected by glass effect.
+Glass effect applied only for fields and toolbar. **Form itself is not affected by glass effect**.

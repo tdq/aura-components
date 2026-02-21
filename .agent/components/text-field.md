@@ -7,11 +7,16 @@ It has the folowing methods:
 - withError(error: Observable<string>): this - sets error of the text field.
 - withLabel(label: Observable<string>): this - sets label of the text field.
 - withClass(className: Observable<string>): this - sets class css name of the text field.
-- asGlass(): this - sets special styling option for textfield and its popup with items as transparent with blur background (glass effect). 
+- asGlass(): this - sets special styling option for textfield and its popup with items as transparent with blur background (glass effect).
+- asPassword(): this - sets special behavior for inputing password.
+- asEmail(): this - sets special behavior for inputing emails.
 
 TextField style is an enum with the following values:
 - tonal
 - outlined
+
+## Requirements
+At password mode it should display "*" symbols instead of actual text.
 
 ## Style
 Style according to Material Design 3 

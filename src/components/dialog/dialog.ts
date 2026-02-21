@@ -35,6 +35,7 @@ export class DialogBuilder implements ComponentBuilder, PopupBuilder {
     private height$?: Observable<number>;
     private toolbarBuilder?: ToolbarBuilder;
     private element?: HTMLDialogElement;
+    private isGlass: boolean = false;
 
     withCaption(caption: Observable<string>): this {
         this.caption$ = caption;
@@ -63,6 +64,11 @@ export class DialogBuilder implements ComponentBuilder, PopupBuilder {
 
     asScrollable(): this {
         this.isScrollable = true;
+        return this;
+    }
+
+    asGlass(): this {
+        this.isGlass = true;
         return this;
     }
 
@@ -105,10 +111,16 @@ export class DialogBuilder implements ComponentBuilder, PopupBuilder {
         }
 
         const dialog = document.createElement('dialog');
-        dialog.className = cn(
-            'bg-surface text-on-surface rounded-large elevation-5 flex flex-col overflow-hidden border-none p-0 backdrop:bg-black/50',
+        
+        const getBaseClasses = () => cn(
+            this.isGlass
+                ? 'bg-white/10 backdrop-blur-md border border-white/20'
+                : 'bg-surface border-none',
+            'text-on-surface rounded-large elevation-5 flex flex-col overflow-hidden p-0 backdrop:bg-white/50',
             DIALOG_SIZE_MAP[this.size]
         );
+
+        dialog.className = getBaseClasses();
 
         // Header
         const headerBuilder = new LayoutBuilder()
@@ -149,9 +161,15 @@ export class DialogBuilder implements ComponentBuilder, PopupBuilder {
 
         // Toolbar
         if (this.toolbarBuilder) {
+            if (this.isGlass) {
+                this.toolbarBuilder.asGlass();
+            }
             const toolbar = this.toolbarBuilder.build();
             const toolbarWrapper = document.createElement('div');
-            toolbarWrapper.className = 'flex-none px-6 py-4';
+            toolbarWrapper.className = cn(
+                'flex-none px-6 py-4',
+                this.isGlass && 'bg-white/5 border-t border-white/10'
+            );
             toolbarWrapper.appendChild(toolbar);
             dialog.appendChild(toolbarWrapper);
         }
@@ -168,8 +186,7 @@ export class DialogBuilder implements ComponentBuilder, PopupBuilder {
         if (this.className$) {
             const sub = this.className$.subscribe(cls => {
                 dialog.className = cn(
-                    'bg-surface text-on-surface rounded-large elevation-5 flex flex-col overflow-hidden border-none p-0 backdrop:bg-black/50',
-                    DIALOG_SIZE_MAP[this.size],
+                    getBaseClasses(),
                     cls
                 );
             });

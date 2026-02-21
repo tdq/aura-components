@@ -4,7 +4,7 @@ import { map } from 'rxjs/operators';
 import { FormBuilder } from '../components/form';
 import { PanelBuilder, PanelGap } from '../components/panel';
 import { ButtonStyle } from '../components/button';
-import { LayoutBuilder } from '../components/layout';
+import { Alignment, LayoutBuilder } from '../components/layout';
 
 export default {
     title: 'Examples/Forms',
@@ -24,7 +24,9 @@ const withExampleControls = (form: FormBuilder, maxWidthClass: string = 'max-w-m
             : 'p-px-48 min-h-screen -m-px-16 gap-px-24 bg-surface'
         ));
 
-    layout.addSlot().withContent(panel);
+    layout.addSlot()
+        .withAlignment(of(Alignment.CENTER))
+        .withContent(panel);
 
     return layout.build();
 };
@@ -98,28 +100,28 @@ export const PersonInformationForm = () => {
         .withPlaceholder(of('Enter your first name'))
         .withValue(firstName$)
         .withError(firstNameError$)
-        .withStyle(of(TextFieldStyle.FILLED));
+        .withStyle(of(TextFieldStyle.TONAL));
 
     fields.addTextField()
         .withLabel(of('Last Name'))
         .withPlaceholder(of('Enter your last name'))
         .withValue(lastName$)
         .withError(lastNameError$)
-        .withStyle(of(TextFieldStyle.FILLED));
+        .withStyle(of(TextFieldStyle.TONAL));
 
     fields.addTextField()
         .withLabel(of('Email'))
         .withPlaceholder(of('example@domain.com'))
         .withValue(email$)
         .withError(emailError$)
-        .withStyle(of(TextFieldStyle.FILLED));
+        .withStyle(of(TextFieldStyle.TONAL));
 
     fields.addTextField()
         .withLabel(of('Phone (Optional)'))
         .withPlaceholder(of('+1 (555) 123-4567'))
         .withValue(phone$)
         .withError(phoneError$)
-        .withStyle(of(TextFieldStyle.FILLED));
+        .withStyle(of(TextFieldStyle.TONAL));
 
     const toolbar = form.withToolbar();
     toolbar.addSecondaryButton()
@@ -321,21 +323,21 @@ export const CombinedForm = () => {
         .withPlaceholder(of('John'))
         .withValue(firstName$)
         .withError(firstNameError$)
-        .withStyle(of(TextFieldStyle.FILLED));
+        .withStyle(of(TextFieldStyle.TONAL));
 
     fields.addTextField(2, 1)
         .withLabel(of('Last Name'))
         .withPlaceholder(of('Doe'))
         .withValue(lastName$)
         .withError(lastNameError$)
-        .withStyle(of(TextFieldStyle.FILLED));
+        .withStyle(of(TextFieldStyle.TONAL));
 
     fields.addTextField(1, 2)
         .withLabel(of('Email'))
         .withPlaceholder(of('john.doe@example.com'))
         .withValue(email$)
         .withError(emailError$)
-        .withStyle(of(TextFieldStyle.FILLED));
+        .withStyle(of(TextFieldStyle.TONAL));
 
     fields.addHeading(1, 2).withCaption(of('Address'));
 
@@ -344,21 +346,21 @@ export const CombinedForm = () => {
         .withPlaceholder(of('123 Main St'))
         .withValue(street$)
         .withError(streetError$)
-        .withStyle(of(TextFieldStyle.FILLED));
+        .withStyle(of(TextFieldStyle.TONAL));
 
     fields.addTextField(1, 1)
         .withLabel(of('City'))
         .withPlaceholder(of('New York'))
         .withValue(city$)
         .withError(cityError$)
-        .withStyle(of(TextFieldStyle.FILLED));
+        .withStyle(of(TextFieldStyle.TONAL));
 
     fields.addTextField(2, 1)
         .withLabel(of('ZIP Code'))
         .withPlaceholder(of('10001'))
         .withValue(zipCode$)
         .withError(zipCodeError$)
-        .withStyle(of(TextFieldStyle.FILLED));
+        .withStyle(of(TextFieldStyle.TONAL));
 
     const toolbar = form.withToolbar();
     toolbar.withPrimaryButton()
