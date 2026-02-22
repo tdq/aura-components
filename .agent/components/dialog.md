@@ -31,4 +31,4 @@ Only content is scrollable.
 Dialog drops large shadow.
 Dialog border radius is rounded-large.
 Glass effect applied also for toolbar.
-Backdrop color is white with 50% opacity.
+Backdrop is totaly transparent.

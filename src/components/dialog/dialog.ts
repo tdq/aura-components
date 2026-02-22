@@ -116,7 +116,7 @@ export class DialogBuilder implements ComponentBuilder, PopupBuilder {
             this.isGlass
                 ? 'glass-effect'
                 : 'bg-surface border-none',
-            'text-on-surface rounded-large elevation-5 flex flex-col overflow-hidden p-0 backdrop:bg-white/50',
+            'text-on-surface rounded-large elevation-5 flex flex-col overflow-hidden p-0 backdrop:bg-transparent',
             DIALOG_SIZE_MAP[this.size]
         );
 
