@@ -11,7 +11,7 @@ export { ComboBoxStyle };
 
 export class ComboBoxBuilder<ITEM> implements ComponentBuilder {
     private items$?: Observable<ITEM[]>;
-    private value$?: Subject<ITEM | null>;
+    private value$: Subject<ITEM | null> = new Subject<ITEM | null>();
     private itemCaptionProvider: (item: ITEM) => string = (item) => String(item);
     private itemIdProvider: (item: ITEM) => string | number = (item) => String(item);
     private placeholder?: string;

@@ -5,7 +5,7 @@ It has the following methods:
 - withClick(click: Subject<void>): this - sets click event of the button.
 - withStyle(style: Observable<ButtonStyle>): this - sets style of the button.
 - withClass(className: Observable<string>): this - sets class css name of the button.
-- asGlass(): this - sets special styling option for button and its popup with items as transparent with blur background (glass effect). 
+- asGlass(): this - sets special styling option for button as transparent with blur background (glass effect). 
 
 Button style is an enum with the following values:
 - filled
