@@ -9,20 +9,20 @@ The "glass effect" is characterized by a semi-transparent background with a back
 ### Glass Effect Classes
 
 #### Light Theme
-- **Background**: `bg-white/40`
-- **Blur**: `backdrop-blur-md`
-- **Border**: `border-primary/20`
-- **Label Color**: `text-on-primary-container` (Dark Blue)
-- **Caption Color**: `text-on-primary-container` (Dark Blue)
-- **Description Color**: `text-on-primary-container` (Dark Blue)
+- **Background**: `bg-white/60`
+- **Blur**: `backdrop-blur-xl`
+- **Border**: `ring-1 ring-black/10`
+- **Label Color**: `text-gray-900`
+- **Caption Color**: `text-gray-700`
+- **Description Color**: `text-gray-600`
 
 #### Dark Theme
 - **Background**: `bg-white/10`
-- **Blur**: `backdrop-blur-md`
-- **Border**: `border-white/20`
-- **Label Color**: `text-white` (White)
-- **Caption Color**: `text-white` (White)
-- **Description Color**: `text-white` (White)
+- **Blur**: `backdrop-blur-xl`
+- **Border**: `ring-1 ring-white/20`
+- **Label Color**: `text-white`
+- **Caption Color**: `text-white/80`
+- **Description Color**: `text-white/60`
 
 ## 2. Component Changes
 

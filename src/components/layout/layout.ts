@@ -132,6 +132,7 @@ export class LayoutBuilder implements ComponentBuilder {
     private gap: LayoutGap = LayoutGap.MEDIUM;
     private alignment$?: Observable<Alignment>;
     private className$?: Observable<string>;
+    private isGlass = false;
 
     addSlot(): SlotBuilder {
         const slot = new SlotBuilderImpl();
@@ -164,6 +165,11 @@ export class LayoutBuilder implements ComponentBuilder {
         return this;
     }
 
+    withGlass(): LayoutBuilder {
+        this.isGlass = true;
+        return this;
+    }
+
     build(): HTMLElement {
         const container = document.createElement('div');
         
@@ -176,6 +182,7 @@ export class LayoutBuilder implements ComponentBuilder {
                 this.isVertical ? 'flex-col' : 'flex-row',
                 GAP_MAP[this.gap],
                 alignment && !this.isVertical && ALIGNMENT_MAP[alignment as Alignment],
+                this.isGlass && 'glass-effect p-4 rounded-large',
                 cls
             );
         });

@@ -386,7 +386,7 @@ export class TextFieldBuilder implements ComponentBuilder {
             );
 
             if (this.isGlass) {
-                inputWrapper.classList.add('glass-effect', 'focus-within:bg-white/20');
+                inputWrapper.classList.add('glass-effect', 'focus-within:bg-white/20', 'dark:focus-within:bg-white/20');
                 if (state.style === TextFieldStyle.OUTLINED) {
                     inputWrapper.classList.add('rounded-small');
                 } else {
@@ -395,38 +395,46 @@ export class TextFieldBuilder implements ComponentBuilder {
                 activeIndicator.classList.add('hidden');
 
                 // Apply glass text colors
-                const glassTextClasses = ['text-on-primary-container', 'dark:text-white'];
-                const standardTextClasses = ['text-on-surface', 'text-on-surface-variant'];
+                // Label: text-gray-900 (light) / text-white (dark)
+                label.classList.remove('text-on-surface-variant', 'text-primary');
+                label.classList.add('text-gray-900', 'dark:text-white');
 
-                [label, input, prefix, suffix, leadingIconContainer, trailingIconContainer, supportText, charCounter].forEach(el => {
-                    el.classList.remove(...standardTextClasses);
-                    el.classList.add(...glassTextClasses);
+                // Input text: text-gray-900 (light) / text-white (dark)
+                input.classList.remove('text-on-surface');
+                input.classList.add('text-gray-900', 'dark:text-white');
+
+                // Caption (Helper Text): text-gray-700 (light) / text-white/80 (dark)
+                supportText.classList.remove('text-on-surface-variant');
+                supportText.classList.add('text-gray-700', 'dark:text-white/80');
+
+                // Description (Prefix/Suffix/Counter/Icons): text-gray-600 (light) / text-white/60 (dark)
+                const descClasses = ['text-gray-600', 'dark:text-white/60'];
+                [prefix, suffix, charCounter, leadingIconContainer, trailingIconContainer].forEach(el => {
+                    el.classList.remove('text-on-surface-variant');
+                    el.classList.add(...descClasses);
                 });
-
-                // Ensure label uses glass color even when focused/error unless specifically needed otherwise
-                if (!state.errorText) {
-                    label.classList.remove('text-primary'); // Remove focus color
-                }
 
             } else {
                 STYLE_MAP[state.style].split(' ').forEach(c => inputWrapper.classList.add(c));
                 
                 // Revert text colors
-                const glassTextClasses = ['text-on-primary-container', 'dark:text-white'];
+                const glassLabelClasses = ['text-gray-900', 'dark:text-white'];
+                const glassCaptionClasses = ['text-gray-700', 'dark:text-white/80'];
+                const glassDescClasses = ['text-gray-600', 'dark:text-white/60'];
                 
                 // Reset specific elements to their defaults
-                label.classList.remove(...glassTextClasses);
+                label.classList.remove(...glassLabelClasses);
                 label.classList.add('text-on-surface-variant');
 
-                input.classList.remove(...glassTextClasses);
+                input.classList.remove(...glassLabelClasses);
                 input.classList.add('text-on-surface');
 
                 [prefix, suffix, leadingIconContainer, trailingIconContainer, charCounter].forEach(el => {
-                    el.classList.remove(...glassTextClasses);
+                    el.classList.remove(...glassDescClasses);
                     el.classList.add('text-on-surface-variant');
                 });
 
-                supportText.classList.remove(...glassTextClasses);
+                supportText.classList.remove(...glassCaptionClasses);
                 if (!state.errorText) {
                     supportText.classList.add('text-on-surface-variant');
                 }

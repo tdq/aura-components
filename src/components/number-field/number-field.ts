@@ -240,7 +240,8 @@ export class NumberFieldBuilder implements ComponentBuilder {
                 inputWrapper.classList.remove('bg-surface-variant', 'bg-transparent', 'rounded-small', 'rounded-t-small', 'shadow-[inset_0_-1px_0_0_var(--md-sys-color-outline-variant)]', 'focus-within:shadow-[inset_0_-2px_0_0_var(--md-sys-color-primary)]', 'ring-1', 'ring-inset', 'ring-outline', 'focus-within:ring-2', 'focus-within:ring-primary', 'glass-effect', 'focus-within:bg-white/20');
 
                 // Define text color classes
-                const glassTextClasses = ['text-on-primary-container', 'dark:text-white'];
+                const glassLabelInputClasses = ['text-gray-900', 'dark:text-white'];
+                const glassAffixClasses = ['text-gray-600', 'dark:text-white/60'];
                 const standardLabelClasses = ['text-on-surface-variant'];
                 const standardInputClasses = ['text-on-surface'];
                 const standardAffixClasses = ['text-on-surface-variant'];
@@ -255,14 +256,14 @@ export class NumberFieldBuilder implements ComponentBuilder {
 
                     // Apply glass text colors
                     label.classList.remove(...standardLabelClasses);
-                    label.classList.add(...glassTextClasses);
+                    label.classList.add(...glassLabelInputClasses);
 
                     input.classList.remove(...standardInputClasses);
-                    input.classList.add(...glassTextClasses);
+                    input.classList.add(...glassLabelInputClasses);
 
                     [prefix, suffix].forEach(el => {
                         el.classList.remove(...standardAffixClasses);
-                        el.classList.add(...glassTextClasses);
+                        el.classList.add(...glassAffixClasses);
                     });
 
                     // For error/description, if we want it same as label color in glass mode
@@ -285,14 +286,14 @@ export class NumberFieldBuilder implements ComponentBuilder {
                     });
 
                     // Revert text colors
-                    label.classList.remove(...glassTextClasses);
+                    label.classList.remove(...glassLabelInputClasses);
                     label.classList.add(...standardLabelClasses);
 
-                    input.classList.remove(...glassTextClasses);
+                    input.classList.remove(...glassLabelInputClasses);
                     input.classList.add(...standardInputClasses);
 
                     [prefix, suffix].forEach(el => {
-                        el.classList.remove(...glassTextClasses);
+                        el.classList.remove(...glassAffixClasses);
                         el.classList.add(...standardAffixClasses);
                     });
                 }

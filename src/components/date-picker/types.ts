@@ -15,4 +15,5 @@ export interface CalendarOptions {
     maxDate$?: Observable<Date>;
     onSelect: (date: Date) => void;
     onClose?: () => void;
+    isGlass?: boolean;
 }

@@ -135,8 +135,8 @@ export class TabsBuilder implements ComponentBuilder {
                     !this.isGlass && !active && 'border-transparent text-on-surface-variant hover:bg-surface-variant/10 hover:text-on-surface',
                     
                     // Glass Theme
-                    this.isGlass && active && 'border-white text-white',
-                    this.isGlass && !active && 'border-transparent text-white/70 hover:bg-white/10 hover:text-white'
+                    this.isGlass && active && 'border-gray-900 text-gray-900 dark:border-white dark:text-white',
+                    this.isGlass && !active && 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-black/5 dark:text-white/70 dark:hover:text-white dark:hover:bg-white/10'
                 );
             });
             registerDestroy(container, () => styleSub.unsubscribe());
@@ -159,8 +159,7 @@ export class TabsBuilder implements ComponentBuilder {
         // Content Area
         const contentArea = document.createElement('div');
         contentArea.className = cn(
-            'flex-1 p-4',
-            this.isGlass && 'glass-effect rounded-b-lg text-white' // Glass content background
+            'flex-1 p-4'
         );
 
         // Render content for active tab

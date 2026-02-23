@@ -24,6 +24,7 @@ export class LabelBuilder implements ComponentBuilder {
     private caption$?: Observable<string>;
     private size: LabelSize = LabelSize.MEDIUM;
     private className$?: Observable<string>;
+    private isGlass = false;
 
     withCaption(caption: Observable<string>): LabelBuilder {
         this.caption$ = caption;
@@ -40,11 +41,17 @@ export class LabelBuilder implements ComponentBuilder {
         return this;
     }
 
+    withGlass(): LabelBuilder {
+        this.isGlass = true;
+        return this;
+    }
+
     build(): HTMLElement {
         const label = document.createElement('span');
         label.className = cn(
             'transition-all',
-            SIZE_MAP[this.size]
+            SIZE_MAP[this.size],
+            this.isGlass && 'glass-effect px-2 rounded-md'
         );
 
         if (this.caption$) {
@@ -62,6 +69,7 @@ export class LabelBuilder implements ComponentBuilder {
                 label.className = cn(
                     'transition-all',
                     SIZE_MAP[this.size],
+                    this.isGlass && 'glass-effect px-2 rounded-md',
                     cls
                 );
             });

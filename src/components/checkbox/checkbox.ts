@@ -89,7 +89,11 @@ export class CheckboxBuilder implements ComponentBuilder {
         container.appendChild(stateLayer);
 
         const captionSpan = document.createElement('span');
-        captionSpan.className = 'md-label-large text-on-surface peer-disabled:opacity-38';
+        // md-label-large defaults
+        captionSpan.className = cn(
+            'md-label-large peer-disabled:opacity-38',
+            this.isGlass ? '' : 'text-on-surface'
+        );
 
         root.appendChild(container);
         root.appendChild(captionSpan);

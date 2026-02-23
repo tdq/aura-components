@@ -1,6 +1,12 @@
 import { BehaviorSubject, combineLatest, take } from 'rxjs';
 import { getDaysInMonth, getFirstDayOfMonth, isSameDay, isValidDate } from './date-utils';
 import { CalendarOptions } from './types';
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+function cn(...inputs: ClassValue[]) {
+    return twMerge(clsx(inputs));
+}
 
 export function renderCalendar(options: CalendarOptions): HTMLElement {
     const container = document.createElement('div');
@@ -59,7 +65,10 @@ export function renderCalendar(options: CalendarOptions): HTMLElement {
     };
 
     const title = document.createElement('span');
-    title.className = 'md-label-large text-on-surface';
+    title.className = cn(
+        'md-label-large',
+        options.isGlass ? 'text-gray-900 dark:text-white' : 'text-on-surface'
+    );
 
     header.appendChild(prevBtn);
     header.appendChild(title);
@@ -75,7 +84,10 @@ export function renderCalendar(options: CalendarOptions): HTMLElement {
     const weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
     weekdays.forEach(day => {
         const d = document.createElement('div');
-        d.className = 'text-px-12 font-medium text-on-surface-variant py-px-4';
+        d.className = cn(
+            'text-px-12 font-medium py-px-4',
+            options.isGlass ? 'text-gray-600 dark:text-white/60' : 'text-on-surface-variant'
+        );
         d.textContent = day;
         grid.appendChild(d);
     });
@@ -168,14 +180,14 @@ export function renderCalendar(options: CalendarOptions): HTMLElement {
             cell.className = `w-px-40 h-px-40 flex items-center justify-center rounded-full text-px-14 transition-colors focus:outline-none`;
             
             if (isDisabled) {
-                cell.className += ' text-outline-variant cursor-not-allowed';
+                cell.className += options.isGlass ? ' text-gray-400 dark:text-white/30 cursor-not-allowed' : ' text-outline-variant cursor-not-allowed';
                 cell.disabled = true;
             } else if (isSelected) {
-                cell.className += ' bg-primary text-on-primary';
+                cell.className += options.isGlass ? ' bg-gray-900 text-white dark:bg-white dark:text-gray-900' : ' bg-primary text-on-primary';
             } else if (isFocused) {
-                cell.className += ' bg-surface-variant text-on-surface outline outline-2 outline-primary outline-offset-[-2px]';
+                cell.className += options.isGlass ? ' bg-white/20 text-gray-900 dark:text-white outline outline-2 outline-white/50 outline-offset-[-2px]' : ' bg-surface-variant text-on-surface outline outline-2 outline-primary outline-offset-[-2px]';
             } else {
-                cell.className += ' text-on-surface hover:bg-surface-variant';
+                cell.className += options.isGlass ? ' text-gray-900 hover:bg-white/20 dark:text-white' : ' text-on-surface hover:bg-surface-variant';
             }
 
             cell.textContent = day.toString();

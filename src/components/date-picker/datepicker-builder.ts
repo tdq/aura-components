@@ -113,7 +113,8 @@ export class DatePickerBuilder implements ComponentBuilder {
             },
             onClose: () => {
                 isExpanded$.next(false);
-            }
+            },
+            isGlass: this.isGlass
         });
         popup.appendChild(calendar);
 
@@ -165,7 +166,7 @@ export class DatePickerBuilder implements ComponentBuilder {
 
         // Calendar Popup
         const popup = document.createElement('div');
-        popup.className = 'absolute top-full left-0 mt-px-4 z-50 bg-surface border border-outline rounded-small shadow-level-2 p-px-16 w-px-320 hidden';
+        popup.className = 'absolute top-full left-0 mt-px-4 z-50 bg-surface border-outline rounded-small shadow-level-2 p-px-16 w-px-320 hidden';
 
         return { captionElement, inputWrapper, input, iconButton, errorElement, popup };
     }
@@ -225,16 +226,17 @@ export class DatePickerBuilder implements ComponentBuilder {
             popup.classList.add('glass-effect');
 
             // Apply glass text colors
-            const glassTextClasses = ['text-on-primary-container', 'dark:text-white'];
+            const glassLabelInputClasses = ['text-gray-900', 'dark:text-white'];
+            const glassIconClasses = ['text-gray-600', 'dark:text-white/60'];
             
             captionElement.classList.remove('text-on-surface-variant');
-            captionElement.classList.add(...glassTextClasses);
+            captionElement.classList.add(...glassLabelInputClasses);
 
             input.classList.remove('text-on-surface');
-            input.classList.add(...glassTextClasses);
+            input.classList.add(...glassLabelInputClasses);
 
             iconButton.classList.remove('text-on-surface-variant');
-            iconButton.classList.add(...glassTextClasses);
+            iconButton.classList.add(...glassIconClasses);
         }
 
         subs.push(isExpanded$.subscribe(expanded => {

@@ -123,11 +123,11 @@ export class ListBoxBuilder<ITEM> implements ComponentBuilder {
              listContainer.className = cn(
                 'rounded-large border overflow-hidden transition-all flex-1 relative flex flex-col',
                 !this.isGlass && 'bg-surface text-on-surface',
-                !this.isGlass && !error && 'border-outline',
-                 this.isGlass && 'bg-white/10 backdrop-blur-md border-white/20 text-on-surface',
-                 !!error && 'border-error'
-            );
-        });
+               !this.isGlass && !error && 'border-outline',
+                this.isGlass && 'glass-effect',
+                !!error && 'border-error'
+           );
+       });
         registerDestroy(container, () => listStyleSub.unsubscribe());
         
         container.appendChild(listContainer);
@@ -167,20 +167,28 @@ export class ListBoxBuilder<ITEM> implements ComponentBuilder {
                 const isTonal = style === ListBoxStyle.TONAL && !this.isGlass;
                 const isOutlined = style === ListBoxStyle.OUTLINED && !this.isGlass;
 
-                const itemTextColor = (isSelected && isOutlined)
-                    ? 'text-on-primary-container'
-                    : (isTonal ? 'text-on-secondary-container' : 'text-on-surface');
+                let itemTextColor: string;
+                let selectedBg: string;
+                let hoverBg: string;
 
-                const selectedBg = this.isGlass
-                    ? 'bg-white/40'
-                    : (isTonal ? 'bg-on-secondary-container/20' : 'bg-primary-container');
+                if (this.isGlass) {
+                    itemTextColor = '';
+                    selectedBg = 'bg-white/40';
+                    hoverBg = 'hover:bg-black/5 dark:hover:bg-white/10';
+                } else {
+                    itemTextColor = (isSelected && isOutlined)
+                        ? 'text-on-primary-container'
+                        : (isTonal ? 'text-on-secondary-container' : 'text-on-surface');
+                    selectedBg = isTonal ? 'bg-on-secondary-container/20' : 'bg-primary-container';
+                    hoverBg = 'hover:bg-on-surface/8';
+                }
 
                 li.className = cn(
                     'px-px-16 py-px-12 cursor-pointer body-large transition-colors relative overflow-hidden group',
                     itemTextColor,
                     isSelected && 'font-bold',
                     isSelected && selectedBg,
-                    !isSelected && 'hover:bg-on-surface/8'
+                    !isSelected && hoverBg
                 );
 
                 // State Layer (for focus/hover/active visual consistency)

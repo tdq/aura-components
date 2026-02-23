@@ -32,9 +32,11 @@ export function renderComboBoxItem<ITEM>({
     const isTonal = style === ComboBoxStyle.TONAL && !isGlass;
     const isOutlined = style === ComboBoxStyle.OUTLINED && !isGlass;
 
-    const itemTextColor = (isSelected && isOutlined)
-        ? 'text-on-primary-container'
-        : (isTonal ? 'text-on-secondary-container' : 'text-on-surface');
+    const itemTextColor = isGlass
+        ? 'text-gray-900 dark:text-white'
+        : ((isSelected && isOutlined)
+            ? 'text-on-primary-container'
+            : (isTonal ? 'text-on-secondary-container' : 'text-on-surface'));
 
     // Selected state background
     const selectedBg = isGlass

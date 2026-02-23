@@ -84,11 +84,16 @@ export class ButtonBuilder implements ComponentBuilder {
 
             if (this.isGlass && style !== ButtonStyle.TEXT) {
                 // Apply glass effect
-                button.classList.add('bg-white/10', 'backdrop-blur-md', 'border', 'border-white/20', 'hover:bg-white/20');
-                // Keep the text color and focus ring from the original style if possible
+                button.classList.add('glass-effect', 'hover:bg-white/20', 'dark:hover:bg-white/20');
+
+                // Text color
+                button.classList.remove('text-on-primary', 'text-primary', 'text-on-secondary-container');
+                button.classList.add('text-gray-900', 'dark:text-white');
+
+                // Keep focus ring from the original style if possible
                 const originalClasses = STYLE_MAP[style].split(' ');
                 originalClasses.forEach(c => {
-                    if (c.startsWith('text-') || c.startsWith('focus:ring-')) {
+                    if (c.startsWith('focus:ring-')) {
                         button.classList.add(c);
                     }
                 });

@@ -158,33 +158,39 @@ export class ComboBoxBuilder<ITEM> implements ComponentBuilder {
                 inputContainer.classList.remove('bg-secondary-container');
 
                 // Adjust text colors for glass mode
-                const glassTextClasses = ['text-on-primary-container', 'dark:text-white'];
+                const glassLabelClasses = ['text-gray-900', 'dark:text-white'];
+                const glassDescClasses = ['text-gray-600', 'dark:text-white/60'];
+
                 const standardCaptionClasses = ['text-on-surface-variant'];
                 const standardInputClasses = ['text-on-surface'];
                 const standardIconClasses = ['text-on-surface-variant'];
 
+                // Caption
                 captionElement.classList.remove(...standardCaptionClasses);
-                captionElement.classList.add(...glassTextClasses);
+                captionElement.classList.add(...glassLabelClasses);
                 
+                // Input
                 input.classList.remove(...standardInputClasses);
-                input.classList.add(...glassTextClasses);
+                input.classList.add(...glassLabelClasses);
                 
+                // Icons (using Description color)
                 iconContainer.classList.remove(...standardIconClasses);
-                iconContainer.classList.add(...glassTextClasses);
+                iconContainer.classList.add(...glassDescClasses);
             } else {
                 inputContainer.classList.remove('glass-effect');
 
                 // Revert text colors
-                const glassTextClasses = ['text-on-primary-container', 'dark:text-white'];
+                const glassLabelClasses = ['text-gray-900', 'dark:text-white'];
+                const glassDescClasses = ['text-gray-600', 'dark:text-white/60'];
                 
                 captionElement.classList.add('text-on-surface-variant');
-                captionElement.classList.remove(...glassTextClasses);
+                captionElement.classList.remove(...glassLabelClasses);
 
                 input.classList.add('text-on-surface');
-                input.classList.remove(...glassTextClasses);
+                input.classList.remove(...glassLabelClasses);
 
                 iconContainer.classList.add('text-on-surface-variant');
-                iconContainer.classList.remove(...glassTextClasses);
+                iconContainer.classList.remove(...glassDescClasses);
             }
 
             listbox.classList.toggle('hidden', !expanded);
@@ -196,7 +202,7 @@ export class ComboBoxBuilder<ITEM> implements ComponentBuilder {
             listbox.classList.remove(...dynamicClasses);
 
             if (isGlass) {
-                listbox.classList.add('glass-effect', 'bg-white/20', 'backdrop-blur-xl');
+                listbox.classList.add('glass-effect');
             } else if (style === ComboBoxStyle.TONAL) {
                 listbox.classList.add('bg-secondary-container', 'border', 'border-transparent');
             } else {

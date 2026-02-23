@@ -115,8 +115,8 @@ export class DialogBuilder implements ComponentBuilder, PopupBuilder {
         const getBaseClasses = () => cn(
             this.isGlass
                 ? 'glass-effect'
-                : 'bg-surface border-none',
-            'text-on-surface rounded-large elevation-5 flex flex-col overflow-hidden p-0 backdrop:bg-transparent',
+                : 'bg-surface border-none text-on-surface',
+            'rounded-large elevation-5 flex flex-col overflow-hidden p-0 backdrop:bg-transparent',
             DIALOG_SIZE_MAP[this.size]
         );
 
@@ -141,7 +141,10 @@ export class DialogBuilder implements ComponentBuilder, PopupBuilder {
                 .withContent(new LabelBuilder()
                     .withCaption(this.description$)
                     .withSize(LabelSize.SMALL)
-                    .withClass(of('text-body-medium text-on-surface-variant')));
+                    .withClass(of(cn(
+                        'text-body-medium',
+                        this.isGlass ? 'text-gray-600 dark:text-white/60' : 'text-on-surface-variant'
+                    ))));
         }
 
         const header = headerBuilder.build();
