@@ -102,6 +102,8 @@ describe('ButtonBuilder', () => {
         // Should have specific text glass overrides
         expect(button).toHaveClass('bg-transparent');
         expect(button).toHaveClass('ring-0');
+        expect(button).toHaveClass('text-on-primary-container');
+        expect(button).toHaveClass('dark:text-white');
     });
 
     it('should apply glass style to OUTLINED button', () => {

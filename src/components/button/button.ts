@@ -88,7 +88,7 @@ export class ButtonBuilder implements ComponentBuilder {
 
                 // Specific overrides based on button style
                 if (style === ButtonStyle.TEXT) {
-                    button.classList.add('bg-transparent', 'ring-0');
+                    button.classList.add('bg-transparent', 'ring-0', 'text-on-primary-container', 'dark:text-white');
                 } else if (style === ButtonStyle.OUTLINED) {
                     button.classList.add('bg-transparent');
                 } else if (style === ButtonStyle.TONAL) {

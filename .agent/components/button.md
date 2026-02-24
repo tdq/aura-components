@@ -23,4 +23,4 @@ Button styles:
 2. Elevated button has glass background, shadow and caption color according to generic glass effect instructions and color theme.
 3. Tonal button has glass background and caption color according to generic glass effect instructions and color theme.
 4. Outlined button has transparent background, border and caption color according to generic glass effect instructions and color theme.
-5. Text button has transparent background and caption color according to generic glass effect instructions and color theme.
+5. Text button has no background, caption color according to generic glass effect instructions and color theme.
