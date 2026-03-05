@@ -12,7 +12,7 @@ export class FormBuilder implements ComponentBuilder {
     private caption$?: Observable<string>;
     private description$?: Observable<string>;
     private isGlass: boolean = false;
-    
+
     private toolbarBuilder?: ToolbarBuilder;
     private fieldsBuilder?: FieldsBuilder;
 
@@ -62,7 +62,7 @@ export class FormBuilder implements ComponentBuilder {
             .asVertical()
             .withGap(LayoutGap.SMALL)
             .withClass(of(FORM_STYLES.header));
-        
+
         if (this.caption$) {
             headerLayout.addSlot()
                 .withContent(new LabelBuilder()
@@ -78,7 +78,7 @@ export class FormBuilder implements ComponentBuilder {
                     .withClass(of(FORM_STYLES.description)))
                 .withVisible(this.description$.pipe(map(text => !!text)));
         }
-        
+
         layout.addSlot().withContent(headerLayout);
 
         // 2. Fields
@@ -102,7 +102,7 @@ export class FormBuilder implements ComponentBuilder {
         if (this.toolbarBuilder) {
             if (this.enabled$) this.toolbarBuilder.withEnabled(this.enabled$);
 
-            if(this.isGlass) {
+            if (this.isGlass) {
                 this.toolbarBuilder.asGlass();
             }
 

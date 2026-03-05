@@ -1,41 +1,40 @@
 import { Observable, Subject, of } from 'rxjs';
 import { ComponentBuilder } from '../../core/component-builder';
+import { FieldStyle } from '@/theme';
+import { generateFieldId } from '../component-parts';
 import { registerDestroy } from '@/core/destroyable-element';
 import { NumberFieldLogic, NumberFieldState } from './number-field-logic';
 import { createNumberFieldLabel } from './number-field-label';
 import { createNumberFieldSupportText } from './number-field-error';
 
-export enum NumberFieldStyle {
-    TONAL = 'tonal',
-    OUTLINED = 'outlined'
-}
+export { FieldStyle as NumberFieldStyle };
 
 export class NumberFieldBuilder implements ComponentBuilder {
     private value$?: Subject<number | null>;
-    private placeholder$?: Observable<string>;
-    private enabled$?: Observable<boolean>;
-    private style$?: Observable<NumberFieldStyle>;
-    private error$?: Observable<string>;
-    private label$?: Observable<string>;
-    private className$?: Observable<string>;
-    private format$?: Observable<string>;
-    private precision$?: Observable<number>;
-    private min$?: Observable<number>;
-    private max$?: Observable<number>;
-    private step$?: Observable<number>;
-    private locale$?: Observable<string>;
-    private prefix$?: Observable<HTMLElement | string>;
-    private suffix$?: Observable<HTMLElement | string>;
+    private placeholder$ = of('');
+    private enabled$ = of(true);
+    private style$ = of(FieldStyle.TONAL);
+    private error$ = of('');
+    private label$ = of('');
+    private className$ = of('');
+    private format$ = of('');
+    private precision$ = of<number | undefined>(undefined);
+    private min$ = of(-Infinity);
+    private max$ = of(Infinity);
+    private step$ = of(1);
+    private locale$ = of<string | undefined>(undefined);
+    private prefix$ = of<HTMLElement | string>('');
+    private suffix$ = of<HTMLElement | string>('');
     private isGlass: boolean = false;
     private isInlineError: boolean = false;
 
-    asGlass(isGlass: boolean = true): this {
-        this.isGlass = isGlass;
+    asGlass(): this {
+        this.isGlass = true;
         return this;
     }
 
-    asInlineError(isInlineError: boolean = true): this {
-        this.isInlineError = isInlineError;
+    asInlineError(): this {
+        this.isInlineError = true;
         return this;
     }
 
@@ -54,7 +53,7 @@ export class NumberFieldBuilder implements ComponentBuilder {
         return this;
     }
 
-    withStyle(style: Observable<NumberFieldStyle>): this {
+    withStyle(style: Observable<FieldStyle>): this {
         this.style$ = style;
         return this;
     }
@@ -115,7 +114,7 @@ export class NumberFieldBuilder implements ComponentBuilder {
     }
 
     build(): HTMLElement {
-        const id = `number-field-${Math.random().toString(36).substring(2, 9)}`;
+        const id = generateFieldId('number-field');
         const errorId = `${id}-error`;
 
         const container = document.createElement('div');
@@ -124,10 +123,11 @@ export class NumberFieldBuilder implements ComponentBuilder {
         container.appendChild(label);
 
         const inputWrapper = document.createElement('div');
+        inputWrapper.className = 'relative flex items-center gap-2 px-4 transition-all duration-200 h-[48px]';
         container.appendChild(inputWrapper);
 
         const prefixContainer = document.createElement('span');
-        prefixContainer.className = 'flex items-center shrink-0 hidden mr-px-8';
+        prefixContainer.className = 'flex items-center shrink-0 hidden';
         inputWrapper.appendChild(prefixContainer);
 
         const input = document.createElement('input');
@@ -136,32 +136,40 @@ export class NumberFieldBuilder implements ComponentBuilder {
         input.inputMode = 'decimal';
         input.setAttribute('role', 'spinbutton');
         input.setAttribute('aria-describedby', errorId);
-        input.className = 'flex-1 min-w-0 bg-transparent outline-none body-large text-on-surface text-right placeholder:text-on-surface-variant placeholder:text-left disabled:opacity-38 disabled:cursor-not-allowed';
+        input.className = 'flex-1 min-w-0 bg-transparent outline-none transition-all body-large text-on-surface text-right placeholder:text-on-surface-variant placeholder:text-left disabled:opacity-38 disabled:cursor-not-allowed h-full';
         inputWrapper.appendChild(input);
 
         const suffixContainer = document.createElement('span');
-        suffixContainer.className = 'flex items-center shrink-0 hidden ml-px-8';
+        suffixContainer.className = 'flex items-center shrink-0 hidden';
         inputWrapper.appendChild(suffixContainer);
 
+        const activeIndicator = document.createElement('div');
+        activeIndicator.className = 'absolute bottom-0 left-0 right-0 h-[1px] bg-outline-variant transition-all duration-200 origin-center scale-x-100 group-focus-within:h-[2px] group-focus-within:bg-primary';
+        inputWrapper.appendChild(activeIndicator);
+
+        const footer = document.createElement('div');
+        footer.className = 'flex justify-between px-4 min-h-[20px] mt-1';
+        container.appendChild(footer);
+
         const errorText = createNumberFieldSupportText(errorId);
-        container.appendChild(errorText);
+        footer.appendChild(errorText);
 
         const state: NumberFieldState = {
             value$: this.value$ || new Subject<number | null>(),
-            placeholder$: this.placeholder$ || of(''),
-            enabled$: this.enabled$ || of(true),
-            style$: this.style$ || of(NumberFieldStyle.TONAL),
-            error$: this.error$ || of(''),
-            label$: this.label$ || of(''),
-            className$: this.className$ || of(''),
-            format$: this.format$ || of(''),
-            precision$: this.precision$ || of(undefined),
-            min$: this.min$ || of(-Infinity),
-            max$: this.max$ || of(Infinity),
-            step$: this.step$ || of(1),
-            locale$: this.locale$ || of(undefined),
-            prefix$: this.prefix$ || of(''),
-            suffix$: this.suffix$ || of(''),
+            placeholder$: this.placeholder$,
+            enabled$: this.enabled$,
+            style$: this.style$,
+            error$: this.error$,
+            label$: this.label$,
+            className$: this.className$,
+            format$: this.format$,
+            precision$: this.precision$,
+            min$: this.min$,
+            max$: this.max$,
+            step$: this.step$,
+            locale$: this.locale$,
+            prefix$: this.prefix$,
+            suffix$: this.suffix$,
             isGlass: this.isGlass,
             isInlineError: this.isInlineError
         };
@@ -174,6 +182,8 @@ export class NumberFieldBuilder implements ComponentBuilder {
             errorText,
             prefixContainer,
             suffixContainer,
+            activeIndicator,
+            footer,
             state
         );
 

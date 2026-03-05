@@ -1,21 +1,13 @@
+import { FieldAffixBuilder, updateAffixContent } from '../component-parts';
+
 export function createTextFieldIconContainer(className: string = ''): HTMLElement {
-    const container = document.createElement('div');
-    container.className = `flex items-center justify-center text-on-surface-variant ${className}`;
-    return container;
+    return new FieldAffixBuilder()
+        .withClass(className)
+        .build();
 }
 
 export function updateIconContent(container: HTMLElement, content: HTMLElement | string | null): void {
-    container.innerHTML = '';
-    if (!content) {
-        container.classList.add('hidden');
-        return;
-    }
-    container.classList.remove('hidden');
-    if (typeof content === 'string') {
-        container.innerHTML = content;
-    } else {
-        container.appendChild(content);
-    }
+    updateAffixContent(container, content);
 }
 
 export function createPasswordToggle(onToggle: (isVisible: boolean) => void, isVisible: boolean): HTMLElement {

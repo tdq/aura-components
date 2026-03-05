@@ -18,7 +18,7 @@ export const RegistrationForm = () => {
         .withError(error$);
 
     const fields = form.withFields(2);
-    
+
     fields.addTextField(1, 1).withLabel(of('First Name')).withValue(firstName$);
     fields.addTextField(2, 1).withLabel(of('Last Name')).withValue(lastName$);
     fields.addEmailField(1, 2).withLabel(of('Email'));
@@ -35,7 +35,7 @@ export const RegistrationForm = () => {
     // Controls for the story
     const controls = document.createElement('div');
     controls.className = 'flex gap-px-16 mb-px-24 p-px-16 bg-surface-variant/50 backdrop-blur-sm rounded-small border border-outline/20 self-start';
-    
+
     const errorBtn = document.createElement('button');
     errorBtn.className = 'px-px-16 py-px-8 rounded-small bg-secondary text-on-secondary hover:elevation-1 transition-all';
     errorBtn.textContent = 'Toggle Error';

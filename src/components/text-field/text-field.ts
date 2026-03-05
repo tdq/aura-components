@@ -1,20 +1,19 @@
 import { Observable, Subject, of } from 'rxjs';
 import { ComponentBuilder } from '../../core/component-builder';
-import { buildTextField, TextFieldStyle } from './text-field-logic';
+import { FieldStyle } from '@/theme';
+import { generateFieldId } from '../component-parts';
+import { buildTextField } from './text-field-logic';
 import { createTextFieldLabel } from './text-field-label';
 import { createTextFieldIconContainer } from './text-field-icon';
 import { createTextFieldSupportText } from './text-field-error';
 
-export { TextFieldStyle };
-
-let nextId = 0;
-const generateId = () => `text-field-${nextId++}`;
+export { FieldStyle as TextFieldStyle };
 
 export class TextFieldBuilder implements ComponentBuilder {
     private value$?: Subject<string>;
     private placeholder$ = of('');
     private enabled$ = of(true);
-    private style$ = of(TextFieldStyle.TONAL);
+    private style$ = of(FieldStyle.TONAL);
     private error$ = of('');
     private label$ = of('');
     private className$ = of('');
@@ -46,7 +45,7 @@ export class TextFieldBuilder implements ComponentBuilder {
         return this;
     }
 
-    withStyle(style: Observable<TextFieldStyle>): this {
+    withStyle(style: Observable<FieldStyle>): this {
         this.style$ = style;
         return this;
     }
@@ -97,7 +96,7 @@ export class TextFieldBuilder implements ComponentBuilder {
     }
 
     build(): HTMLElement {
-        const id = generateId();
+        const id = generateFieldId('text-field');
         const errorId = `${id}-error`;
 
         const container = document.createElement('div');

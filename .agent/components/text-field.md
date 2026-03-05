@@ -1,50 +1,65 @@
 # TextField
 
 ## Description
-TextField component is a component that allows the user to enter and edit text.
-It has the folowing methods:
-- withValue(value: Subject<string>): this - receives a Subject which is both observed and updated by the component. On input change, component must call value.next(newValue).
-- withPlaceholder(placeholder: Observable<string>): this - sets placeholder of the text field.
-- withEnabled(enabled: Observable<boolean>): this - sets enabled state of the text field.
-- withStyle(style: Observable<TextFieldStyle>): this - sets style of the text field.
-- withError(error: Observable<string>): this - sets error of the text field.
-- withLabel(label: Observable<string>): this - sets label of the text field.
-- withClass(className: Observable<string>): this - sets class css name of the text field.
-- withPrefix(text: Observable<HTMLElement | string>): this - sets prefix as icon or text.
-- withSuffix(text: Observable<HTMLElement | string>): this - sets suffix as icon or text.
-- asGlass(): this - sets special styling option for textfield and its popup with items as transparent with blur background (glass effect).
-- asPassword(): this - sets special behavior for inputing password. Should set type="password"
-- asEmail(): this - sets input type="email" and enables native validation but does not auto-set error observable.
-- asInlineError(): this - sets error state displaying as field style change.
+TextField component allows the user to enter and edit text.
+It uses the builder pattern (implements ComponentBuilder) and follows Material Design 3 styling.
 
-TextField style is an enum with the following values:
-- tonal
-- outlined
+### Builder methods
+- withValue(value: Subject\<string\>): this - receives a Subject which is both observed and updated by the component. On input change, component calls value.next(newValue).
+- withPlaceholder(placeholder: Observable\<string\>): this - sets placeholder text.
+- withEnabled(enabled: Observable\<boolean\>): this - sets enabled/disabled state.
+- withStyle(style: Observable\<FieldStyle\>): this - sets visual style. FieldStyle is imported from `@/theme`.
+- withError(error: Observable\<string\>): this - sets error message. Empty string means no error.
+- withLabel(label: Observable\<string\>): this - sets the label above the field.
+- withClass(className: Observable\<string\>): this - sets additional CSS class on the input wrapper.
+- withPrefix(text: Observable\<HTMLElement | string\>): this - sets non-editable prefix (icon or text).
+- withSuffix(text: Observable\<HTMLElement | string\>): this - sets non-editable suffix (icon or text).
+- asGlass(): this - enables glass effect styling (transparent with blur background).
+- asPassword(): this - sets input type="password" with a visibility toggle icon.
+- asEmail(): this - sets input type="email" and enables native email validation.
+- asInlineError(): this - displays errors as field style change instead of support text below.
+
+### FieldStyle enum (from `@/theme`)
+- TONAL - filled background style with bottom active indicator
+- OUTLINED - transparent background with outline border
 
 ## Requirements
-At password mode it should display "*" symbols instead of actual text.
-Prefix and suffix are not editable parts of text field.
-"asPassword" mode should add suffix icon to toggle visibility of typed password.
-All logic must be implemented in text-field-logic.ts file in the same folder.
-"as<Something>" fields should set corresponding boolean fields values as "true". According to this fields values style, or change component behaviour accordingly.
-"asEmail()" should add email validation. It should be implemented in logic and applied to input type="email".
+- In password mode, display "\*" symbols instead of actual text.
+- Prefix and suffix are non-editable parts of the text field.
+- "asPassword" mode adds a suffix icon button to toggle password visibility.
+- All logic must be implemented in `text-field-logic.ts`.
+- "as\<Something\>" methods set corresponding boolean fields to true. Logic and styling react to these boolean values.
+- "asEmail()" sets input type="email" for native validation but does not auto-set the error observable.
+- All Observable/Subject properties use `of()` defaults (e.g. `of('')`, `of(true)`, `of(FieldStyle.TONAL)`).
 
 ## Files structure
-- text-field.ts - contains TextFieldBuilder and responsible for descibing DOM elements.
-- text-field-logic.ts - contains logic which TextFieldBuilder is using. Responsible for handling all events and subscriptions.
-- text-field-<internal-component>.ts - set of files for internal components, like icons, error message, label.
+- `text-field.ts` - contains TextFieldBuilder class. Responsible for describing DOM elements in `build()`. Imports FieldStyle from `@/theme` and re-exports it as `TextFieldStyle` for backward compatibility. Uses `generateFieldId('text-field')` from `component-parts` for sequential ID generation.
+- `text-field-logic.ts` - contains `buildTextField(config, elements)` function. Responsible for handling all events, subscriptions, and reactive updates. Uses `FieldStyle` from `@/theme` and `updateAffixContent()` from `component-parts`.
+- `text-field-label.ts` - delegates to `FieldLabelBuilder` from `component-parts`.
+- `text-field-error.ts` - delegates to `FieldSupportTextBuilder` and `ErrorPopoverBuilder` from `component-parts`.
+- `text-field-icon.ts` - delegates to `FieldAffixBuilder` and `updateAffixContent()` from `component-parts`. Contains text-field-specific `createPasswordToggle()`.
+- `index.ts` - re-exports from `text-field.ts`.
+
+## Shared dependencies (component-parts)
+This component uses the following shared parts from `src/components/component-parts/`:
+- `FieldLabelBuilder` - creates the `<label>` element
+- `FieldSupportTextBuilder` - creates the error/support text `<span>`
+- `ErrorPopoverBuilder` - creates the inline error icon button with popover tooltip
+- `FieldAffixBuilder` / `updateAffixContent()` - creates and updates prefix/suffix/icon containers
+- `generateFieldId()` - generates sequential IDs with `text-field-` prefix
 
 ## Styling
-Style according to Material Design 3 
-Error and label are small text.
-Border should be defined as outline so changing its size is not affecting size of the input.
-Height is 48px.
-Reserve space for error text only if it is not "as inline error".
+Style according to Material Design 3.
+- Error and label use `md-label-small` typography.
+- Border is defined as outline so changing its size does not affect the input size. Border size is 1px.
+- Height is 48px (`h-[48px]`).
+- Reserve space for error text below the field only if not in inline error mode.
+- Use Tailwind CSS utilities with standard notation (e.g. `px-4`, `h-[48px]`, `w-6`).
 
 ### Inline error state
-- On error set red outline for text field. 
-- Add error icon on the right inside of text field. 
-- Clicking this icon shows tooltip with error text close to this icon. Use "showPopover()" method for showing tooltip.
-- Tooltip should close after 5 seconds or on clicking outside of the tooltip or on clicking the error icon again.
-- Tooltip should have popover shadow.
-- Tooltip should be positioned in the way it is always visible for user.
+- On error, set error-colored ring/border on the input wrapper.
+- Add error icon on the right inside the text field (using `ErrorPopoverBuilder`).
+- Clicking the icon shows a tooltip with error text. Uses `showPopover()` API.
+- Tooltip closes after 5 seconds, on clicking outside, or on clicking the error icon again.
+- Tooltip has popover shadow (`elevation-2` class).
+- Tooltip is positioned to always be visible within the viewport.

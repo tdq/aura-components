@@ -39,7 +39,7 @@ export class FieldsBuilder implements IFieldsBuilder {
     }
 
     addEmailField(column?: number, colspan?: number): TextFieldBuilder {
-        return this.addField(new TextFieldBuilder().asEmail().withEmailValidation(), column, colspan);
+        return this.addField(new TextFieldBuilder().asEmail(), column, colspan);
     }
 
     addNumberField(column?: number, colspan?: number): NumberFieldBuilder {
@@ -80,7 +80,7 @@ export class FieldsBuilder implements IFieldsBuilder {
     build(): HTMLElement {
         const container = document.createElement('div');
         container.className = FORM_STYLES.fields;
-        
+
         // Dynamic grid columns based on columnsAmount
         container.style.gridTemplateColumns = `repeat(${this.columnsAmount}, 1fr)`;
 
@@ -94,7 +94,7 @@ export class FieldsBuilder implements IFieldsBuilder {
             }
 
             const fieldEl = field.builder.build();
-            
+
             // Handle grid positioning
             if (field.column) {
                 fieldEl.style.gridColumnStart = `${field.column}`;
@@ -102,7 +102,7 @@ export class FieldsBuilder implements IFieldsBuilder {
             if (field.colspan) {
                 fieldEl.style.gridColumn = `span ${field.colspan}`;
             }
-            
+
             container.appendChild(fieldEl);
         });
 

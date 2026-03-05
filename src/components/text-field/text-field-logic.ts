@@ -2,22 +2,19 @@ import { Observable, Subject, BehaviorSubject, combineLatest, of, fromEvent, Sub
 import { map, distinctUntilChanged, startWith } from 'rxjs/operators';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { FieldStyle } from '@/theme';
 import { registerDestroy } from '@/core/destroyable-element';
-import { updateIconContent, createPasswordToggle } from './text-field-icon';
+import { updateAffixContent } from '../component-parts';
+import { createPasswordToggle } from './text-field-icon';
 import { createTextFieldError } from './text-field-error';
-
-export enum TextFieldStyle {
-    TONAL = 'tonal',
-    OUTLINED = 'outlined'
-}
 
 function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
-const STYLE_MAP: Record<TextFieldStyle, string> = {
-    [TextFieldStyle.TONAL]: 'bg-surface-variant rounded-t-small',
-    [TextFieldStyle.OUTLINED]: 'bg-transparent rounded-small outline outline-1 -outline-offset-1 outline-outline focus-within:outline-2 focus-within:outline-primary',
+const STYLE_MAP: Record<FieldStyle, string> = {
+    [FieldStyle.TONAL]: 'bg-surface-variant rounded-t-small',
+    [FieldStyle.OUTLINED]: 'bg-transparent rounded-small outline outline-1 -outline-offset-1 outline-outline focus-within:outline-2 focus-within:outline-primary',
 };
 
 const BASE_INPUT_CLASSES = 'flex-1 min-w-0 bg-transparent outline-none transition-all body-large placeholder:text-on-surface-variant text-on-surface disabled:opacity-38 disabled:cursor-not-allowed h-full';
@@ -31,7 +28,7 @@ export interface TextFieldConfig {
     value$?: Subject<string>;
     placeholder$: Observable<string>;
     enabled$: Observable<boolean>;
-    style$: Observable<TextFieldStyle>;
+    style$: Observable<FieldStyle>;
     error$: Observable<string>;
     label$: Observable<string>;
     className$: Observable<string>;
@@ -143,19 +140,19 @@ export function buildTextField(config: TextFieldConfig, elements: TextFieldEleme
         input.placeholder = state.placeholder;
         input.type = isPassword ? state.passwordType : (isEmail ? 'email' : 'text');
 
-        updateIconContent(prefix, state.prefix);
-        updateIconContent(suffix, state.suffix);
+        updateAffixContent(prefix, state.prefix);
+        updateAffixContent(suffix, state.suffix);
 
         if (isInlineError && showErrorMessage) {
-            updateIconContent(trailingIconContainer, createTextFieldError(state.errorText));
+            updateAffixContent(trailingIconContainer, createTextFieldError(state.errorText));
         } else if (isPassword) {
             const toggle = createPasswordToggle((visible) => {
                 isPasswordVisible = visible;
                 passwordType$.next(visible ? 'text' : 'password');
             }, isPasswordVisible);
-            updateIconContent(trailingIconContainer, toggle);
+            updateAffixContent(trailingIconContainer, toggle);
         } else {
-            updateIconContent(trailingIconContainer, null);
+            updateAffixContent(trailingIconContainer, null);
         }
 
         const validationClasses = getValidationClasses(state.errorText);
@@ -169,13 +166,13 @@ export function buildTextField(config: TextFieldConfig, elements: TextFieldEleme
 
         if (isGlass) {
             inputWrapper.classList.add('glass-effect', 'focus-within:bg-white/20');
-            inputWrapper.classList.add(state.style === TextFieldStyle.OUTLINED ? 'rounded-small' : 'rounded-t-small');
+            inputWrapper.classList.add(state.style === FieldStyle.OUTLINED ? 'rounded-small' : 'rounded-t-small');
             activeIndicator.classList.add('hidden');
             label.className = cn(label.className, 'text-gray-900 dark:text-white');
             input.className = cn(input.className, 'text-gray-900 dark:text-white');
         } else {
             STYLE_MAP[state.style].split(' ').forEach(c => inputWrapper.classList.add(c));
-            if (state.style === TextFieldStyle.TONAL) {
+            if (state.style === FieldStyle.TONAL) {
                 activeIndicator.classList.remove('hidden');
                 activeIndicator.classList.toggle('bg-error', !!state.errorText);
                 activeIndicator.classList.toggle('bg-outline-variant', !state.errorText);

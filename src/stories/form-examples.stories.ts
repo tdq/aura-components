@@ -128,7 +128,7 @@ export const PersonInformationForm = () => {
     toolbar.addSecondaryButton()
         .withCaption(of('Reset'))
         .withClick(resetClick$);
-    
+
     toolbar.withPrimaryButton()
         .withCaption(of('Submit'))
         .withEnabled(isFormValid$)
@@ -204,7 +204,7 @@ export const AddressForm = () => {
         .withCaption(of('Address Information'));
 
     const fields = form.withFields(2);
-    
+
     fields.addTextField(1, 2)
         .withLabel(of('Street Address'))
         .withPlaceholder(of('123 Main Street'))
@@ -244,7 +244,7 @@ export const AddressForm = () => {
     toolbar.addTextButton()
         .withCaption(of('Clear'))
         .withClick(clearClick$);
-    
+
     toolbar.withPrimaryButton()
         .withCaption(of('Save Address'))
         .withEnabled(isFormValid$)
@@ -316,7 +316,7 @@ export const CombinedForm = () => {
         .withCaption(of('Registration Form'));
 
     const fields = form.withFields(2);
-    
+
     fields.addHeading(1, 2).withCaption(of('Personal Information'));
 
     fields.addTextField(1, 1)
@@ -446,7 +446,7 @@ export const GlassSignupForm = () => {
         .withDescription(of('Join our community today'));
 
     const fields = form.withFields(2);
-    
+
     fields.addTextField(1, 2)
         .withLabel(of('Full Name'))
         .withPlaceholder(of('John Doe'))
@@ -473,7 +473,7 @@ export const GlassSignupForm = () => {
         .withStyle(of(TextFieldStyle.OUTLINED));
 
     const toolbar = form.withToolbar();
-    
+
     toolbar.addTextButton()
         .withCaption(of('Sign In Instead'))
         .withStyle(of(ButtonStyle.TEXT));
@@ -548,7 +548,7 @@ export const GlassRegistrationDialog = () => {
 
     const container = document.createElement('div');
     container.className = 'p-10 min-h-[600px] w-full relative overflow-hidden flex items-center justify-center rounded-xl';
-    
+
     // Add a colorful background to showcase the glass effect
     const bg = document.createElement('div');
     bg.className = 'absolute inset-0 -z-10 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500';
@@ -574,7 +574,7 @@ export const GlassRegistrationDialog = () => {
         .withCaption(of('Open Registration Dialog'))
         .withClick(btnClick$)
         .build();
-    
+
     container.appendChild(btn);
 
     // Auto-open for convenience

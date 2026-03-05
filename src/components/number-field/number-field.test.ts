@@ -69,10 +69,10 @@ describe('NumberFieldBuilder', () => {
             const error$ = new BehaviorSubject('');
             const container = builder.withError(error$).build();
             const input = container.querySelector('input') as HTMLInputElement;
-            // The error element is the last child of the main container
-            const errorEl = container.lastElementChild as HTMLElement;
+            // The error element is inside the footer div
+            const footer = container.lastElementChild as HTMLElement;
+            const errorEl = footer.querySelector('span') as HTMLElement;
 
-            expect(errorEl.tagName).toBe('SPAN');
             expect(errorEl.classList.contains('hidden')).toBe(true);
             expect(input.getAttribute('aria-invalid')).toBe('false');
 
@@ -81,9 +81,9 @@ describe('NumberFieldBuilder', () => {
             expect(errorEl.classList.contains('hidden')).toBe(false);
             expect(input.getAttribute('aria-invalid')).toBe('true');
 
-            // Error styles are on the wrapper
+            // Error styles are on the wrapper (outline-based, matching text-field)
             const wrapper = input.parentElement as HTMLElement;
-            expect(wrapper.classList.contains('ring-error')).toBe(true);
+            expect(wrapper.classList.contains('outline-error')).toBe(true);
         });
 
         test('should handle placeholder and enabled states', () => {
@@ -216,7 +216,9 @@ describe('NumberFieldBuilder', () => {
                 .build();
             const input = container.querySelector('input') as HTMLInputElement;
             const label = container.querySelector('label') as HTMLLabelElement;
-            const error = container.lastElementChild as HTMLElement;
+            // Error element is now inside footer div
+            const footer = container.lastElementChild as HTMLElement;
+            const error = footer.querySelector('span') as HTMLElement;
 
             expect(input.getAttribute('role')).toBe('spinbutton');
             expect(input.getAttribute('aria-valuemin')).toBe('0');
@@ -347,7 +349,9 @@ describe('NumberFieldBuilder', () => {
             document.body.appendChild(container);
 
             const inputWrapper = container.querySelector('input')?.parentElement as HTMLElement;
-            const suffixContainer = inputWrapper.lastElementChild as HTMLElement;
+            // suffixContainer is the span after the input, before the activeIndicator
+            const spans = inputWrapper.querySelectorAll(':scope > span');
+            const suffixContainer = spans[spans.length - 1] as HTMLElement;
 
             expect(suffixContainer.querySelector('button')).toBeNull();
 
@@ -355,6 +359,9 @@ describe('NumberFieldBuilder', () => {
             const errorButton = suffixContainer.querySelector('button') as HTMLButtonElement;
             expect(errorButton).toBeTruthy();
             expect(errorButton.getAttribute('aria-label')).toContain('Invalid number');
+
+            // Check outline-based error on wrapper (matching text-field)
+            expect(inputWrapper.classList.contains('outline-error')).toBe(true);
 
             // Find the popover
             const popover = document.body.querySelector('.error-popover') as HTMLElement;

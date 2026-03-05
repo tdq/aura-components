@@ -1,5 +1,5 @@
 import { Observable, Subject, Subscription, combineLatest } from 'rxjs';
-import { NumberFieldStyle } from './number-field';
+import { FieldStyle } from '@/theme';
 import { clamp, roundToStep, formatNumber } from '@/utils/number';
 import { createNumberFieldErrorIcon } from './number-field-error';
 
@@ -7,7 +7,7 @@ export interface NumberFieldState {
     value$: Subject<number | null>;
     placeholder$: Observable<string>;
     enabled$: Observable<boolean>;
-    style$: Observable<NumberFieldStyle>;
+    style$: Observable<FieldStyle>;
     error$: Observable<string>;
     label$: Observable<string>;
     className$: Observable<string>;
@@ -34,6 +34,8 @@ export class NumberFieldLogic {
         private errorText: HTMLElement,
         private prefixContainer: HTMLElement,
         private suffixContainer: HTMLElement,
+        private activeIndicator: HTMLElement,
+        private footer: HTMLElement,
         private state: NumberFieldState
     ) { }
 
@@ -76,6 +78,7 @@ export class NumberFieldLogic {
                 // Label
                 this.label.textContent = labelMsg;
                 this.label.classList.toggle('hidden', !labelMsg);
+                this.label.classList.toggle('text-error', !!errorMsg);
 
                 // Input
                 this.input.placeholder = placeholder;
@@ -116,11 +119,6 @@ export class NumberFieldLogic {
     }
 
     private setupEvents(min: number, max: number, step: number, format: string, precision: number | undefined, locale: string | undefined) {
-        // We need to re-read currents in events because they might change via observables
-        // But for step/min/max we can use the latest values from closure or better - from a local state if we want to be very precise.
-        // Let's use a simple approach: update local vars in the main subscription.
-
-        // Re-declaring vars in init to be accessible by reference in events
         let latestMin = min;
         let latestMax = max;
         let latestStep = step;
@@ -222,11 +220,17 @@ export class NumberFieldLogic {
     }
 
     private updateError(msg: string) {
-        if (this.state.isInlineError) {
-            this.errorText.classList.add('hidden');
-            this.errorText.textContent = '';
+        const showErrorMessage = !!msg;
 
-            // Manage inline error icon
+        if (this.state.isInlineError) {
+            this.errorText.textContent = '';
+            this.errorText.classList.add('hidden');
+
+            this.footer.classList.toggle('hidden', true);
+            this.footer.style.minHeight = '0px';
+            this.footer.style.height = '0px';
+            this.footer.style.marginTop = '0px';
+
             const existingIcon = this.suffixContainer.querySelector('button[aria-label^="Error:"]');
             if (msg) {
                 if (!existingIcon) {
@@ -235,9 +239,6 @@ export class NumberFieldLogic {
                     this.suffixContainer.appendChild(icon);
                 } else {
                     existingIcon.setAttribute('aria-label', `Error: ${msg}`);
-                    // Potentially update popover text if we had a reference, 
-                    // but createNumberFieldErrorIcon recreates everything.
-                    // For simplicity, if error changes, re-create or just leave as is.
                 }
             } else if (existingIcon) {
                 existingIcon.remove();
@@ -247,40 +248,59 @@ export class NumberFieldLogic {
             }
         } else {
             this.errorText.textContent = msg;
-            this.errorText.classList.toggle('hidden', !msg);
+            this.errorText.classList.toggle('hidden', !showErrorMessage);
+            this.errorText.classList.toggle('text-error', true);
+
+            this.footer.classList.toggle('hidden', false);
+            this.footer.style.minHeight = '20px';
+            this.footer.style.height = 'auto';
+            this.footer.style.marginTop = '4px';
         }
+
+        this.input.setAttribute('aria-invalid', showErrorMessage ? 'true' : 'false');
+        if (showErrorMessage) this.input.setAttribute('aria-describedby', this.errorText.id);
+        else this.input.removeAttribute('aria-describedby');
     }
 
-    private updateStyles(style: NumberFieldStyle, extraClass: string, hasError: boolean) {
-        const isOutlined = style === NumberFieldStyle.OUTLINED;
+    private updateStyles(style: FieldStyle, extraClass: string, hasError: boolean) {
+        const isOutlined = style === FieldStyle.OUTLINED;
 
         // Base container styles
         this.container.className = 'flex flex-col w-full';
         if (extraClass) this.container.classList.add(...extraClass.split(' '));
 
+        // Validation classes (same as text-field)
+        const validationClasses = hasError
+            ? 'outline outline-2 -outline-offset-2 outline-error focus-within:outline-error text-error'
+            : '';
+
         // Input Wrapper styles - 48px height, MD3
         const baseWrapperClasses = [
-            'relative', 'flex', 'items-center', 'px-px-16', 'transition-all', 'duration-200', 'h-px-48', 'box-border'
+            'relative', 'flex', 'items-center', 'gap-2', 'px-4', 'transition-all', 'duration-200', 'h-[48px]'
         ];
 
         this.inputWrapper.className = baseWrapperClasses.join(' ');
+        if (validationClasses) {
+            this.inputWrapper.classList.add(...validationClasses.split(' '));
+        }
 
         if (this.state.isGlass) {
             this.inputWrapper.classList.add('glass-effect', 'focus-within:bg-white/20');
             this.inputWrapper.classList.add(isOutlined ? 'rounded-small' : 'rounded-t-small');
-            // Border/Outline for glass
-            if (isOutlined) {
-                this.inputWrapper.classList.add('ring-1', 'ring-inset', 'ring-white/20');
-            } else {
-                this.inputWrapper.classList.add('border-b', 'border-white/20');
-            }
+            this.activeIndicator.classList.add('hidden');
         } else {
             if (isOutlined) {
-                this.inputWrapper.classList.add('rounded-small', 'ring-1', 'ring-inset', 'ring-outline', 'focus-within:ring-2', 'focus-within:ring-primary');
-                if (hasError) this.inputWrapper.classList.add('ring-error', 'focus-within:ring-error');
+                this.inputWrapper.classList.add(
+                    'bg-transparent', 'rounded-small',
+                    'outline', 'outline-1', '-outline-offset-1', 'outline-outline',
+                    'focus-within:outline-2', 'focus-within:outline-primary'
+                );
+                this.activeIndicator.classList.add('hidden');
             } else {
-                this.inputWrapper.classList.add('bg-surface-variant', 'rounded-t-small', 'border-b', 'border-outline-variant', 'focus-within:border-primary', 'focus-within:border-b-2');
-                if (hasError) this.inputWrapper.classList.add('ring-error', 'focus-within:ring-error', 'border-error', 'focus-within:border-error');
+                this.inputWrapper.classList.add('bg-surface-variant', 'rounded-t-small');
+                this.activeIndicator.classList.remove('hidden');
+                this.activeIndicator.classList.toggle('bg-error', hasError);
+                this.activeIndicator.classList.toggle('bg-outline-variant', !hasError);
             }
         }
     }

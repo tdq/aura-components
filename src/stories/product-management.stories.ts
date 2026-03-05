@@ -111,7 +111,7 @@ export const ProductManagement = () => {
         categoryCombo.withCaption(of('Category'))
             .withItems(of(CATEGORIES))
             .withValue(category$ as any);
-            
+
         fields.addCheckBox(2, 1)
             .withCaption(of('Active Product'))
             .withValue(active$);
@@ -174,7 +174,7 @@ export const ProductManagement = () => {
     // 1. Filter Panel
     const filterPanel = new PanelBuilder()
         .withGap(PanelGap.MEDIUM);
-        
+
     const filterLayout = new LayoutBuilder()
         .asHorizontal()
         .withGap(LayoutGap.LARGE)
@@ -184,7 +184,8 @@ export const ProductManagement = () => {
     const nameFilter = new TextFieldBuilder()
         .withPlaceholder(of('Filter by name...'))
         .withValue(filterName$)
-        .withStyle(of(TextFieldStyle.OUTLINED));
+        .withStyle(of(TextFieldStyle.OUTLINED))
+        .asInlineError();
 
     // Category Filter
     const categoryFilter = new ComboBoxBuilder<string>()
