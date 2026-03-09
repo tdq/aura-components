@@ -51,8 +51,8 @@ export interface GridState<ITEM> {
 export interface ColumnBuilder<ITEM> {
     withHeader(header: string): this;
     withWidth(width: string): this;
-    sortable(sortable: boolean): this;
-    resizable(resizable: boolean): this;
+    asSortable(sortable?: boolean): this;
+    asResizable(resizable?: boolean): this;
     withClass(className: string): this;
     build(): GridColumn<ITEM>;
 }

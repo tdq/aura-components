@@ -111,7 +111,7 @@ export class GridHeader<ITEM> {
                     
                     document.body.style.cursor = 'col-resize';
                     handle.classList.add('active');
-                    cell.classList.add('bg-surface-variant/30');
+                    cell.classList.add(GridStyles.headerCellActive);
 
                     const onMouseMove = (moveEvent: MouseEvent) => {
                         const newWidth = Math.max(50, startWidth + (moveEvent.pageX - startX));
@@ -123,7 +123,7 @@ export class GridHeader<ITEM> {
                     const onMouseUp = () => {
                         document.body.style.cursor = '';
                         handle.classList.remove('active');
-                        cell.classList.remove('bg-surface-variant/30');
+                        cell.classList.remove(GridStyles.headerCellActive);
                         document.removeEventListener('mousemove', onMouseMove);
                         document.removeEventListener('mouseup', onMouseUp);
                     };

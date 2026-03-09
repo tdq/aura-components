@@ -213,11 +213,11 @@ export const Sorting = () => {
         .withSort('name', SortDirection.ASC);
 
     const columns = grid.withColumns();
-    columns.addNumberColumn('id').withHeader('ID').withWidth('60px').sortable(true);
-    columns.addTextColumn('name').withHeader('Name').withWidth('150px').sortable(true);
-    columns.addEnumColumn('role').withHeader('Role').withWidth('100px').sortable(true);
-    columns.addMoneyColumn('balance').withHeader('Balance').withWidth('100px').sortable(true);
-    columns.addDateColumn('lastLogin').withHeader('Last Login').withWidth('150px').sortable(true);
+    columns.addNumberColumn('id').withHeader('ID').withWidth('60px').asSortable();
+    columns.addTextColumn('name').withHeader('Name').withWidth('150px').asSortable();
+    columns.addEnumColumn('role').withHeader('Role').withWidth('100px').asSortable();
+    columns.addMoneyColumn('balance').withHeader('Balance').withWidth('100px').asSortable();
+    columns.addDateColumn('lastLogin').withHeader('Last Login').withWidth('150px').asSortable();
 
     return grid.build();
 };
@@ -228,8 +228,8 @@ export const ResizableColumns = () => {
         .withHeight(of(400));
 
     const columns = grid.withColumns();
-    columns.addTextColumn('name').withHeader('Name (Resizable)').withWidth('200px').resizable(true);
-    columns.addTextColumn('email').withHeader('Email (Resizable)').withWidth('250px').resizable(true);
+    columns.addTextColumn('name').withHeader('Name (Resizable)').withWidth('200px').asResizable();
+    columns.addTextColumn('email').withHeader('Email (Resizable)').withWidth('250px').asResizable();
     columns.addEnumColumn('role').withHeader('Role').withWidth('100px');
     columns.addMoneyColumn('balance').withHeader('Balance').withWidth('100px');
 

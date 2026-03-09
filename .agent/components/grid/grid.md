@@ -50,8 +50,8 @@ Used to add specialized columns to the grid:
 All column builders inherit these common methods:
 - `withHeader(header: string)`: Sets the display name in the column header.
 - `withWidth(width: string)`: Sets CSS width (e.g., `'100px'`, `'2fr'`, `'15%'`).
-- `sortable(sortable: boolean)`: Enables the sorting UI for the column.
-- `resizable(resizable: boolean)`: Enables column resizing via a handle in the header.
+- `asSortable()`: Enables the sorting UI for the column.
+- `asResizable()`: Enables column resizing via a handle in the header.
 - `withClass(className: string)`: Adds custom CSS classes to all cells in this column.
 
 ## Implementation Requirements

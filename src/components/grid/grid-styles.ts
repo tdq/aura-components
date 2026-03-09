@@ -11,8 +11,9 @@ export const GridStyles = {
     checkboxCell: 'w-12 flex-none flex items-center justify-center',
     checkboxInput: 'rounded border-outline w-4 h-4 cursor-pointer accent-primary',
     
-    headerCell: 'px-4 h-full flex items-center text-left truncate font-semibold text-on-surface-variant group relative transition-colors hover:bg-surface-variant/30 after:absolute after:right-0 after:top-[10%] after:h-[80%] after:w-0.5 after:bg-outline/20 after:opacity-0 [&.resizable-column]:hover:after:opacity-100 before:absolute before:left-0 before:top-[10%] before:h-[80%] before:w-0.5 before:bg-outline/20 before:opacity-0 [&.prev-resizable]:hover:before:opacity-100',
+    headerCell: 'px-4 h-full flex items-center text-left truncate font-semibold text-on-surface-variant group relative transition-colors hover:bg-surface-variant/30 after:absolute after:right-0 after:top-[10%] after:h-[80%] after:w-0.5 after:bg-outline/30 after:opacity-0 [&.resizable-column]:hover:after:opacity-100 before:absolute before:left-0 before:top-[10%] before:h-[80%] before:w-0.5 before:bg-outline/30 before:opacity-0 [&.prev-resizable]:hover:before:opacity-100',
     headerCellSortable: 'cursor-pointer hover:text-primary',
+    headerCellActive: 'bg-surface-variant/30',
     
     sortIcon: 'fas ml-2 transition-all transform',
     sortIconActive: 'opacity-100 text-primary scale-110',

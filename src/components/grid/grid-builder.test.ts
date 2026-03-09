@@ -26,7 +26,7 @@ describe('GridBuilder', () => {
             .withHeight(of(400))
             .withSort('name', SortDirection.DESC);
 
-        grid.withColumns().addTextColumn('name').withHeader('Name').sortable(true);
+        grid.withColumns().addTextColumn('name').withHeader('Name').asSortable();
 
         container = grid.build();
         document.body.appendChild(container);
@@ -128,7 +128,7 @@ describe('GridBuilder', () => {
             ]))
             .withHeight(of(400));
 
-        grid.withColumns().addTextColumn('name').withHeader('Name').sortable(true);
+        grid.withColumns().addTextColumn('name').withHeader('Name').asSortable();
 
         container = grid.build();
         document.body.appendChild(container);
@@ -158,7 +158,7 @@ describe('GridBuilder', () => {
             .withItems(of(items))
             .withHeight(of(400));
 
-        grid.withColumns().addTextColumn('name').withHeader('Name').withWidth('100px').resizable(true);
+        grid.withColumns().addTextColumn('name').withHeader('Name').withWidth('100px').asResizable();
 
         container = grid.build();
         document.body.appendChild(container);

@@ -23,12 +23,12 @@ export abstract class BaseColumnBuilder<ITEM> implements ColumnBuilder<ITEM> {
         return this;
     }
 
-    sortable(sortable: boolean): this {
+    asSortable(sortable: boolean = true): this {
         this._sortable = sortable;
         return this;
     }
 
-    resizable(resizable: boolean): this {
+    asResizable(resizable: boolean = true): this {
         this._resizable = resizable;
         return this;
     }
