@@ -7,6 +7,7 @@ The `GridViewport` class handles the virtualization and scroll management for th
 - **Row Height**: Fixed at `52px` (as defined in `GridStyles`).
 - **Buffer**: Extra rows (default: `5`) are rendered above and below the visible viewport to prevent flickering during scrolls.
 - **Rendering Loop**: `renderVisibleRows()` calculates the visible range based on `scrollTop` and `clientHeight` of the viewport element.
+- **Dynamic Resizing**: Uses a `ResizeObserver` to automatically trigger `renderVisibleRows()` whenever the viewport's dimensions change. This ensures the correct number of rows is displayed even if the grid's initial size is zero or changes after initialization.
 
 ## Components
 - **Element**: The main container with `overflow-auto`.
@@ -18,6 +19,7 @@ The `GridViewport` class handles the virtualization and scroll management for th
 - `updateColumns(columns: GridColumn<ITEM>[])`: Propagates column changes (like resizing) to all currently rendered rows.
 - `addHeader(headerElement: HTMLElement)`: Inserts a header element into the viewport.
 - `handleScroll()`: Event listener that triggers re-calculation and rendering of visible rows.
+- `destroy()`: Disconnects the `ResizeObserver` and performs necessary cleanup.
 
 ## Implementation Details
 Rendered rows are stored in a `Map<number, GridRow<ITEM>>`, where the key is the row index. This allows reusing row components when their position remains constant but data changes.

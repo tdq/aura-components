@@ -12,6 +12,8 @@ export class GridViewport<ITEM> {
     private lastItems: ITEM[] = [];
     private lastSelected: Set<ITEM> = new Set();
 
+    private resizeObserver: ResizeObserver | null = null;
+
     constructor(
         private columns: GridColumn<ITEM>[],
         private actions: GridAction<ITEM>[],
@@ -28,6 +30,20 @@ export class GridViewport<ITEM> {
         this.element.appendChild(this.contentElement);
 
         this.element.addEventListener('scroll', () => this.handleScroll());
+
+        if (typeof ResizeObserver !== 'undefined') {
+            this.resizeObserver = new ResizeObserver(() => {
+                this.renderVisibleRows();
+            });
+            this.resizeObserver.observe(this.element);
+        }
+    }
+
+    destroy() {
+        if (this.resizeObserver) {
+            this.resizeObserver.disconnect();
+            this.resizeObserver = null;
+        }
     }
 
     update(items: ITEM[], selected: Set<ITEM>) {

@@ -129,6 +129,7 @@ export class GridBuilder<ITEM> implements ComponentBuilder {
         registerDestroy(container, () => {
             sub.unsubscribe();
             this.logic.destroy();
+            viewport.destroy();
         });
 
         return container;

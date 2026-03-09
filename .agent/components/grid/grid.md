@@ -63,6 +63,7 @@ The grid implements a custom virtualization engine to maintain 60fps even with t
 - **Header Sync**: The header is placed inside the scrollable viewport to ensure horizontal alignment with rows while remaining `sticky top-0` vertically.
 - **Row Positioning**: Visible rows are managed as `GridRow` instances and absolutely positioned within the content container based on their index.
 - **Buffering**: Extra rows (default: 5) are rendered above and below the visible viewport to prevent flickering during fast scrolls.
+- **Resize Awareness**: The `GridViewport` utilizes `ResizeObserver` to recalculate visible rows when the grid container's size changes, ensuring proper rendering after the initial layout.
 
 ### Selection
 When `asMultiSelect()` is enabled:
