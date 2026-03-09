@@ -20,16 +20,16 @@ export const GridStyles = {
     
     resizeHandle: 'resize-handle absolute right-0 top-0 w-1 h-full cursor-col-resize hover:bg-primary/30 transition-colors z-30',
     
-    actionHeaderCell: 'w-20 flex-none sticky right-0 bg-surface-container-low/80 backdrop-blur-sm border-l border-outline/10 dark:border-stone-50/10 z-20',
+    actionHeaderCell: 'w-20 flex-none sticky right-0 bg-surface-container-low/80 border-l border-outline/10 dark:border-stone-50/10 z-20',
     
-    row: 'absolute w-full flex items-stretch border-b border-outline/10 dark:border-stone-50/10 transition-all duration-200 group border-l-2 border-l-transparent hover:bg-surface-variant/20 hover:border-l-primary dark:hover:bg-slate-800/60',
+    row: 'absolute w-full flex items-stretch border-b border-outline/10 dark:border-stone-50/10 transition-colors duration-200 group border-l-2 border-l-transparent hover:bg-surface-variant/20 hover:border-l-primary dark:hover:bg-slate-800/60',
     rowOdd: 'bg-surface-container-low/20',
     rowSelected: 'bg-primary/10 border-l-primary',
     rowEditable: 'cursor-text',
     
     cell: 'px-4 flex items-center truncate h-full',
     
-    actionCell: 'w-20 flex-none flex items-center justify-center gap-1 sticky right-0 z-10 border-l border-outline/10 dark:border-stone-50/10 transition-all duration-200 bg-surface-container-low/80 backdrop-blur-sm',
+    actionCell: 'w-20 flex-none flex items-center justify-center gap-1 sticky right-0 z-10 border-l border-outline/10 dark:border-stone-50/10 transition-colors duration-200 bg-surface-container-low/80',
     actionCellSelected: 'bg-primary/10',
     actionCellOdd: 'bg-surface-container-low/20',
     actionCellEven: 'bg-background',

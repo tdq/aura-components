@@ -17,3 +17,4 @@ The `ActionsBuilder` is used to define a set of contextual actions that appear f
 - **Default Appearance**: Defined by `GridStyles.actionButton`. Rendered as rounded-full buttons that gain a background on hover.
 - **Icon Actions**: Use a class-based icon system (e.g., `<i class="fa fa-edit"></i>`).
 - **Container**: The action cell uses `flex-none` with a fixed width (default `w-20`).
+- **Performance**: Sticky cells use an opaque background (`bg-surface-container-low/80`) instead of backdrop blur to maintain high frame rates during scroll.

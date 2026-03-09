@@ -11,6 +11,7 @@ export class GridViewport<ITEM> {
 
     private lastItems: ITEM[] = [];
     private lastSelected: Set<ITEM> = new Set();
+    private ticking = false;
 
     private resizeObserver: ResizeObserver | null = null;
 
@@ -29,7 +30,15 @@ export class GridViewport<ITEM> {
         this.contentElement.className = GridStyles.content;
         this.element.appendChild(this.contentElement);
 
-        this.element.addEventListener('scroll', () => this.handleScroll());
+        this.element.addEventListener('scroll', () => {
+            if (!this.ticking) {
+                requestAnimationFrame(() => {
+                    this.handleScroll();
+                    this.ticking = false;
+                });
+                this.ticking = true;
+            }
+        });
 
         if (typeof ResizeObserver !== 'undefined') {
             this.resizeObserver = new ResizeObserver(() => {

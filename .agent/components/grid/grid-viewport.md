@@ -18,8 +18,9 @@ The `GridViewport` class handles the virtualization and scroll management for th
 - `update(items: ITEM[], selected: Set<ITEM>)`: Updates the virtualization state with new items or selection changes.
 - `updateColumns(columns: GridColumn<ITEM>[])`: Propagates column changes (like resizing) to all currently rendered rows.
 - `addHeader(headerElement: HTMLElement)`: Inserts a header element into the viewport.
-- `handleScroll()`: Event listener that triggers re-calculation and rendering of visible rows.
+- `handleScroll()`: Throttled event listener using `requestAnimationFrame`. Ensures visible rows are recalculated only once per frame during active scrolling.
 - `destroy()`: Disconnects the `ResizeObserver` and performs necessary cleanup.
 
 ## Implementation Details
-Rendered rows are stored in a `Map<number, GridRow<ITEM>>`, where the key is the row index. This allows reusing row components when their position remains constant but data changes.
+- **Rendering Storage**: Rendered rows are stored in a `Map<number, GridRow<ITEM>>`, where the key is the row index.
+- **Scroll Throttling**: The scroll listener uses a `ticking` boolean flag and `requestAnimationFrame` to ensure the main thread is not overwhelmed by rapid scroll events. This is critical for maintaining 60fps performance on high-density displays or mobile devices.

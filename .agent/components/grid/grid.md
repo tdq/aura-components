@@ -58,27 +58,33 @@ All column builders inherit these common methods:
 
 ### Virtual Scrolling & Horizontal Sync
 The grid implements a custom virtualization engine to maintain 60fps even with thousands of rows:
-- **Viewport**: The main scrollable container with `overflow-auto`. Managed by `GridViewport`.
+- **Viewport**: The main scrollable container with `overflow-auto`. Managed by `GridViewport`. Uses `requestAnimationFrame` to throttle scroll events and ensure smooth rendering.
 - **Content**: A relative-positioned container with its total height calculated as `itemCount * rowHeight`.
 - **Header Sync**: The header is placed inside the scrollable viewport to ensure horizontal alignment with rows while remaining `sticky top-0` vertically.
-- **Row Positioning**: Visible rows are managed as `GridRow` instances and absolutely positioned within the content container based on their index.
+- **Row Positioning**: Visible rows are managed as `GridRow` instances and absolutely positioned within the content container based on their index. Row components cache key interactive elements (checkboxes, action panels) to minimize DOM traversals during state updates.
 - **Buffering**: Extra rows (default: 5) are rendered above and below the visible viewport to prevent flickering during fast scrolls.
-- **Resize Awareness**: The `GridViewport` utilizes `ResizeObserver` to recalculate visible rows when the grid container's size changes, ensuring proper rendering after the initial layout.
+- **Resize Awareness**: The `GridViewport` utilizes `ResizeObserver` to recalculate visible rows when the grid container's size changes.
 
 ### Selection
 When `asMultiSelect()` is enabled:
 - **State**: Tracked via `GridLogic` using `selectedItems` (a `BehaviorSubject<Set<ITEM>>`).
 - **Header**: `GridHeader` renders a checkbox for "Select All" / "Deselect All" logic.
-- **Rows**: `GridRow` renders a checkbox and handles selection toggling. Selection triggers a background highlight (`bg-primary/10`) and an accent border.
+- **Rows**: `GridRow` renders a checkbox and handles selection toggling. To maintain performance, selection updates are optimized to avoid full row re-renders, using cached element references to toggle classes and attributes.
 
 ### Sticky Panels
-- **Sticky Header**: Managed by `GridHeader`, remains fixed at the top (`sticky top-0`) with a higher z-index (`z-20`).
-- **Sticky Actions**: Rendered in a dedicated column that is `sticky right-0`. This panel uses `backdrop-blur-sm` and an opaque background to remain visible over scrolled content.
+- **Sticky Header**: Managed by `GridHeader`, remains fixed at the top (`sticky top-0`) with a higher z-index (`z-20`). Includes a backdrop blur for high-end visual feedback.
+- **Sticky Actions**: Rendered in a dedicated column that is `sticky right-0`. To prevent scroll lag, this panel uses an opaque background (`bg-surface-container-low/80`) and avoids expensive backdrop filters.
 
 ### Column Sorting
 - **State**: Managed in `GridLogic` (field and direction).
 - **Interaction**: `GridHeader` captures clicks and updates `GridLogic`.
 - **Visuals**: `GridHeader` displays sort icons based on the current `SortConfig`.
+
+### Performance Mandates
+1. **No Layout Thrashing**: Always use `requestAnimationFrame` for scroll-related DOM updates.
+2. **Element Caching**: `GridRow` must cache frequently accessed elements (checkboxes, action containers) during creation.
+3. **Selective Transitions**: Use `transition-colors` instead of `transition-all` on row containers to keep the compositor efficient.
+4. **Filter Restraint**: Limit the use of `backdrop-blur` to static or low-frequency update elements like the primary header. Avoid it on repeated elements like row cells.
 
 ## File Structure
 - `grid-builder.ts`: Orchestrator that assembles the grid using specialized modules.

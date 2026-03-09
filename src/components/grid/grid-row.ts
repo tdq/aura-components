@@ -9,6 +9,8 @@ function cn(...inputs: ClassValue[]) {
 
 export class GridRow<ITEM> {
     private element: HTMLElement;
+    private actionCell?: HTMLElement;
+    private checkbox?: HTMLInputElement;
     private readonly rowHeight = 52;
 
     constructor(
@@ -53,6 +55,7 @@ export class GridRow<ITEM> {
                 this.onToggleSelection(this.item);
             });
 
+            this.checkbox = checkbox;
             checkCell.appendChild(checkbox);
             row.appendChild(checkCell);
         }
@@ -99,6 +102,7 @@ export class GridRow<ITEM> {
                 };
                 actionCell.appendChild(btn);
             });
+            this.actionCell = actionCell;
             row.appendChild(actionCell);
         }
     }
@@ -141,6 +145,8 @@ export class GridRow<ITEM> {
         this.item = item;
         this.index = index;
         this.isSelected = isSelected;
+        this.actionCell = undefined;
+        this.checkbox = undefined;
         this.element.innerHTML = '';
         this.element.className = cn(
             GridStyles.row,
@@ -153,25 +159,25 @@ export class GridRow<ITEM> {
     }
 
     updateSelection(isSelected: boolean) {
+        if (this.isSelected === isSelected) return;
         this.isSelected = isSelected;
-        if (this.isMultiSelect) {
-            const checkbox = this.element.querySelector('input[type="checkbox"]') as HTMLInputElement;
-            if (checkbox) checkbox.checked = isSelected;
+
+        if (this.checkbox) {
+            this.checkbox.checked = isSelected;
         }
 
-        const actionCell = Array.from(this.element.children).find(c => (c as HTMLElement).classList.contains('sticky')) as HTMLElement;
-        if (actionCell) {
+        if (this.actionCell) {
             if (isSelected) {
-                actionCell.classList.add('bg-primary/10');
-                actionCell.classList.remove('bg-background', 'bg-surface-container-low/20');
+                this.actionCell.classList.add(GridStyles.actionCellSelected);
+                this.actionCell.classList.remove(GridStyles.actionCellEven, GridStyles.actionCellOdd);
             } else {
-                actionCell.classList.remove('bg-primary/10');
+                this.actionCell.classList.remove(GridStyles.actionCellSelected);
                 if (this.index % 2 === 1) {
-                    actionCell.classList.add('bg-surface-container-low/20');
-                    actionCell.classList.remove('bg-background');
+                    this.actionCell.classList.add(GridStyles.actionCellOdd);
+                    this.actionCell.classList.remove(GridStyles.actionCellEven);
                 } else {
-                    actionCell.classList.add('bg-background');
-                    actionCell.classList.remove('bg-surface-container-low/20');
+                    this.actionCell.classList.add(GridStyles.actionCellEven);
+                    this.actionCell.classList.remove(GridStyles.actionCellOdd);
                 }
             }
         }

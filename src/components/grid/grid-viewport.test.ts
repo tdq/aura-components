@@ -21,6 +21,11 @@ describe('GridViewport', () => {
     let resizeCallback: (entries: ResizeObserverEntry[], observer: ResizeObserver) => void;
 
     beforeAll(() => {
+        global.requestAnimationFrame = (callback: FrameRequestCallback) => {
+            callback(performance.now());
+            return 0;
+        };
+
         global.ResizeObserver = class ResizeObserver {
             constructor(cb: any) {
                 resizeCallback = cb;
