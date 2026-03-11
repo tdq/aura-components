@@ -174,4 +174,8 @@ export class GridHeader<ITEM> {
     getElement(): HTMLElement {
         return this.element;
     }
+
+    updateColumns(columns: GridColumn<ITEM>[]) {
+        this.columns = columns;
+    }
 }

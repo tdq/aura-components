@@ -21,6 +21,7 @@ The `GridHeader` class renders the column headers, handles sorting interactions,
 - `onSort(field: string, direction: SortDirection)`: Callback for sorting interactions.
 - `onSelectAll(checked: boolean)`: Callback for the header checkbox.
 - `onColumnsResized(columns: GridColumn<ITEM>[])`: Callback triggered when a column's width is changed.
+- `updateColumns(columns: GridColumn<ITEM>[])`: Replaces the current column definitions. Used when pivoting or dynamic configuration changes occur.
 
 ## Implementation Details
 Resizing is handled via a `mousedown`, `mousemove`, and `mouseup` pattern on the `resize-handle` element. 

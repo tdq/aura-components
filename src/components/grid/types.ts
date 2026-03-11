@@ -58,11 +58,13 @@ export type GridRowData<ITEM> =
 
 export interface GridState<ITEM> {
     items: ITEM[];
+    rawItems: ITEM[];
     rows: GridRowData<ITEM>[];
     selectedItems: Set<ITEM>;
     sortConfig: SortConfig;
     groupBy: string[];
     expandedGroups: Set<string>;
+    pivotConfig?: PivotConfig;
 }
 
 export interface ColumnBuilder<ITEM> {
@@ -72,4 +74,25 @@ export interface ColumnBuilder<ITEM> {
     asResizable(resizable?: boolean): this;
     withClass(className: string): this;
     build(): GridColumn<ITEM>;
+}
+
+export enum AggregationType {
+    SUM = 'SUM',
+    COUNT = 'COUNT',
+    AVG = 'AVG',
+    MIN = 'MIN',
+    MAX = 'MAX'
+}
+
+export interface PivotValueConfig {
+    field: string;
+    aggregation: AggregationType;
+    header?: string;
+}
+
+export interface PivotConfig {
+    rows: string[];
+    columns: string[];
+    values: PivotValueConfig[];
+    showGrandTotal?: boolean;
 }

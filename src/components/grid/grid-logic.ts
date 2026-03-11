@@ -1,14 +1,17 @@
 import { BehaviorSubject, combineLatest, map, Observable, Subscription } from 'rxjs';
-import { SortConfig, SortDirection, GridState, GridRowData, GridGroupHeader } from './types';
+import { SortConfig, SortDirection, GridState, GridRowData, GridGroupHeader, PivotConfig } from './types';
+import { PivotLogic } from './pivot-logic';
 
 export class GridLogic<ITEM> {
     private _items$ = new BehaviorSubject<ITEM[]>([]);
     private _selectedItems$ = new BehaviorSubject<Set<ITEM>>(new Set());
     private _sortConfig$ = new BehaviorSubject<SortConfig>({ field: '', direction: SortDirection.NONE });
     private _groupBy$ = new BehaviorSubject<string[]>([]);
+    private _pivotConfig$ = new BehaviorSubject<PivotConfig | undefined>(undefined);
     private _expandedGroups$ = new BehaviorSubject<Set<string>>(new Set());
     private _itemsSubscription?: Subscription;
     private _groupBySubscription?: Subscription;
+    private _pivotSubscription?: Subscription;
 
     constructor() {}
 
@@ -17,6 +20,13 @@ export class GridLogic<ITEM> {
             this._itemsSubscription.unsubscribe();
         }
         this._itemsSubscription = items$.subscribe(items => this._items$.next(items));
+    }
+
+    setPivot(pivotConfig$: Observable<PivotConfig | undefined>) {
+        if (this._pivotSubscription) {
+            this._pivotSubscription.unsubscribe();
+        }
+        this._pivotSubscription = pivotConfig$.subscribe(config => this._pivotConfig$.next(config));
     }
 
     setGrouping(groupBy$: Observable<string[]>) {
@@ -55,12 +65,17 @@ export class GridLogic<ITEM> {
     }
 
     get sortedItems$(): Observable<ITEM[]> {
-        return combineLatest([this._items$, this._sortConfig$]).pipe(
-            map(([items, sort]) => {
-                if (!sort.field || sort.direction === SortDirection.NONE) {
-                    return items;
+        return combineLatest([this._items$, this._sortConfig$, this._pivotConfig$]).pipe(
+            map(([items, sort, pivotConfig]) => {
+                let processedItems = items;
+                if (pivotConfig) {
+                    processedItems = PivotLogic.pivot(items, pivotConfig);
                 }
-                return this.sortItems(items, sort.field, sort.direction);
+
+                if (!sort.field || sort.direction === SortDirection.NONE) {
+                    return processedItems;
+                }
+                return this.sortItems(processedItems, sort.field, sort.direction);
             })
         );
     }
@@ -81,17 +96,21 @@ export class GridLogic<ITEM> {
             this._selectedItems$,
             this._sortConfig$,
             this._groupBy$,
-            this._expandedGroups$
+            this._expandedGroups$,
+            this._pivotConfig$,
+            this._items$
         ]).pipe(
-            map(([items, selectedItems, sortConfig, groupBy, expandedGroups]) => {
+            map(([items, selectedItems, sortConfig, groupBy, expandedGroups, pivotConfig, rawItems]) => {
                 const rows = this.processRows(items, groupBy, expandedGroups, sortConfig);
                 return {
                     items,
+                    rawItems,
                     rows,
                     selectedItems,
                     sortConfig,
                     groupBy,
-                    expandedGroups
+                    expandedGroups,
+                    pivotConfig
                 };
             })
         );

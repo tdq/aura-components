@@ -29,6 +29,7 @@ export const GridStyles = {
     rowEditable: 'cursor-text',
     
     cell: 'px-4 flex items-center truncate h-full',
+    totalCell: 'font-bold bg-surface-container-highest/30',
     
     groupRow: 'absolute w-full flex items-center bg-surface-container-high border-b border-outline/10 cursor-pointer hover:bg-surface-container-highest transition-colors z-10 [will-change:transform]',
     groupToggle: 'w-10 h-10 flex items-center justify-center text-on-surface-variant transition-transform duration-200',

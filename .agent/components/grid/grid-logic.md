@@ -19,6 +19,7 @@ Uses RxJS `BehaviorSubject` to track:
 
 ## Methods
 - `setItems(items$: Observable<ITEM[]>)`: Subscribes to an external items observable.
+- `setPivot(pivotConfig$: Observable<PivotConfig | undefined>)`: Configures the pivot transformation logic.
 - `setGrouping(groupBy$: Observable<string[]>)`: Subscribes to the grouping configuration observable.
 - `setSort(field: string, direction: SortDirection)`: Updates the sorting configuration.
 - `toggleGroup(groupKey: string)`: Toggles the expansion state of a specific group.
@@ -27,7 +28,17 @@ Uses RxJS `BehaviorSubject` to track:
 - `destroy()`: Cleans up internal subscriptions.
 
 ## Implementation Details
-Sorting is performed in-memory. Grouping is implemented via a recursive function that:
+Sorting is performed in-memory. 
+
+### Pivot Transformation
+If a `PivotConfig` is provided, the data transformation occurs at the beginning of the `state$` observable pipe. 
+1.  **Scan Phase**: Identifies all unique values in the `columns` fields to generate dynamic column headers.
+2.  **Aggregation Phase**: Groups the raw `ITEM[]` by the `rows` fields.
+3.  **Calculation Phase**: Applies the specified `aggregation` (SUM, COUNT, etc.) to the `values` fields for each dynamic column.
+4.  **Result**: Produces a `PivotedRow[]` that is then passed to the grouping and sorting logic.
+
+### Grouping Logic
+Grouping is implemented via a recursive function that:
 1.  Segments items by the current grouping level's field.
 2.  Creates a `GridGroupHeader` for each segment.
 3.  If the group is expanded, recursively processes the next grouping level or adds the leaf `ITEM` rows.

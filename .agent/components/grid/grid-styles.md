@@ -19,6 +19,7 @@ The `GridStyles` object centralizes the Tailwind CSS classes used across all gri
 - **`rowOdd`**: Background color for zebra striping on odd rows.
 - **`rowSelected`**: Background highlight for selected rows.
 - **`cell`**: Flex container with padding and truncation for text content.
+- **`totalCell`**: Specialized styling for aggregated pivot columns. Bold text with a distinct background (`bg-surface-container-highest/30`).
 - **`groupRow`**: Full-width container for group headers. Uses `bg-surface-container-high` for visual distinction. Employs `transform: translateY` and `will-change: transform` for performance.
 - **`groupToggle`**: Icon container for expansion chevrons. Supports 90-degree rotation when expanded.
 - **`groupContent`**: Flex container for group label, value, and item count.

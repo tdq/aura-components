@@ -25,9 +25,16 @@ The `GridBuilder<ITEM>` class uses a generic type `ITEM` to ensure type safety a
 - `withSort(field: keyof ITEM | string, direction: SortDirection): this`: Sets the initial sort configuration.
 
 ### Configuration
-- `withColumns(): ColumnsBuilder<ITEM>`: Starts the column definition flow. Returns a `ColumnsBuilder`.
+- `withColumns(): ColumnsBuilder<ITEM>`: Starts the column definition flow. Returns a `ColumnsBuilder`. 
+  *Example:*
+  ```typescript
+  const columns = grid.withColumns();
+  columns.addTextColumn('name').withHeader('Name');
+  columns.addNumberColumn('age').withHeader('Age');
+  ```
 - `withToolbar(): ToolbarBuilder`: Adds an optional top toolbar for global actions.
 - `withActions(): ActionsBuilder<ITEM>`: Adds per-row action buttons in a dedicated trailing column.
+- `withPivot(config: PivotConfig): this`: Enables the [Pivoting Mode](pivot.md) for data aggregation.
 - `asGlass(): this`: Enables translucent glass styling with backdrop blur.
 - `asEditable(): this`: Enables visual cues for edit mode (e.g., specific cursors or state layers).
 - `asMultiSelect(): this`: Enables row selection via checkboxes and "Select All" functionality in the header.
@@ -92,6 +99,7 @@ When `asMultiSelect()` is enabled:
 ## File Structure
 - `grid-builder.ts`: Orchestrator that assembles the grid using specialized modules.
 - `grid-logic.ts`: Reactive state and data processing logic.
+- `pivot-logic.ts`: Utility for data transformation and aggregation.
 - `grid-viewport.ts`: Virtualization and scrolling implementation.
 - `grid-header.ts`: Header rendering and interaction logic.
 - `grid-row.ts`: Row and cell rendering implementation.
