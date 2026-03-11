@@ -12,7 +12,7 @@ Builds an error icon button with a popover tooltip for inline error display.
 
 Methods:
 - withError(error: string): this - sets the error text to display.
-- build(): HTMLElement - returns a `<button>` with an error SVG icon. On click, toggles a popover tooltip showing the error text.
+- build(): HTMLElement - returns a `<button>` with an error icon (uses `Icons.ERROR`). On click, toggles a popover tooltip showing the error text.
 
 Popover behavior:
 - Positioned above the icon, centered horizontally.

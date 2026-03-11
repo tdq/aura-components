@@ -3,6 +3,7 @@ import { ComponentBuilder } from '../../core/component-builder';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { registerDestroy } from '@/core/destroyable-element';
+import { Icons } from '@/core/icons';
 
 export enum ButtonStyle {
     FILLED = 'filled',
@@ -26,6 +27,7 @@ const STYLE_MAP: Record<ButtonStyle, string> = {
 
 export class ButtonBuilder implements ComponentBuilder {
     private caption$?: Observable<string>;
+    private icon$?: Observable<string>;
     private enabled$?: Observable<boolean>;
     private click$?: Subject<void>;
     private style$?: Observable<ButtonStyle>;
@@ -39,6 +41,11 @@ export class ButtonBuilder implements ComponentBuilder {
 
     withCaption(caption: Observable<string>): ButtonBuilder {
         this.caption$ = caption;
+        return this;
+    }
+
+    withIcon(icon: Observable<string> | string): ButtonBuilder {
+        this.icon$ = typeof icon === 'string' ? of(icon) : icon;
         return this;
     }
 
@@ -68,9 +75,38 @@ export class ButtonBuilder implements ComponentBuilder {
 
         button.className = cn(BASE_CLASSES);
 
+        const iconSpan = document.createElement('span');
+        iconSpan.className = 'w-5 h-5 flex items-center justify-center';
+        
+        const captionSpan = document.createElement('span');
+
         const captionSub = this.caption$ ? this.caption$.subscribe(caption => {
-            button.textContent = caption;
+            captionSpan.textContent = caption;
+            if (!caption) {
+                captionSpan.classList.add('hidden');
+                button.classList.add('aspect-square', 'p-px-12');
+                button.classList.remove('px-px-24');
+            } else {
+                captionSpan.classList.remove('hidden');
+                button.classList.remove('aspect-square', 'p-px-12');
+                button.classList.add('px-px-24');
+            }
         }) : null;
+
+        const iconSub = this.icon$ ? this.icon$.subscribe(iconHtml => {
+            if (iconHtml) {
+                iconSpan.innerHTML = iconHtml.includes('<svg') 
+                    ? iconHtml.replace('<svg', '<svg class="w-full h-full"') 
+                    : `<i class="${iconHtml}"></i>`;
+                if (!iconSpan.parentElement) {
+                    button.prepend(iconSpan);
+                }
+            } else {
+                iconSpan.remove();
+            }
+        }) : null;
+
+        button.appendChild(captionSpan);
 
         const enabledSub = this.enabled$ ? this.enabled$.subscribe(enabled => {
             button.disabled = !enabled;
@@ -81,6 +117,14 @@ export class ButtonBuilder implements ComponentBuilder {
 
         const styleSub = combineLatest([style$, className$]).subscribe(([style, extraClass]) => {
             button.className = cn(BASE_CLASSES, extraClass);
+            
+            // Re-apply classes if it's an icon-only button
+            if (this.caption$) {
+                // Subscription will handle it
+            } else {
+                button.classList.add('aspect-square', 'p-px-12');
+                button.classList.remove('px-px-24');
+            }
 
             if (this.isGlass) {
                 // Apply glass effect
@@ -117,6 +161,7 @@ export class ButtonBuilder implements ComponentBuilder {
 
         registerDestroy(button, () => {
             captionSub?.unsubscribe();
+            iconSub?.unsubscribe();
             enabledSub?.unsubscribe();
             styleSub?.unsubscribe();
             this.click$?.complete();

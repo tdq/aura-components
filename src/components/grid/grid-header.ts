@@ -2,6 +2,7 @@ import { GridColumn, SortConfig, SortDirection } from './types';
 import { GridStyles } from './grid-styles';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { Icons } from '@/core/icons';
 
 function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -76,11 +77,12 @@ export class GridHeader<ITEM> {
             if (col.sortable) {
                 const icon = document.createElement('i');
                 const isCurrent = sort.field === col.field;
-                const iconClass = isCurrent && sort.direction === SortDirection.ASC ? 'fa-sort-up' :
-                    isCurrent && sort.direction === SortDirection.DESC ? 'fa-sort-down' : 'fa-sort';
+                const iconClass = isCurrent && sort.direction === SortDirection.ASC ? Icons.SORT_UP :
+                    isCurrent && sort.direction === SortDirection.DESC ? Icons.SORT_DOWN : Icons.SORT;
 
                 icon.className = cn(
                     GridStyles.sortIcon,
+                    'fas',
                     iconClass,
                     isCurrent ? GridStyles.sortIconActive : GridStyles.sortIconInactive
                 );

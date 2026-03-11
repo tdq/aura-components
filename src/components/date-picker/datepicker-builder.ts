@@ -4,6 +4,7 @@ import { registerDestroy } from '@/core/destroyable-element';
 import { formatDate, parseDate, isValidDate } from './date-utils';
 import { renderCalendar } from './calendar';
 import { DatePickerStyle } from './types';
+import { Icons } from '@/core/icons';
 
 export class DatePickerBuilder implements ComponentBuilder {
     private value$?: Subject<Date | null>;
@@ -157,7 +158,7 @@ export class DatePickerBuilder implements ComponentBuilder {
         const iconButton = document.createElement('button');
         iconButton.type = 'button';
         iconButton.className = 'p-px-12 text-on-surface-variant hover:text-primary transition-colors focus:outline-none';
-        iconButton.innerHTML = `<svg class="w-px-24 h-px-24" viewBox="0 0 24 24"><path fill="currentColor" d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>`;
+        iconButton.innerHTML = Icons.CALENDAR.replace('<svg', '<svg class="w-px-24 h-px-24"');
         inputWrapper.appendChild(iconButton);
 
         // Error message

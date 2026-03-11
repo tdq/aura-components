@@ -4,6 +4,7 @@
 Button component is a custom element that is used to display a button.
 It has the following methods:
 - withCaption(caption: Observable<string>): this - sets caption of the button.
+- withIcon(icon: Observable<string> | string): this - sets an icon for the button. Supports SVG strings (e.g., from `Icons` class) or CSS icon classes.
 - withEnabled(enabled: Observable<boolean>): this - sets enabled state of the button.
 - withClick(click: Subject<void>): this - sets click event of the button.
 - withStyle(style: Observable<ButtonStyle>): this - sets style of the button.

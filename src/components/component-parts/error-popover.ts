@@ -1,5 +1,6 @@
 import { ComponentBuilder } from '../../core/component-builder';
 import { registerDestroy } from '@/core/destroyable-element';
+import { Icons } from '@/core/icons';
 
 export class ErrorPopoverBuilder implements ComponentBuilder {
     private errorText: string = '';
@@ -14,11 +15,7 @@ export class ErrorPopoverBuilder implements ComponentBuilder {
         button.type = 'button';
         button.className = 'flex items-center justify-center w-6 h-6 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors focus:outline-none';
         button.setAttribute('aria-label', `Error: ${this.errorText}`);
-        button.innerHTML = `
-            <svg viewBox="0 0 24 24" class="w-5 h-5 fill-current text-error">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
-            </svg>
-        `;
+        button.innerHTML = Icons.ERROR.replace('<svg', '<svg class="w-5 h-5 text-error"');
 
         const popover = document.createElement('div');
         popover.setAttribute('popover', 'auto');

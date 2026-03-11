@@ -50,7 +50,7 @@ Popup with items should have background according to combobox style (tonal or ou
 Popup with items should have limited height.
 Hovered item in popup should be highlighted with darker background.
 Currently selected item also should be highlighted in popup by using bold text style.
-Clicking the dropdown icon should focus the input.
+Clicking the dropdown icon (uses `Icons.CHEVRON_DOWN`) should focus the input.
 Height is 48px.
 Reserve space for error text only if it is not "as inline error".
 

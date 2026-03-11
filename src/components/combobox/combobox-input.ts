@@ -1,5 +1,6 @@
 import { ComboBoxStyle } from './types';
 import { cn, STYLE_MAP } from './styles';
+import { Icons } from '@/core/icons';
 
 export interface ComboBoxInputElements {
     container: HTMLDivElement;
@@ -39,11 +40,7 @@ export function renderComboBoxInput(props: ComboBoxInputProps = {}): ComboBoxInp
     // Dropdown icon
     const iconContainer = document.createElement('div');
     iconContainer.className = 'pr-px-12 flex items-center justify-center text-on-surface-variant cursor-pointer z-10';
-    iconContainer.innerHTML = `
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M7 10L12 15L17 10H7Z" fill="currentColor"/>
-        </svg>
-    `;
+    iconContainer.innerHTML = Icons.CHEVRON_DOWN.replace('<svg', '<svg width="24" height="24"');
     inputContainer.appendChild(iconContainer);
 
     return {

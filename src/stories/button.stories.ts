@@ -1,6 +1,7 @@
 import { ButtonBuilder, ButtonStyle } from '../components/button';
 import { BehaviorSubject, of, Subject } from 'rxjs';
 import { LayoutBuilder, LayoutGap } from '../components/layout';
+import { Icons } from '../core/icons';
 
 export default {
     title: 'Components/Button',
@@ -141,3 +142,66 @@ export const Glass = () => {
 
     return container;
 };
+
+export const WithIcons = () => {
+    const layout = new LayoutBuilder()
+        .asVertical()
+        .withGap(LayoutGap.LARGE);
+
+    const row1 = new LayoutBuilder()
+        .asHorizontal()
+        .withGap(LayoutGap.MEDIUM);
+
+    row1.addSlot().withContent(
+        new ButtonBuilder()
+            .withCaption(of('Search'))
+            .withIcon(Icons.EXPAND)
+    );
+
+    row1.addSlot().withContent(
+        new ButtonBuilder()
+            .withCaption(of('Calendar'))
+            .withIcon(Icons.CALENDAR)
+            .withStyle(of(ButtonStyle.TONAL))
+    );
+
+    row1.addSlot().withContent(
+        new ButtonBuilder()
+            .withCaption(of('Check'))
+            .withIcon(Icons.CHECKMARK)
+            .withStyle(of(ButtonStyle.OUTLINED))
+    );
+
+    layout.addSlot().withContent(row1);
+
+    const row2 = new LayoutBuilder()
+        .asHorizontal()
+        .withGap(LayoutGap.MEDIUM);
+
+    row2.addSlot().withContent(
+        new ButtonBuilder()
+            .withIcon(Icons.CALENDAR)
+            .withStyle(of(ButtonStyle.FILLED))
+    );
+
+    row2.addSlot().withContent(
+        new ButtonBuilder()
+            .withIcon(Icons.EXPAND)
+            .withStyle(of(ButtonStyle.ELEVATED))
+    );
+
+    row2.addSlot().withContent(
+        new ButtonBuilder()
+            .withIcon(Icons.ERROR)
+            .withStyle(of(ButtonStyle.TEXT))
+            .withClass(of('text-error'))
+    );
+
+    layout.addSlot().withContent(row2);
+
+    const container = layout.build();
+    container.classList.add('p-4');
+
+    return container;
+};
+

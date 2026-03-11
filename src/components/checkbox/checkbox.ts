@@ -3,6 +3,7 @@ import { ComponentBuilder } from '../../core/component-builder';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { registerDestroy } from '@/core/destroyable-element';
+import { Icons } from '@/core/icons';
 
 function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -55,7 +56,7 @@ export class CheckboxBuilder implements ComponentBuilder {
         const box = document.createElement('div');
         const updateBoxClasses = (isGlass: boolean) => {
             box.className = cn(
-                'w-full h-full rounded-small transition-all',
+                'w-full h-full rounded-small transition-all relative',
                 'peer-focus-visible:ring-2 peer-focus-visible:ring-primary peer-focus-visible:ring-offset-2',
                 'peer-checked:bg-primary peer-checked:border-primary',
                 'peer-disabled:opacity-38 peer-disabled:cursor-not-allowed',
@@ -65,16 +66,9 @@ export class CheckboxBuilder implements ComponentBuilder {
             );
         };
 
-        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        svg.setAttribute('class', 'absolute inset-0 w-full h-full text-on-primary scale-0 transition-transform peer-checked:scale-100');
-        svg.setAttribute('viewBox', '0 0 24 24');
-        svg.setAttribute('fill', 'none');
-        svg.setAttribute('stroke', 'currentColor');
-        svg.setAttribute('stroke-width', '4');
-
-        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.setAttribute('d', 'M5 13l4 4L19 7');
-        svg.appendChild(path);
+        const iconContainer = document.createElement('div');
+        iconContainer.className = 'absolute inset-0 w-full h-full text-on-primary scale-0 transition-transform peer-checked:scale-100 flex items-center justify-center';
+        iconContainer.innerHTML = Icons.CHECKMARK;
 
         const stateLayer = document.createElement('div');
         stateLayer.className = cn(
@@ -85,7 +79,7 @@ export class CheckboxBuilder implements ComponentBuilder {
 
         container.appendChild(input);
         container.appendChild(box);
-        box.appendChild(svg);
+        container.appendChild(iconContainer);
         container.appendChild(stateLayer);
 
         const captionSpan = document.createElement('span');

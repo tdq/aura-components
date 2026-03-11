@@ -11,4 +11,5 @@ It has the following methods:
 
 ## Styling
 Style according to Material Design 3
-Glass effect applied only for checkbox clickable part which contains check mark.
+Glass effect applied only for checkbox clickable part which contains check mark. 
+Uses `Icons.CHECKMARK` for the selection indicator.

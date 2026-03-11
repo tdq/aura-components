@@ -21,7 +21,8 @@ It has the following methods:
 ## State Management
 
 - **Selected Date**: Managed via `withValue(Subject<Date | null>)`. Updates on valid manual input or grid cell selection.
-- **Popup Visibility**: Toggled by the calendar icon and closed on selection or outside click.
+- **Popup Visibility**: Toggled by the calendar icon (uses `Icons.CALENDAR`) and closed on selection or outside click.
+- **Navigation**: Uses `Icons.CHEVRON_LEFT` and `Icons.CHEVRON_RIGHT` for month navigation.
 - **Constraints**: `minDate` and `maxDate` disable selection of dates outside the range.
 - **Validation**: Manual input is validated against the specified format; invalid entries trigger error state.
 

@@ -6,7 +6,9 @@ The `GridHeader` class renders the column headers, handles sorting interactions,
 ## Responsibilities
 - **Header Structure**: Renders column titles, sort icons, and resize handles.
 - **Selection**: Renders the "Select All" checkbox when multi-select is enabled.
-- **Sorting**: Captures clicks on sortable columns and triggers the sorting logic.
+### Sorting
+- **Icons**: Displays sort icons (`Icons.SORT`, `Icons.SORT_UP`, `Icons.SORT_DOWN`) based on the current `SortConfig`.
+- **Interaction**: Captures clicks on sortable columns and triggers the sorting logic.
 - **Resizing**: Implements mouse-based column resizing, updating the grid's layout reactively.
 
 ## Components

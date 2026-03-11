@@ -3,6 +3,7 @@ import { getDaysInMonth, getFirstDayOfMonth, isSameDay, isValidDate } from './da
 import { CalendarOptions } from './types';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { Icons } from '@/core/icons';
 
 function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -47,7 +48,7 @@ export function renderCalendar(options: CalendarOptions): HTMLElement {
     const prevBtn = document.createElement('button');
     prevBtn.className = 'p-px-8 hover:bg-surface-variant rounded-full text-on-surface focus:outline-primary';
     prevBtn.setAttribute('aria-label', 'Previous Month');
-    prevBtn.innerHTML = '<svg class="w-px-20 h-px-20" viewBox="0 0 24 24"><path fill="currentColor" d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>';
+    prevBtn.innerHTML = Icons.CHEVRON_LEFT.replace('<svg', '<svg class="w-px-20 h-px-20"');
     prevBtn.onclick = (e) => {
         e.stopPropagation();
         const current = viewDate$.value;
@@ -57,7 +58,7 @@ export function renderCalendar(options: CalendarOptions): HTMLElement {
     const nextBtn = document.createElement('button');
     nextBtn.className = 'p-px-8 hover:bg-surface-variant rounded-full text-on-surface focus:outline-primary';
     nextBtn.setAttribute('aria-label', 'Next Month');
-    nextBtn.innerHTML = '<svg class="w-px-20 h-px-20" viewBox="0 0 24 24"><path fill="currentColor" d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>';
+    nextBtn.innerHTML = Icons.CHEVRON_RIGHT.replace('<svg', '<svg class="w-px-20 h-px-20"');
     nextBtn.onclick = (e) => {
         e.stopPropagation();
         const current = viewDate$.value;
