@@ -29,7 +29,10 @@ Used to configure area-based series (line with filled area below).
 - `asStacked(): this`: Sets the series to be stacked with other bar or area series.
 
 ## Implementation Details
-- **Path Rendering**: Lines and area boundaries MUST use `<path>` elements with standard `M` (move to) and `L` (line to) commands for maximum compatibility.
+- **Zero Baseline**: All value-based renderings (lines, bars, areas) MUST use `yScale(0)` as the baseline. This ensures bars grow from the correct axis line and that charts with negative values render accurately.
+- **Path Rendering**: Lines and area boundaries MUST use `<path>` elements with standard `M` (move to) and `L` (line to) commands. 
+- **Animation Paths**: For path-based animations (`LineChart`, `AreaChart`), create a `zeroLinePoints` string representing all data points shifted to `yScale(0)`. Transition the `d` attribute from `zeroLinePoints` to actual `points`.
+- **Bar Animation**: Bars MUST transition both `y` and `height` properties from the `baselineY` to their final calculated values.
 - **Shadow Application**: Each series MUST apply its corresponding filter using `setAttribute('filter', 'url(#shadow-i)')`.
 - **Composition**: Series are rendered in the order they were added. Area charts should typically be added first to ensure they don't overlap line markers.
-- **Markers**: Markers for line series should also receive the shadow filter for consistent visual depth.
+- **Markers**: Markers for line series should also receive the shadow filter for consistent visual depth. Markers should also be animated from `baselineY` to their target position.

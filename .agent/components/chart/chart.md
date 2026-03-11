@@ -39,6 +39,7 @@ Each method returns a specialized builder for that series.
 - `withTitle(title: Observable<string>): this`: Sets the chart title.
 - `withLegend(visible: boolean): this`: Toggles the legend visibility.
 - `withTooltip(enabled: boolean): this`: Toggles interactive tooltips.
+- `withAnimation(enabled: boolean): this`: Toggles entry animations for data series (default: true).
 - `asGlass(): this`: Enables translucent glass styling with backdrop blur and adds panel-like container styling (padding, borders, rounded corners).
 
 ## Implementation Requirements
@@ -46,6 +47,8 @@ Each method returns a specialized builder for that series.
 - **Responsive ViewBox**: The SVG `viewBox` MUST be defined using the dimensions of the parent `chartArea` div via `getBoundingClientRect()`. 
 - **Resize Handling**: A `ResizeObserver` MUST be attached to the `chartArea` element to trigger a re-render and update the `viewBox` whenever the available space changes.
 - **SVG Attributes**: The SVG element MUST have `width="100%"`, `height="100%"`, and `preserveAspectRatio="xMidYMid meet"`.
+- **SVG Animations**: When `animate` is true, use `<animate>` elements inside SVG paths/rects/circles to transition from a zero-baseline state (e.g., `yScale(0)`) to the actual value state. 
+- **Animation Timing**: Use a duration of `0.5s` and `calcMode="spline"` with `keySplines="0.4 0 0.2 1"` for smooth MD3-compliant motion.
 - **Rendering Loop**: Use `logic.state$` subscription to trigger re-renders.
 - **Individual Shadows**: Each series must have its own shadow filter in `<defs>` with ID `shadow-${index}`.
 - **Shadow Configuration**: 

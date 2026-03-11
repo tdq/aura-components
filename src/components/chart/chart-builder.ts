@@ -116,6 +116,11 @@ export class ChartBuilder<ITEM> implements ComponentBuilder {
         return this;
     }
 
+    withAnimation(enabled: boolean = true): this {
+        this.logic.setAnimate(enabled);
+        return this;
+    }
+
     build(): HTMLElement {
         const container = document.createElement('div');
         container.className = ChartStyles.container;
@@ -317,14 +322,20 @@ export class ChartBuilder<ITEM> implements ComponentBuilder {
     }
 
     private renderLine(g: SVGGElement, state: ChartState<ITEM>, config: LineChartConfig<ITEM>, xScale: any, yScale: any, filterId: string) {
+        const baselineY = yScale(0);
         const points = state.data.map((d, i) => {
             const x = xScale(i);
             const y = yScale(Number(d[config.field as keyof ITEM]) || 0);
             return `${i === 0 ? 'M' : 'L'} ${x},${y}`;
         }).join(' ');
 
+        const zeroPoints = state.data.map((d, i) => {
+            const x = xScale(i);
+            return `${i === 0 ? 'M' : 'L'} ${x},${baselineY}`;
+        }).join(' ');
+
         const pathAttrs: Record<string, string> = {
-            d: points,
+            d: state.animate ? zeroPoints : points,
             fill: 'none',
             stroke: config.color || 'currentColor',
             'stroke-width': String(config.width || 2),
@@ -333,17 +344,44 @@ export class ChartBuilder<ITEM> implements ComponentBuilder {
         if (config.isDashed) pathAttrs['stroke-dasharray'] = '5,5';
 
         const path = this.createSvgElement('path', pathAttrs);
+        if (state.animate) {
+            const anim = this.createSvgElement('animate', {
+                attributeName: 'd',
+                from: zeroPoints,
+                to: points,
+                dur: '0.5s',
+                fill: 'freeze',
+                calcMode: 'spline',
+                keySplines: '0.4 0 0.2 1'
+            });
+            path.appendChild(anim);
+        }
         g.appendChild(path);
 
         if (config.showMarkers) {
             state.data.forEach((d, i) => {
+                const x = xScale(i);
+                const y = yScale(Number(d[config.field as keyof ITEM]) || 0);
                 const circle = this.createSvgElement('circle', {
-                    cx: String(xScale(i)),
-                    cy: String(yScale(Number(d[config.field as keyof ITEM]) || 0)),
+                    cx: String(x),
+                    cy: String(state.animate ? baselineY : y),
                     r: '4',
                     fill: config.color || 'currentColor',
                     filter: `url(#${filterId})`
                 });
+
+                if (state.animate) {
+                    const anim = this.createSvgElement('animate', {
+                        attributeName: 'cy',
+                        from: String(baselineY),
+                        to: String(y),
+                        dur: '0.5s',
+                        fill: 'freeze',
+                        calcMode: 'spline',
+                        keySplines: '0.4 0 0.2 1'
+                    });
+                    circle.appendChild(anim);
+                }
                 g.appendChild(circle);
             });
         }
@@ -351,18 +389,47 @@ export class ChartBuilder<ITEM> implements ComponentBuilder {
 
     private renderBars(g: SVGGElement, state: ChartState<ITEM>, config: BarChartConfig<ITEM>, xScale: any, yScale: any, viewHeight: number, filterId: string) {
         const barWidth = 20; 
+        const baselineY = yScale(0);
+
         state.data.forEach((d, i) => {
             const val = Number(d[config.field as keyof ITEM]) || 0;
-            const y = yScale(val);
+            const valY = yScale(val);
+            const y = Math.min(baselineY, valY);
+            const height = Math.max(0.5, Math.abs(baselineY - valY)); // Ensure at least a thin line for visibility
+
             const rect = this.createSvgElement('rect', {
                 x: String(xScale(i) - barWidth / 2),
-                y: String(y),
+                y: String(state.animate ? baselineY : y),
                 width: String(barWidth),
-                height: String(viewHeight - y),
+                height: String(state.animate ? 0 : height),
                 fill: config.color || 'currentColor',
                 rx: '2',
                 filter: `url(#${filterId})`
             });
+
+            if (state.animate) {
+                const animY = this.createSvgElement('animate', {
+                    attributeName: 'y',
+                    from: String(baselineY),
+                    to: String(y),
+                    dur: '0.5s',
+                    fill: 'freeze',
+                    calcMode: 'spline',
+                    keySplines: '0.4 0 0.2 1'
+                });
+                const animHeight = this.createSvgElement('animate', {
+                    attributeName: 'height',
+                    from: '0',
+                    to: String(height),
+                    dur: '0.5s',
+                    fill: 'freeze',
+                    calcMode: 'spline',
+                    keySplines: '0.4 0 0.2 1'
+                });
+                rect.appendChild(animY);
+                rect.appendChild(animHeight);
+            }
+
             g.appendChild(rect);
         });
     }
@@ -370,29 +437,62 @@ export class ChartBuilder<ITEM> implements ComponentBuilder {
     private renderArea(g: SVGGElement, state: ChartState<ITEM>, config: AreaChartConfig<ITEM>, xScale: any, yScale: any, viewHeight: number, filterId: string) {
         if (state.data.length === 0) return;
 
+        const baselineY = yScale(0);
         const linePoints = state.data.map((d, i) => {
             const x = xScale(i);
             const y = yScale(Number(d[config.field as keyof ITEM]) || 0);
             return `${i === 0 ? 'M' : 'L'} ${x},${y}`;
         }).join(' ');
 
-        const areaPathData = `${linePoints} L ${xScale(state.data.length - 1)},${viewHeight} L ${xScale(0)},${viewHeight} Z`;
+        const zeroLinePoints = state.data.map((d, i) => {
+            const x = xScale(i);
+            return `${i === 0 ? 'M' : 'L'} ${x},${baselineY}`;
+        }).join(' ');
+
+        const areaPathData = `${linePoints} L ${xScale(state.data.length - 1)},${baselineY} L ${xScale(0)},${baselineY} Z`;
+        const zeroAreaPathData = `${zeroLinePoints} L ${xScale(state.data.length - 1)},${baselineY} L ${xScale(0)},${baselineY} Z`;
         
         const area = this.createSvgElement('path', {
-            d: areaPathData,
+            d: state.animate ? zeroAreaPathData : areaPathData,
             fill: config.color || 'currentColor',
             'fill-opacity': String(config.opacity || 0.3),
             filter: `url(#${filterId})`
         });
+
+        if (state.animate) {
+            const anim = this.createSvgElement('animate', {
+                attributeName: 'd',
+                from: zeroAreaPathData,
+                to: areaPathData,
+                dur: '0.5s',
+                fill: 'freeze',
+                calcMode: 'spline',
+                keySplines: '0.4 0 0.2 1'
+            });
+            area.appendChild(anim);
+        }
         g.appendChild(area);
 
         const line = this.createSvgElement('path', {
-            d: linePoints,
+            d: state.animate ? zeroLinePoints : linePoints,
             fill: 'none',
             stroke: config.color || 'currentColor',
             'stroke-width': '2',
             filter: `url(#${filterId})`
         });
+
+        if (state.animate) {
+            const anim = this.createSvgElement('animate', {
+                attributeName: 'd',
+                from: zeroLinePoints,
+                to: linePoints,
+                dur: '0.5s',
+                fill: 'freeze',
+                calcMode: 'spline',
+                keySplines: '0.4 0 0.2 1'
+            });
+            line.appendChild(anim);
+        }
         g.appendChild(line);
     }
 

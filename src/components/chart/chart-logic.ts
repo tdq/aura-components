@@ -25,6 +25,7 @@ export class ChartLogic<ITEM> {
     private _showLegend$ = new BehaviorSubject<boolean>(true);
     private _showTooltip$ = new BehaviorSubject<boolean>(true);
     private _isGlass$ = new BehaviorSubject<boolean>(false);
+    private _animate$ = new BehaviorSubject<boolean>(true);
     private _height$ = new BehaviorSubject<number>(0);
     private _width$ = new BehaviorSubject<string>('100%');
 
@@ -42,10 +43,11 @@ export class ChartLogic<ITEM> {
         this._showLegend$,
         this._showTooltip$,
         this._isGlass$,
+        this._animate$,
         this._height$,
         this._width$
     ]).pipe(
-        map(([data, categoryField, charts, xAxis, yAxis, secondaryYAxis, title, showLegend, showTooltip, isGlass, height, width]) => ({
+        map(([data, categoryField, charts, xAxis, yAxis, secondaryYAxis, title, showLegend, showTooltip, isGlass, animate, height, width]) => ({
             data,
             categoryField,
             charts,
@@ -56,6 +58,7 @@ export class ChartLogic<ITEM> {
             showLegend,
             showTooltip,
             isGlass,
+            animate,
             height,
             width
         }))
@@ -106,6 +109,10 @@ export class ChartLogic<ITEM> {
 
     setIsGlass(isGlass: boolean): void {
         this._isGlass$.next(isGlass);
+    }
+
+    setAnimate(enabled: boolean): void {
+        this._animate$.next(enabled);
     }
 
     setHeight(height: number): void {
@@ -209,6 +216,7 @@ export class ChartLogic<ITEM> {
         this._showLegend$.complete();
         this._showTooltip$.complete();
         this._isGlass$.complete();
+        this._animate$.complete();
         this._height$.complete();
         this._width$.complete();
     }

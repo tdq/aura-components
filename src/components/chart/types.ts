@@ -64,6 +64,7 @@ export interface ChartState<ITEM> {
     showLegend: boolean;
     showTooltip: boolean;
     isGlass: boolean;
+    animate: boolean;
     height: number;
     width: string;
 }

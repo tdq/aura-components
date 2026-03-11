@@ -112,4 +112,23 @@ describe('ChartBuilder', () => {
 
         expect(chart).toHaveClass('backdrop-blur-md');
     });
+
+    it('should include animation elements when enabled', () => {
+        const chartBuilder = new ChartBuilder<any>()
+            .withData(of(testData))
+            .withCategoryField('category')
+            .withAnimation(true);
+        
+        chartBuilder.addBarChart('value1');
+        chartBuilder.addLineChart('value2');
+        
+        const chart = chartBuilder.build();
+
+        // Check for animate elements in the SVG
+        const animateElements = chart.querySelectorAll('animate');
+        expect(animateElements.length).toBeGreaterThan(0);
+        
+        // At least 2 for each bar (y and height) + 1 for line (d)
+        expect(animateElements.length).toBe(testData.length * 2 + 1);
+    });
 });
