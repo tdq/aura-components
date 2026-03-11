@@ -4,13 +4,11 @@ import { GridStyles } from './grid-styles';
 import { ColumnsBuilder } from './columns/columns-builder';
 
 describe('GridHeader', () => {
-    let container: HTMLElement;
     let onSort: jest.Mock;
     let onSelectAll: jest.Mock;
     let onColumnsResized: jest.Mock;
 
     beforeEach(() => {
-        container = document.createElement('div');
         onSort = jest.fn();
         onSelectAll = jest.fn();
         onColumnsResized = jest.fn();

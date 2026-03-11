@@ -3,7 +3,6 @@ import { ComponentBuilder } from '../../core/component-builder';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { registerDestroy } from '@/core/destroyable-element';
-import { Icons } from '@/core/icons';
 
 export enum ButtonStyle {
     FILLED = 'filled',

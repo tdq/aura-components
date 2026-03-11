@@ -23,12 +23,20 @@ export const GridStyles = {
     
     actionHeaderCell: 'w-20 flex-none sticky right-0 bg-surface-container-low/80 border-l border-outline/10 dark:border-stone-50/10 z-20',
     
-    row: 'absolute w-full flex items-stretch border-b border-outline/10 dark:border-stone-50/10 transition-colors duration-200 group border-l-2 border-l-transparent hover:bg-surface-variant/20 hover:border-l-primary dark:hover:bg-slate-800/60',
+    row: 'absolute w-full flex items-stretch border-b border-outline/10 dark:border-stone-50/10 transition-colors duration-200 group border-l-2 border-l-transparent hover:bg-surface-variant/20 hover:border-l-primary dark:hover:bg-slate-800/60 [will-change:transform]',
     rowOdd: 'bg-surface-container-low/20',
     rowSelected: 'bg-primary/10 border-l-primary',
     rowEditable: 'cursor-text',
     
     cell: 'px-4 flex items-center truncate h-full',
+    
+    groupRow: 'absolute w-full flex items-center bg-surface-container-high border-b border-outline/10 cursor-pointer hover:bg-surface-container-highest transition-colors z-10 [will-change:transform]',
+    groupToggle: 'w-10 h-10 flex items-center justify-center text-on-surface-variant transition-transform duration-200',
+    groupToggleExpanded: 'rotate-90',
+    groupIcon: 'w-5 h-5 flex items-center justify-center',
+    groupContent: 'flex items-center gap-2 font-medium',
+    groupValue: 'text-primary',
+    groupCount: 'text-xs text-on-surface-variant/60 font-normal',
     
     actionCell: 'w-20 flex-none flex items-center justify-center gap-1 sticky right-0 z-10 border-l border-outline/10 dark:border-stone-50/10 transition-colors duration-200 bg-surface-container-low/80',
     actionCellSelected: 'bg-primary/10',

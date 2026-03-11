@@ -15,12 +15,12 @@ The `GridViewport` class handles the virtualization and scroll management for th
 - **Header Sync**: Supports adding a `GridHeader` element into the viewport (before the content) to ensure horizontal scroll synchronization.
 
 ## Methods
-- `update(items: ITEM[], selected: Set<ITEM>)`: Updates the virtualization state with new items or selection changes.
-- `updateColumns(columns: GridColumn<ITEM>[])`: Propagates column changes (like resizing) to all currently rendered rows.
+- `update(rows: GridRowData<ITEM>[], selected: Set<ITEM>)`: Updates the virtualization state with new rows (items or group headers) and selection changes.
+- `updateColumns(columns: GridColumn<ITEM>[])`: Propagates column changes to all currently rendered data rows.
 - `addHeader(headerElement: HTMLElement)`: Inserts a header element into the viewport.
-- `handleScroll()`: Throttled event listener using `requestAnimationFrame`. Ensures visible rows are recalculated only once per frame during active scrolling.
-- `destroy()`: Disconnects the `ResizeObserver` and performs necessary cleanup.
+- `handleScroll()`: Throttled event listener using `requestAnimationFrame`.
+- `destroy()`: Disconnects the `ResizeObserver`.
 
 ## Implementation Details
-- **Rendering Storage**: Rendered rows are stored in a `Map<number, GridRow<ITEM>>`, where the key is the row index.
-- **Scroll Throttling**: The scroll listener uses a `ticking` boolean flag and `requestAnimationFrame` to ensure the main thread is not overwhelmed by rapid scroll events. This is critical for maintaining 60fps performance on high-density displays or mobile devices.
+- **Rendering Storage**: Rendered rows are stored in a `Map<number, GridRow<ITEM> | GridGroupRow>`, where the key is the row index.
+- **Mixed Content**: `renderVisibleRows()` inspects the `type` of each `GridRowData` to instantiate and manage either a `GridRow` or a `GridGroupRow`. It handles row recycling by checking the instance type of existing cached rows.

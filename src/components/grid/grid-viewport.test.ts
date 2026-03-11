@@ -38,12 +38,20 @@ describe('GridViewport', () => {
 
     let viewport: GridViewport<TestItem>;
 
+    const rowData: import('./types').GridRowData<TestItem>[] = items.map((item, index) => ({
+        type: 'ITEM',
+        data: item,
+        index,
+        level: 0
+    }));
+
     beforeEach(() => {
         viewport = new GridViewport<TestItem>(
             columns,
             [],
             false,
             false,
+            () => {},
             () => {}
         );
         // Mock clientHeight for JSDOM
@@ -51,7 +59,7 @@ describe('GridViewport', () => {
     });
 
     it('should render visible rows', () => {
-        viewport.update(items, new Set());
+        viewport.update(rowData, new Set());
         const content = viewport.getElement().querySelector('.relative') as HTMLElement;
         const rows = content.querySelectorAll('.absolute');
 
@@ -64,7 +72,7 @@ describe('GridViewport', () => {
     it('should update rows when viewport size changes', () => {
         // Initial clientHeight 0
         Object.defineProperty(viewport.getElement(), 'clientHeight', { value: 0, configurable: true, writable: true });
-        viewport.update(items, new Set());
+        viewport.update(rowData, new Set());
 
         let content = viewport.getElement().querySelector('.relative') as HTMLElement;
         let rows = content.querySelectorAll('.absolute');
@@ -85,7 +93,7 @@ describe('GridViewport', () => {
 
 
 it('should update rows on scroll', () => {
-    viewport.update(items, new Set());
+    viewport.update(rowData, new Set());
 
     // Scroll to item 20
     const scrollTop = 20 * 52;
@@ -101,7 +109,11 @@ it('should update rows on scroll', () => {
     // 15 to 28 is 14 rows.
     expect(rows.length).toBe(14);
 
-    const firstRowTop = Math.min(...rows.map(r => parseInt(r.style.top)));
+    const firstRowTop = Math.min(...rows.map(r => {
+        const transform = r.style.transform;
+        const match = transform.match(/translateY\((\d+)px\)/);
+        return match ? parseInt(match[1]) : 0;
+    }));
     expect(firstRowTop).toBe(15 * 52);
 });
 });

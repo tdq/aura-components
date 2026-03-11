@@ -42,10 +42,27 @@ export interface GridAction<ITEM> {
     onClick: (item: ITEM) => void;
 }
 
+export interface GridGroupHeader {
+    type: 'GROUP_HEADER';
+    groupValue: any;
+    groupKey: string;
+    field: string;
+    count: number;
+    isExpanded: boolean;
+    level: number;
+}
+
+export type GridRowData<ITEM> = 
+    | { type: 'ITEM'; data: ITEM; index: number; level: number } 
+    | GridGroupHeader;
+
 export interface GridState<ITEM> {
     items: ITEM[];
+    rows: GridRowData<ITEM>[];
     selectedItems: Set<ITEM>;
     sortConfig: SortConfig;
+    groupBy: string[];
+    expandedGroups: Set<string>;
 }
 
 export interface ColumnBuilder<ITEM> {

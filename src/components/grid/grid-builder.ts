@@ -21,7 +21,6 @@ export class GridBuilder<ITEM> implements ComponentBuilder {
     private columnsBuilder?: ColumnsBuilder<ITEM>;
     private toolbarBuilder?: ToolbarBuilder;
     private actionsBuilder?: ActionsBuilder<ITEM>;
-    private items$: Observable<ITEM[]> = of([]);
     private isGlass: boolean = false;
     private isEditable: boolean = false;
     private isMultiSelect: boolean = false;
@@ -64,8 +63,12 @@ export class GridBuilder<ITEM> implements ComponentBuilder {
     }
 
     withItems(items: Observable<ITEM[]>): this {
-        this.items$ = items;
         this.logic.setItems(items);
+        return this;
+    }
+
+    withGrouping(groupBy$: Observable<(keyof ITEM | string)[]>): this {
+        this.logic.setGrouping(groupBy$ as Observable<string[]>);
         return this;
     }
 
@@ -94,7 +97,8 @@ export class GridBuilder<ITEM> implements ComponentBuilder {
             actions,
             this.isMultiSelect,
             this.isEditable,
-            (item) => this.logic.toggleSelection(item)
+            (item) => this.logic.toggleSelection(item),
+            (groupKey) => this.logic.toggleGroup(groupKey)
         );
 
         let currentItems: ITEM[] = [];
@@ -123,7 +127,7 @@ export class GridBuilder<ITEM> implements ComponentBuilder {
             currentItems = state.items;
             container.style.height = `${height}px`;
             header.render(state.items, state.selectedItems, state.sortConfig);
-            viewport.update(state.items, state.selectedItems);
+            viewport.update(state.rows, state.selectedItems);
         });
 
         registerDestroy(container, () => {

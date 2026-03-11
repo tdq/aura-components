@@ -21,7 +21,8 @@ export class GridRow<ITEM> {
         private isSelected: boolean,
         private isMultiSelect: boolean,
         private isEditable: boolean,
-        private onToggleSelection: (item: ITEM) => void
+        private onToggleSelection: (item: ITEM) => void,
+        private level: number = 0
     ) {
         this.element = this.createRow();
     }
@@ -34,7 +35,7 @@ export class GridRow<ITEM> {
             this.isEditable && GridStyles.rowEditable,
             this.isSelected && GridStyles.rowSelected
         );
-        row.style.top = `${this.index * this.rowHeight}px`;
+        row.style.transform = `translateY(${this.index * this.rowHeight}px)`;
         row.style.height = `${this.rowHeight}px`;
 
         this.populateRow(row);
@@ -42,6 +43,8 @@ export class GridRow<ITEM> {
     }
 
     private populateRow(row: HTMLElement) {
+        let firstCell: HTMLElement | null = null;
+
         if (this.isMultiSelect) {
             const checkCell = document.createElement('div');
             checkCell.className = GridStyles.checkboxCell;
@@ -58,9 +61,10 @@ export class GridRow<ITEM> {
             this.checkbox = checkbox;
             checkCell.appendChild(checkbox);
             row.appendChild(checkCell);
+            firstCell = checkCell;
         }
 
-        this.columns.forEach((col) => {
+        this.columns.forEach((col, index) => {
             const cell = document.createElement('div');
             this.applyColumnWidth(cell, col);
             cell.className = cn(GridStyles.cell, col.cellClass);
@@ -72,7 +76,14 @@ export class GridRow<ITEM> {
                 cell.textContent = String(content);
             }
             row.appendChild(cell);
+            if (!firstCell && index === 0) {
+                firstCell = cell;
+            }
         });
+
+        if (firstCell && this.level > 0) {
+            firstCell.style.paddingLeft = `${(this.level * 24) + 16}px`; // 16px is standard cell padding
+        }
 
         if (this.actions.length > 0) {
             const actionCell = document.createElement('div');
@@ -141,10 +152,11 @@ export class GridRow<ITEM> {
         return this.item;
     }
 
-    update(item: ITEM, index: number, isSelected: boolean) {
+    update(item: ITEM, index: number, isSelected: boolean, level: number = 0) {
         this.item = item;
         this.index = index;
         this.isSelected = isSelected;
+        this.level = level;
         this.actionCell = undefined;
         this.checkbox = undefined;
         this.element.innerHTML = '';
@@ -154,7 +166,7 @@ export class GridRow<ITEM> {
             this.isEditable && GridStyles.rowEditable,
             this.isSelected && GridStyles.rowSelected
         );
-        this.element.style.top = `${this.index * this.rowHeight}px`;
+        this.element.style.transform = `translateY(${this.index * this.rowHeight}px)`;
         this.populateRow(this.element);
     }
 

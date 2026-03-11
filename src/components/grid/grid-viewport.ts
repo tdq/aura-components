@@ -1,15 +1,16 @@
-import { GridColumn, GridAction } from './types';
+import { GridColumn, GridAction, GridRowData, GridGroupHeader } from './types';
 import { GridStyles } from './grid-styles';
 import { GridRow } from './grid-row';
+import { GridGroupRow } from './grid-group-row';
 
 export class GridViewport<ITEM> {
     private element: HTMLElement;
     private contentElement: HTMLElement;
-    private renderedRows = new Map<number, GridRow<ITEM>>();
+    private renderedRows = new Map<number, GridRow<ITEM> | GridGroupRow>();
     private readonly rowHeight = 52;
     private readonly buffer = 5;
 
-    private lastItems: ITEM[] = [];
+    private lastRows: GridRowData<ITEM>[] = [];
     private lastSelected: Set<ITEM> = new Set();
     private ticking = false;
 
@@ -20,7 +21,8 @@ export class GridViewport<ITEM> {
         private actions: GridAction<ITEM>[],
         private isMultiSelect: boolean,
         private isEditable: boolean,
-        private onToggleSelection: (item: ITEM) => void
+        private onToggleSelection: (item: ITEM) => void,
+        private onToggleGroup: (groupKey: string) => void
     ) {
         this.element = document.createElement('div');
         this.element.className = GridStyles.viewport;
@@ -55,10 +57,10 @@ export class GridViewport<ITEM> {
         }
     }
 
-    update(items: ITEM[], selected: Set<ITEM>) {
-        this.lastItems = items;
+    update(rows: GridRowData<ITEM>[], selected: Set<ITEM>) {
+        this.lastRows = rows;
         this.lastSelected = selected;
-        const totalHeight = items.length * this.rowHeight;
+        const totalHeight = rows.length * this.rowHeight;
         this.contentElement.style.height = `${totalHeight}px`;
         this.renderVisibleRows();
     }
@@ -70,9 +72,8 @@ export class GridViewport<ITEM> {
     private renderVisibleRows() {
         const scrollTop = this.element.scrollTop;
         const viewportHeight = this.element.clientHeight;
-        const items = this.lastItems;
-        const selected = this.lastSelected;
-        const count = items.length;
+        const rowsData = this.lastRows;
+        const count = rowsData.length;
 
         if (count === 0) {
             this.clearRenderedRows();
@@ -90,38 +91,68 @@ export class GridViewport<ITEM> {
         }
 
         for (let i = startIndex; i <= endIndex; i++) {
-            const item = items[i];
-            const isSelected = selected.has(item);
+            const rowData = rowsData[i];
             const existing = this.renderedRows.get(i);
 
-            if (!existing) {
-                const row = new GridRow(
-                    item,
-                    i,
-                    this.columns,
-                    this.actions,
-                    isSelected,
-                    this.isMultiSelect,
-                    this.isEditable,
-                    this.onToggleSelection
-                );
-                this.contentElement.appendChild(row.getElement());
-                this.renderedRows.set(i, row);
-            } else if (existing.getItem() !== item) {
-                existing.update(item, i, isSelected);
+            if (rowData.type === 'GROUP_HEADER') {
+                this.renderGroupRow(rowData, i, existing);
             } else {
-                existing.updateSelection(isSelected);
+                this.renderItemRow(rowData.data, i, rowData.level, existing);
             }
+        }
+    }
+
+    private renderGroupRow(header: GridGroupHeader, index: number, existing?: GridRow<ITEM> | GridGroupRow) {
+        if (existing instanceof GridGroupRow) {
+            existing.update(header, index);
+        } else {
+            if (existing) {
+                existing.getElement().remove();
+            }
+            const groupRow = new GridGroupRow(header, index, (key) => this.onToggleGroup(key));
+            this.contentElement.appendChild(groupRow.getElement());
+            this.renderedRows.set(index, groupRow);
+        }
+    }
+
+    private renderItemRow(item: ITEM, index: number, level: number, existing?: GridRow<ITEM> | GridGroupRow) {
+        const isSelected = this.lastSelected.has(item);
+        if (existing instanceof GridRow) {
+            if (existing.getItem() === item) {
+                existing.updateSelection(isSelected);
+            } else {
+                existing.update(item, index, isSelected, level);
+            }
+        } else {
+            if (existing) {
+                existing.getElement().remove();
+            }
+            const row = new GridRow(
+                item,
+                index,
+                this.columns,
+                this.actions,
+                isSelected,
+                this.isMultiSelect,
+                this.isEditable,
+                this.onToggleSelection,
+                level
+            );
+            this.contentElement.appendChild(row.getElement());
+            this.renderedRows.set(index, row);
         }
     }
 
     updateColumns(columns: GridColumn<ITEM>[]) {
         this.columns = columns;
-        this.renderedRows.forEach(row => row.updateColumns(columns));
+        this.renderedRows.forEach(row => {
+            if (row instanceof GridRow) {
+                row.updateColumns(columns);
+            }
+        });
     }
 
     addHeader(headerElement: HTMLElement) {
-        // In the original implementation, header is inserted BEFORE contentElement inside viewport
         this.element.insertBefore(headerElement, this.contentElement);
     }
 

@@ -12,6 +12,7 @@ The grid is refactored into modular components to separate concerns and improve 
 - **`GridViewport`**: Virtualization engine and scroll management.
 - **`GridHeader`**: Header rendering and interaction logic.
 - **`GridRow`**: Row and cell rendering implementation.
+- **`GridGroupRow`**: Collapsible group header row implementation.
 - **`GridStyles`**: Centralized Tailwind CSS class constants.
 
 ## GridBuilder Methods
@@ -20,6 +21,7 @@ The `GridBuilder<ITEM>` class uses a generic type `ITEM` to ensure type safety a
 ### Data & Dimensions
 - `withHeight(height: Observable<number>): this`: Sets the fixed height of the grid container.
 - `withItems(items: Observable<ITEM[]>): this`: Sets the data source for the grid.
+- `withGrouping(fields$: Observable<(keyof ITEM | string)[]>): this`: Enables multi-level grouping by the provided fields.
 - `withSort(field: keyof ITEM | string, direction: SortDirection): this`: Sets the initial sort configuration.
 
 ### Configuration
@@ -82,9 +84,10 @@ When `asMultiSelect()` is enabled:
 
 ### Performance Mandates
 1. **No Layout Thrashing**: Always use `requestAnimationFrame` for scroll-related DOM updates.
-2. **Element Caching**: `GridRow` must cache frequently accessed elements (checkboxes, action containers) during creation.
-3. **Selective Transitions**: Use `transition-colors` instead of `transition-all` on row containers to keep the compositor efficient.
-4. **Filter Restraint**: Limit the use of `backdrop-blur` to static or low-frequency update elements like the primary header. Avoid it on repeated elements like row cells.
+2. **Layer Promotion**: Use `transform: translateY` and `will-change: transform` for row positioning to ensure they are handled by the compositor.
+3. **Element Caching**: `GridRow` and `GridGroupRow` must cache frequently accessed elements (checkboxes, action containers, toggles) during creation.
+4. **Selective Transitions**: Use `transition-colors` instead of `transition-all` on row containers to keep the compositor efficient.
+5. **Filter Restraint**: Limit the use of `backdrop-blur` to static or low-frequency update elements like the primary header. Avoid it on repeated elements like row cells or group headers.
 
 ## File Structure
 - `grid-builder.ts`: Orchestrator that assembles the grid using specialized modules.
@@ -92,6 +95,7 @@ When `asMultiSelect()` is enabled:
 - `grid-viewport.ts`: Virtualization and scrolling implementation.
 - `grid-header.ts`: Header rendering and interaction logic.
 - `grid-row.ts`: Row and cell rendering implementation.
+- `grid-group-row.ts`: Group header row implementation.
 - `grid-styles.ts`: Centralized Tailwind CSS classes.
 - `types.ts`: Shared interfaces, enums (`ColumnType`), and state definitions.
 - `columns/`: Specialized column builders.

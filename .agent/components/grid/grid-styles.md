@@ -14,11 +14,14 @@ The `GridStyles` object centralizes the Tailwind CSS classes used across all gri
     - **Z-Index**: `z-40` to remain above header cell highlights.
     - **Visual**: Uses an `after` pseudo-element for the thin (2px) blue indicator line.
 - **`viewport`**: Scrollable container with `overflow-auto`.
-- **`content`**: Relative-positioned container for absolute-positioned rows.
-- **`row`**: Absolute-positioned flex container for row data. Uses `transition-colors` for optimized scrolling performance.
+- **`content`**: Relative-positioned container for data rows.
+- **`row`**: Absolute-positioned flex container for row data. Uses `transform: translateY` and `will-change: transform` for optimized scrolling performance.
 - **`rowOdd`**: Background color for zebra striping on odd rows.
 - **`rowSelected`**: Background highlight for selected rows.
 - **`cell`**: Flex container with padding and truncation for text content.
+- **`groupRow`**: Full-width container for group headers. Uses `bg-surface-container-high` for visual distinction. Employs `transform: translateY` and `will-change: transform` for performance.
+- **`groupToggle`**: Icon container for expansion chevrons. Supports 90-degree rotation when expanded.
+- **`groupContent`**: Flex container for group label, value, and item count.
 - **`actionCell`**: Sticky panel for row-level actions. Pinned to the right with an opaque background (`bg-surface-container-low/80`) to ensure visibility without the overhead of backdrop filters.
 
 ## Usage
