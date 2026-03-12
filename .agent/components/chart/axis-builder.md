@@ -23,11 +23,14 @@ The `AxisBuilder` is used to configure the appearance and behavior of X and Y ax
 - `withScaleType('linear' | 'log' | 'time' | 'category'): this`: Sets the mathematical scale type.
 
 ## Implementation Details
+- **Rendering**: The `AxisRenderer` is responsible for drawing the axes into the SVG.
 - **Dynamic Scaling**: The axis scale is automatically recalculated by `ChartLogic` when data or bounds change.
-- **Tick Generation**: Ticks are generated using smart algorithms to ensure readable intervals (e.g., using `d3-scale` patterns or custom implementations).
-- **Responsive Layout**: The axis container automatically adjusts its size and labels to fit within the chart's padding.
+- **Tick Generation**: Ticks are generated using smart algorithms to ensure readable intervals.
+- **Responsive Layout**: `ChartSvgArea` provides the `viewWidth` and `viewHeight` to the renderer to ensure proper alignment.
+- **Type Safety**: `AxisRenderer.render` receives a `ChartScales` object containing `xScale`, `yScale`, `yDomain`, and optionally secondary axis information.
 
 ## Styling
 - **Axis Line**: Uses standard MD3 `outline` color tokens.
 - **Tick Labels**: Uses `md-label-small` typography.
 - **Grid Lines**: Uses subtle, low-opacity lines (`border-outline/10`).
+- **SVG Elements**: Ticks and lines use SVG primitives (`line`, `text`).

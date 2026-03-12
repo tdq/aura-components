@@ -66,6 +66,15 @@ export interface ChartState<ITEM> {
     width: string;
 }
 
+export interface ChartScales {
+    xScale: (index: number) => number;
+    yScale: (val: number) => number;
+    yDomain: number[];
+    secondaryYScale?: (val: number) => number;
+    secondaryYDomain?: number[];
+    categories: string[];
+}
+
 export interface AxisBuilder {
     withLabel(label: string): this;
     withVisible(visible: boolean): this;

@@ -1,5 +1,5 @@
 import { BehaviorSubject, Observable, Subscription, combineLatest, map } from 'rxjs';
-import { ChartState, IndividualChartConfig, AxisConfig } from './types';
+import { ChartState, IndividualChartConfig, AxisConfig, ChartScales } from './types';
 
 export class ChartLogic<ITEM> {
     private _data$ = new BehaviorSubject<ITEM[]>([]);
@@ -123,7 +123,7 @@ export class ChartLogic<ITEM> {
         this._width$.next(width);
     }
 
-    public calculateScales(state: ChartState<ITEM>, viewWidth: number, viewHeight: number) {
+    public calculateScales(state: ChartState<ITEM>, viewWidth: number, viewHeight: number): ChartScales {
         const categories = state.data.map(d => String(d[state.categoryField as keyof ITEM]));
         
         // X Scale (Category)

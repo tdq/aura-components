@@ -1,0 +1,87 @@
+import { ChartState } from './types';
+import { ChartStyles } from './styles';
+import { LabelBuilder, LabelSize } from '../label';
+import { of } from 'rxjs';
+import { clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+function cn(...inputs: any[]) {
+    return twMerge(clsx(inputs));
+}
+
+export class ChartTooltip<ITEM> {
+    private element: HTMLElement;
+
+    constructor() {
+        this.element = document.createElement('div');
+        this.element.className = cn(ChartStyles.tooltip, 'opacity-0');
+    }
+
+    getElement(): HTMLElement {
+        return this.element;
+    }
+
+    show(e: MouseEvent, svg: SVGSVGElement, state: ChartState<ITEM>) {
+        const rect = svg.getBoundingClientRect();
+        const padding = { left: 60, right: 40 };
+        const viewWidth = rect.width - padding.left - padding.right;
+        
+        const x = e.clientX - rect.left - padding.left;
+        if (x < -10 || x > viewWidth + 10 || state.data.length === 0) {
+            this.hide();
+            return;
+        }
+
+        const index = Math.max(0, Math.min(state.data.length - 1, Math.round((x / viewWidth) * (state.data.length - 1))));
+        const item = state.data[index];
+        if (!item) return;
+
+        const categories = state.data.map(d => String(d[state.categoryField as keyof ITEM]));
+        
+        while (this.element.firstChild) this.element.removeChild(this.element.firstChild);
+
+        const header = new LabelBuilder()
+            .withSize(LabelSize.MEDIUM)
+            .withCaption(of(categories[index]))
+            .withClass(of('font-semibold mb-1 block'))
+            .build();
+        this.element.appendChild(header);
+
+        state.charts.forEach(chart => {
+            const val = item[chart.field as keyof ITEM];
+            const displayVal = chart.tooltipRenderer ? chart.tooltipRenderer(item) : val;
+            
+            const row = document.createElement('div');
+            row.className = 'flex items-center gap-2';
+            
+            const color = document.createElement('div');
+            color.className = 'w-2 h-2 rounded-full';
+            color.style.backgroundColor = chart.color || 'currentColor';
+            
+            const label = new LabelBuilder()
+                .withSize(LabelSize.SMALL)
+                .withCaption(of(`${chart.label}: ${displayVal}`))
+                .build();
+            
+            row.appendChild(color);
+            row.appendChild(label);
+            this.element.appendChild(row);
+        });
+
+        this.element.classList.remove('opacity-0');
+        
+        const tooltipRect = this.element.getBoundingClientRect();
+        const xPos = (index / (state.data.length - 1)) * viewWidth + padding.left;
+        
+        let left = xPos + 10;
+        if (left + tooltipRect.width > rect.width) {
+            left = xPos - tooltipRect.width - 10;
+        }
+        this.element.style.left = `${left}px`;
+        this.element.style.top = `20px`;
+    }
+
+    hide() {
+        this.element.classList.add('opacity-0');
+    }
+}

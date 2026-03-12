@@ -29,11 +29,13 @@ Used to configure area-based series (line with filled area below).
 - `asStacked(): this`: Sets the series to be stacked with other bar or area series.
 
 ## Implementation Details
-- **Zero Baseline**: All value-based renderings (lines, bars, areas) MUST use `yScale(0)` as the baseline. This ensures bars grow from the correct axis line and that charts with negative values render accurately.
+- **Rendering**: The `SeriesRenderer` handles the drawing of all series types.
+- **Zero Baseline**: All value-based renderings (lines, bars, areas) MUST use `yScale(0)` as the baseline. 
 - **Path Rendering**: Lines and area boundaries MUST use `<path>` elements with standard `M` (move to) and `L` (line to) commands. 
 - **Animation Paths**: For path-based animations (`LineChart`, `AreaChart`), create a `zeroLinePoints` string representing all data points shifted to `yScale(0)`. Transition the `d` attribute from `zeroLinePoints` to actual `points`.
 - **Bar Animation**: Bars MUST transition both `y` and `height` properties from the `baselineY` to their final calculated values.
-- **Shadow Application**: Each series MUST apply its corresponding filter using `setAttribute('filter', 'url(#shadow-i)')`.
-- **Tooltip Content**: Tooltip content MUST be constructed using `LabelBuilder` (e.g., `LabelSize.MEDIUM` for headers and `LabelSize.SMALL` for data rows) instead of raw `innerHTML` strings.
-- **Composition**: Series are rendered in the order they were added. Area charts should typically be added first to ensure they don't overlap line markers.
-- **Markers**: Markers for line series should also receive the shadow filter for consistent visual depth. Markers should also be animated from `baselineY` to their target position.
+- **Shadow Application**: `SeriesRenderer` applies corresponding filters using `setAttribute('filter', 'url(#shadow-i)')`.
+- **Tooltip Content**: Handled by `ChartTooltip` class using `LabelBuilder`.
+- **Composition**: Series are rendered in the order they were added to the `logic.state$.charts` array.
+- **Markers**: Markers for line series should be animated from `baselineY` to their target position and should receive the shadow filter.
+- **Filters**: The `SeriesRenderer` is responsible for updating SVG filters in the `<defs>` section of the SVG (via `SeriesRenderer.updateFilters()`).

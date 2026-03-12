@@ -8,15 +8,16 @@ It supports multiple simultaneous chart types (e.g., Line and Bar on the same ax
 By default, the chart is transparent and occupies 100% of the available width and height of its parent container. To make it look like a standalone card/panel, use the `asGlass()` method.
 
 ## Architecture
-The chart is modularized into several builders and logic classes:
-- **`ChartBuilder<ITEM>`**: The main orchestrator and public API.
-- **`LabelBuilder`**: Used for all text elements outside the SVG (Title, Legend, Tooltip).
-- **`LineChartBuilder<ITEM>`**: Handles configuration of line-based data series.
-- **`BarChartBuilder<ITEM>`**: Handles configuration of bar-based data series.
-- **`AreaChartBuilder<ITEM>`**: Handles configuration of area-based data series.
-- **`AxisBuilder`**: Handles configuration of X and Y axes.
+The chart is modularized into specialized classes to separate configuration, state management, and rendering concerns:
+- **`ChartBuilder<ITEM>`**: The public API and configuration orchestrator.
+- **`ChartViewport<ITEM>`**: The main DOM orchestrator and view component.
 - **`ChartLogic<ITEM>`**: Manages data processing, scaling, and reactive state.
-- **`ChartStyles`**: Centralizes Tailwind CSS classes for consistent styling.
+- **`ChartSvgArea`**: Manages the `<svg>` element, `<defs>`, and responsive `viewBox`.
+- **`AxisRenderer`**: Renders X and Y axes, grid lines, and labels.
+- **`SeriesRenderer`**: Renders data series (Line, Bar, Area) and SVG filters.
+- **`ChartLegend`**: Handles the rendering of the series legend.
+- **`ChartTooltip`**: Manages tooltip visibility, content, and positioning.
+- **`LabelBuilder`**: Used for all text elements outside the SVG.
 
 ## ChartBuilder Methods
 `ChartBuilder<ITEM>` uses a generic type `ITEM` to ensure type safety for data fields and tooltips.
@@ -41,21 +42,15 @@ Each method returns a specialized builder for that series.
 - `withLegend(visible: boolean): this`: Toggles the legend visibility.
 - `withTooltip(enabled: boolean): this`: Toggles interactive tooltips.
 - `withAnimation(enabled: boolean): this`: Toggles entry animations for data series (default: true).
-- `asGlass(): this`: Enables translucent glass styling with backdrop blur and adds panel-like container styling (padding, borders, rounded corners).
+- `asGlass(): this`: Enables translucent glass styling.
 
 ## Implementation Requirements
-- **Text Components**: All text elements outside of the SVG (Title, Legend labels, Tooltip content) MUST be created using `LabelBuilder` to ensure consistent typography and reactivity.
+- **Orchestration**: `ChartBuilder.build()` MUST instantiate `ChartViewport` and pass the `ChartLogic` instance to it.
+- **Viewport Lifecycle**: `ChartViewport` MUST subscribe to `logic.state$` and trigger updates across all sub-components (`AxisRenderer`, `SeriesRenderer`, `ChartLegend`).
+- **SVG Management**: `ChartSvgArea` MUST manage the `<svg>`, its `<defs>`, and main `<g>` group. It MUST also handle `ResizeObserver` to trigger re-renders when the container size changes.
+- **Text Components**: All text elements outside of the SVG MUST be created using `LabelBuilder`.
 - **SVG Namespace**: All SVG elements MUST be created using `document.createElementNS('http://www.w3.org/2000/svg', ...)`.
-- **Responsive ViewBox**: The SVG `viewBox` MUST be defined using the dimensions of the parent `chartArea` div via `getBoundingClientRect()`. 
-- **Resize Handling**: A `ResizeObserver` MUST be attached to the `chartArea` element to trigger a re-render and update the `viewBox` whenever the available space changes.
-- **SVG Attributes**: The SVG element MUST have `width="100%"`, `height="100%"`, and `preserveAspectRatio="xMidYMid meet"`.
-- **SVG Animations**: When `animate` is true, use `<animate>` elements inside SVG paths/rects/circles to transition from a zero-baseline state (e.g., `yScale(0)`) to the actual value state. 
-- **Animation Timing**: Use a duration of `0.5s` and `calcMode="spline"` with `keySplines="0.4 0 0.2 1"` for smooth MD3-compliant motion.
-- **Rendering Loop**: Use `logic.state$` subscription to trigger re-renders.
-- **Individual Shadows**: Each series must have its own shadow filter in `<defs>` with ID `shadow-${index}`.
-- **Shadow Configuration**: 
-  - `dx="0" dy="2" stdDeviation="2" flood-opacity="0.3" flood-color="black"`
-- **Clearing Logic**: When re-rendering, use `while(element.firstChild) element.removeChild(element.firstChild)` to clear content robustly.
-- **Reactivity**: Use RxJS `BehaviorSubject` for all configuration properties. Ensure previous subscriptions (e.g., for `data$` or `title$`) are unsubscribed before creating new ones or on destroy.
-- **State Reset**: Call `logic.resetCharts()` at the beginning of the `build()` method to ensure a clean state if `build()` is called multiple times on the same builder instance.
-- **Reactive Visibility**: Use `classList.toggle('hidden', !condition)` within the state subscription for elements like the title that may be conditionally visible.
+- **Animation Paths**: When `animate` is true, use `<animate>` elements inside SVG paths/rects/circles.
+- **Rendering Loop**: Use `logic.state$` subscription to trigger re-renders. `ChartViewport` is responsible for clearing the SVG (via `ChartSvgArea.clear()`) and updating filters before renderers are called.
+- **Individual Shadows**: `SeriesRenderer` MUST handle the creation of filters in `<defs>` with ID `shadow-${index}`.
+- **Cleanup**: `ChartViewport` MUST use `registerDestroy` to unsubscribe from RxJS and disconnect observers.
