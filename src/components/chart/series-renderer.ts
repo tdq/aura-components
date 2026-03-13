@@ -9,22 +9,27 @@ export class SeriesRenderer {
         scales: ChartScales
     ) {
         const { xScale, yScale, secondaryYScale } = scales;
+        const renderOrder: string[] = ['area', 'bar', 'line'];
 
-        state.charts.forEach((chart, i) => {
-            const scale = chart.useSecondaryAxis && secondaryYScale ? secondaryYScale : yScale;
-            const filterId = `shadow-${i}`;
-            
-            switch (chart.type) {
-                case 'line':
-                    this.renderLine(g, state, chart as LineChartConfig<any>, xScale, scale, filterId);
-                    break;
-                case 'bar':
-                    this.renderBars(g, state, chart as BarChartConfig<any>, xScale, scale, filterId, scales);
-                    break;
-                case 'area':
-                    this.renderArea(g, state, chart as AreaChartConfig<any>, xScale, scale, filterId);
-                    break;
-            }
+        renderOrder.forEach(type => {
+            state.charts.forEach((chart, i) => {
+                if (chart.type !== type) return;
+
+                const scale = chart.useSecondaryAxis && secondaryYScale ? secondaryYScale : yScale;
+                const filterId = `shadow-${i}`;
+                
+                switch (chart.type) {
+                    case 'line':
+                        this.renderLine(g, state, chart as LineChartConfig<any>, xScale, scale, filterId);
+                        break;
+                    case 'bar':
+                        this.renderBars(g, state, chart as BarChartConfig<any>, xScale, scale, filterId, scales);
+                        break;
+                    case 'area':
+                        this.renderArea(g, state, chart as AreaChartConfig<any>, xScale, scale, filterId);
+                        break;
+                }
+            });
         });
     }
 

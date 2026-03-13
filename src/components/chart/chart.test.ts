@@ -148,4 +148,32 @@ describe('ChartBuilder', () => {
         // firstRectX = xScale(0) - barWidth / 2 = (8 + barWidth/2) - barWidth/2 = 8
         expect(firstRectX).toBeCloseTo(8, 1);
     });
+
+    it('should respect render order: area, then bar, then line', () => {
+        const chartBuilder = new ChartBuilder<any>()
+            .withData(of(testData))
+            .withCategoryField('category')
+            .withAnimation(false); // Disable animation for easier path checking
+        
+        // Add in reverse order of required rendering
+        chartBuilder.addLineChart('value1').withColor('red');
+        chartBuilder.addBarChart('value2').withColor('blue');
+        chartBuilder.addAreaChart('value1').withColor('green');
+        
+        const chart = chartBuilder.build();
+        const svg = chart.querySelector('svg');
+        const mainG = svg?.querySelector('g > g'); // The g where series are rendered
+
+        if (!mainG) throw new Error('Main G not found');
+
+        const children = Array.from(mainG.children);
+        
+        // Find indices of different chart types
+        const areaIndex = children.findIndex(el => el.tagName === 'path' && el.getAttribute('fill') === 'green');
+        const barIndex = children.findIndex(el => el.tagName === 'rect' && el.getAttribute('fill') === 'blue');
+        const lineIndex = children.findIndex(el => el.tagName === 'path' && el.getAttribute('stroke') === 'red');
+
+        expect(areaIndex).toBeLessThan(barIndex);
+        expect(barIndex).toBeLessThan(lineIndex);
+    });
 });

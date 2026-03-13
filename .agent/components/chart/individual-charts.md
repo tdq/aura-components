@@ -41,3 +41,8 @@ Used to configure area-based series (line with filled area below).
 - **Composition**: Series are rendered in the order they were added to the `logic.state$.charts` array.
 - **Markers**: Markers for line series should be animated from `baselineY` to their target position and should receive the shadow filter.
 - **Filters**: The `SeriesRenderer` is responsible for updating SVG filters in the `<defs>` section of the SVG (via `SeriesRenderer.updateFilters()`).
+
+## Render order
+1. Area charts
+2. Bar charts
+3. Line charts
