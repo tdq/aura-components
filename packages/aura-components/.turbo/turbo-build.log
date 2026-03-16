@@ -4,7 +4,7 @@
 > vite build && npm run build:css && npm run build:types && node scripts/reorganize-types.mjs && node scripts/generate-manifest.mjs
 
 [1G[0K[36mvite v5.4.21 [32mbuilding for production...[36m[39m
-[2K[1Gtransforming (1) [2msrc/components/combobox/index.ts[22m[2K[1Gtransforming (37) [2msrc/components/grid/types.ts[22m[2K[1Gtransforming (158) [2msrc/components/button/button.ts[22m[2K[1Gtransforming (217) [2m../../node_modules/rxjs/dist/esm5/internal/scheduler/AsyncAction.js[22m[2K[1Gtransforming (269) [2msrc/components/grid/grid-viewport.ts[22m[2K[1G[32m✓[39m 295 modules transformed.
+[2K[1Gtransforming (1) [2msrc/components/dialog/index.ts[22m[2K[1Gtransforming (33) [2msrc/components/checkbox/checkbox.ts[22m[2K[1Gtransforming (162) [2msrc/components/form/form-builder.ts[22m[2K[1Gtransforming (219) [2msrc/components/chart/builders/axis-builder.ts[22m[2K[1G[32m✓[39m 295 modules transformed.
 [2K[1Grendering chunks (1)...[2K[1Grendering chunks (2)...[2K[1Grendering chunks (3)...[2K[1Grendering chunks (4)...[2K[1Grendering chunks (5)...[2K[1Grendering chunks (6)...[2K[1Grendering chunks (7)...[2K[1Grendering chunks (8)...[2K[1Grendering chunks (9)...[2K[1Grendering chunks (10)...[2K[1Grendering chunks (11)...[2K[1Grendering chunks (12)...[2K[1Grendering chunks (13)...[2K[1Grendering chunks (14)...[2K[1Grendering chunks (15)...[2K[1Grendering chunks (16)...[2K[1Grendering chunks (17)...[2K[1Grendering chunks (18)...[2K[1Grendering chunks (19)...[2K[1Grendering chunks (20)...[2K[1Grendering chunks (21)...[2K[1Grendering chunks (22)...[2K[1Grendering chunks (23)...[2K[1Grendering chunks (24)...[2K[1Grendering chunks (25)...[2K[1Grendering chunks (26)...[2K[1Grendering chunks (27)...[2K[1Grendering chunks (28)...[2K[1Grendering chunks (29)...[2K[1Grendering chunks (30)...[2K[1Grendering chunks (31)...[2K[1Grendering chunks (32)...[2K[1Grendering chunks (33)...[2K[1Grendering chunks (34)...[2K[1Grendering chunks (35)...[2K[1Grendering chunks (36)...[2K[1Grendering chunks (37)...[2K[1Grendering chunks (38)...[2K[1G[2K[1Gcomputing gzip size (0)...[2K[1Gcomputing gzip size (1)...[2K[1Gcomputing gzip size (2)...[2K[1Gcomputing gzip size (3)...[2K[1Gcomputing gzip size (4)...[2K[1Gcomputing gzip size (5)...[2K[1Gcomputing gzip size (6)...[2K[1Gcomputing gzip size (7)...[2K[1Gcomputing gzip size (8)...[2K[1Gcomputing gzip size (9)...[2K[1Gcomputing gzip size (10)...[2K[1Gcomputing gzip size (11)...[2K[1Gcomputing gzip size (12)...[2K[1Gcomputing gzip size (13)...[2K[1Gcomputing gzip size (14)...[2K[1Gcomputing gzip size (15)...[2K[1Gcomputing gzip size (16)...[2K[1Gcomputing gzip size (17)...[2K[1Gcomputing gzip size (18)...[2K[1Gcomputing gzip size (19)...[2K[1Gcomputing gzip size (20)...[2K[1Gcomputing gzip size (21)...[2K[1Gcomputing gzip size (22)...[2K[1Gcomputing gzip size (23)...[2K[1Gcomputing gzip size (24)...[2K[1Gcomputing gzip size (25)...[2K[1Gcomputing gzip size (26)...[2K[1Gcomputing gzip size (27)...[2K[1Gcomputing gzip size (28)...[2K[1Gcomputing gzip size (29)...[2K[1Gcomputing gzip size (30)...[2K[1Gcomputing gzip size (31)...[2K[1Gcomputing gzip size (32)...[2K[1Gcomputing gzip size (33)...[2K[1Gcomputing gzip size (34)...[2K[1Gcomputing gzip size (35)...[2K[1Gcomputing gzip size (36)...[2K[1Gcomputing gzip size (37)...[2K[1Gcomputing gzip size (38)...[2K[1G[2mdist/[22m[36mcheckbox/index.js                [39m[1m[2m 0.09 kB[22m[1m[22m[2m │ gzip:  0.09 kB[22m
 [2mdist/[22m[36mbutton/index.js                  [39m[1m[2m 0.10 kB[22m[1m[22m[2m │ gzip:  0.10 kB[22m
 [2mdist/[22m[36mpanel/index.js                   [39m[1m[2m 0.10 kB[22m[1m[22m[2m │ gzip:  0.11 kB[22m
@@ -43,7 +43,7 @@
 [2mdist/[22m[36mchart-builder-2FJN_ANB.js        [39m[1m[2m24.87 kB[22m[1m[22m[2m │ gzip:  6.30 kB[22m
 [2mdist/[22m[36mgrid-builder-zpee3CaJ.js         [39m[1m[2m34.41 kB[22m[1m[22m[2m │ gzip:  8.43 kB[22m
 [2mdist/[22m[36mbundle-mjs-C-fAsw3z.js           [39m[1m[2m59.63 kB[22m[1m[22m[2m │ gzip: 10.67 kB[22m
-[32m✓ built in 1.48s[39m
+[32m✓ built in 1.39s[39m
 
 > aura-components@0.1.1 build:css
 > tailwindcss -i ./src/index.css -o ./dist/a1-components.css --minify
@@ -54,7 +54,7 @@
 
 Rebuilding...
 
-Done in 633ms.
+Done in 571ms.
 [1G[0K\[1G[0K
 > aura-components@0.1.1 build:types
 > tsc -p tsconfig.build.json

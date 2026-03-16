@@ -2,3 +2,5 @@ node_modules
 dist
 storybook-static
 *.tgz
+.turbo
+aura-components/.turbo/*

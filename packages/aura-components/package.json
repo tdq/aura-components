@@ -79,6 +79,10 @@
       "import": "./dist/toolbar/index.js",
       "types": "./dist/toolbar/index.d.ts"
     },
+    "./router": {
+      "import": "./dist/router/index.js",
+      "types": "./dist/router/index.d.ts"
+    },
     "./package.json": "./package.json"
   },
   "files": [

@@ -18,3 +18,4 @@ export * from './components/date-picker';
 export * from './components/listbox';
 export * from './components/component-parts';
 export * from './theme';
+export * from './router';
