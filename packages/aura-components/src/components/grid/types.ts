@@ -38,7 +38,7 @@ export interface GridColumn<ITEM> {
 
 export interface GridAction<ITEM> {
     label: string;
-    icon?: string;
+    icon: string;
     onClick: (item: ITEM) => void;
 }
 

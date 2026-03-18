@@ -121,6 +121,9 @@ When `asMultiSelect()` is enabled:
 ## Styling (Material Design 3)
 Styling is centralized in `grid-styles.ts` and uses Tailwind CSS utilities following MD3 specifications.
 
+### Glass effect
+Grid rows do not have background in case of glass effect. Grid header has background with blur.
+
 ### Components
 - **Container**: `bg-background`, `border-outline/30`, `dark:border-stone-50/20`, `rounded-lg`.
 - **Header**:

@@ -2,12 +2,25 @@ import { readFileSync } from 'fs';
 import { createRequire } from 'module';
 import { join, dirname } from 'path';
 
+export interface MethodParam {
+  name: string;
+  type: string;
+}
+
+export interface MethodEntry {
+  name: string;
+  signature: string;
+  description?: string;
+  params: MethodParam[];
+  returnType: string;
+}
+
 export interface ComponentEntry {
   name: string;
   componentName: string;
   description: string;
   import: string;
-  methods: string[];
+  methods: MethodEntry[];
   example: string;
 }
 

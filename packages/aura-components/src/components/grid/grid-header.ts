@@ -15,7 +15,7 @@ export class GridHeader<ITEM> {
         private columns: GridColumn<ITEM>[],
         private isGlass: boolean,
         private isMultiSelect: boolean,
-        private hasActions: boolean,
+        private actionCount: number,
         private onSort: (field: string, direction: SortDirection) => void,
         private onSelectAll: (checked: boolean) => void,
         private onColumnsResized: (columns: GridColumn<ITEM>[]) => void
@@ -75,18 +75,17 @@ export class GridHeader<ITEM> {
             cell.appendChild(span);
 
             if (col.sortable) {
-                const icon = document.createElement('i');
+                const iconWrapper = document.createElement('span');
                 const isCurrent = sort.field === col.field;
-                const iconClass = isCurrent && sort.direction === SortDirection.ASC ? Icons.SORT_UP :
+                const iconSvg = isCurrent && sort.direction === SortDirection.ASC ? Icons.SORT_UP :
                     isCurrent && sort.direction === SortDirection.DESC ? Icons.SORT_DOWN : Icons.SORT;
 
-                icon.className = cn(
+                iconWrapper.className = cn(
                     GridStyles.sortIcon,
-                    'fas',
-                    iconClass,
                     isCurrent ? GridStyles.sortIconActive : GridStyles.sortIconInactive
                 );
-                cell.appendChild(icon);
+                iconWrapper.innerHTML = iconSvg;
+                cell.appendChild(iconWrapper);
 
                 cell.addEventListener('click', (e) => {
                     if ((e.target as HTMLElement).classList.contains('resize-handle')) return;
@@ -138,9 +137,11 @@ export class GridHeader<ITEM> {
             this.element.appendChild(cell);
         });
 
-        if (this.hasActions) {
+        if (this.actionCount > 0) {
             const actionCell = document.createElement('div');
             actionCell.className = GridStyles.actionHeaderCell;
+            const actionWidth = this.actionCount * 36 + 8;
+            actionCell.style.width = `${actionWidth}px`;
             this.element.appendChild(actionCell);
         }
     }

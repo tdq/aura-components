@@ -1,5 +1,6 @@
 import { GridBuilder } from 'aura-components';
 import { SortDirection } from 'aura-components';
+import { Icons } from '@/core/icons';
 import { of, Subject } from 'rxjs';
 
 export default {
@@ -90,8 +91,8 @@ export const WithActions = () => {
     const deleteClick = (user: User) => alert(`Deleting ${user.name}`);
 
     const actions = grid.withActions();
-    actions.addAction('Edit', editClick);
-    actions.addAction('Delete', deleteClick);
+    actions.addAction(Icons.EDIT, 'Edit', editClick);
+    actions.addAction(Icons.DELETE, 'Delete', deleteClick);
 
     return grid.build();
 };

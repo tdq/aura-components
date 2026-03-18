@@ -113,6 +113,7 @@ export class DialogBuilder implements ComponentBuilder, PopupBuilder {
         const dialog = document.createElement('dialog');
         
         const getBaseClasses = () => cn(
+            'm-auto',
             this.isGlass
                 ? 'glass-effect'
                 : 'bg-surface border-none text-on-surface',

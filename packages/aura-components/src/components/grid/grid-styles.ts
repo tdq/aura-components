@@ -15,13 +15,13 @@ export const GridStyles = {
     headerCellSortable: 'cursor-pointer hover:text-primary',
     headerCellActive: 'bg-surface-variant/30',
     
-    sortIcon: 'fas ml-2 transition-all transform',
+    sortIcon: 'ml-2 transition-all transform inline-flex w-3 h-3 shrink-0 [&_svg]:w-full [&_svg]:h-full [&_svg]:block',
     sortIconActive: 'opacity-100 text-primary scale-110',
     sortIconInactive: 'opacity-0 group-hover:opacity-40 -translate-y-1 group-hover:translate-y-0',
     
     resizeHandle: 'resize-handle absolute right-0 top-[10%] w-1.5 h-[80%] cursor-col-resize z-40 transition-all after:absolute after:right-0 after:top-0 after:h-full after:w-0.5 after:bg-primary after:opacity-0 hover:after:opacity-100 [&.active]:after:opacity-100',
     
-    actionHeaderCell: 'w-20 flex-none sticky right-0 bg-surface-container-low/80 border-l border-outline/10 dark:border-stone-50/10 z-20',
+    actionHeaderCell: 'flex-none sticky right-0 bg-surface-container-low/80 border-l border-outline/10 dark:border-stone-50/10 z-20',
     
     row: 'absolute w-full flex items-stretch border-b border-outline/10 dark:border-stone-50/10 transition-colors duration-200 group border-l-2 border-l-transparent hover:bg-surface-variant/20 hover:border-l-primary dark:hover:bg-slate-800/60 [will-change:transform]',
     rowOdd: 'bg-surface-container-low/20',
@@ -39,11 +39,12 @@ export const GridStyles = {
     groupValue: 'text-primary',
     groupCount: 'text-xs text-on-surface-variant/60 font-normal',
     
-    actionCell: 'w-20 flex-none flex items-center justify-center gap-1 sticky right-0 z-10 border-l border-outline/10 dark:border-stone-50/10 transition-colors duration-200 bg-surface-container-low/80',
+    actionCell: 'flex-none flex items-center justify-center gap-1 sticky right-0 z-10 border-l border-outline/10 dark:border-stone-50/10 transition-colors duration-200 bg-surface-container-low/80',
     actionCellSelected: 'bg-primary/10',
     actionCellOdd: 'bg-surface-container-low/20',
     actionCellEven: 'bg-background',
     
     actionButton: 'p-2 hover:bg-muted rounded-full text-on-surface-variant hover:text-primary transition-colors',
-    actionButtonText: 'text-xs px-2 rounded-md'
+    tooltipWrapper: 'relative',
+    tooltip: 'fixed m-0 border-0 px-2 py-1 text-xs font-medium rounded bg-neutral-800/90 text-white dark:bg-neutral-100 dark:text-neutral-900 whitespace-nowrap pointer-events-none -translate-x-1/2 -translate-y-full z-[9999]'
 };

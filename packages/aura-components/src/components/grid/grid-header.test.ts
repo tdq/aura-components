@@ -23,7 +23,7 @@ describe('GridHeader', () => {
 
     it('should render header with columns', () => {
         const columns = createColumns();
-        const header = new GridHeader(columns, false, false, false, onSort, onSelectAll, onColumnsResized);
+        const header = new GridHeader(columns, false, false, 0, onSort, onSelectAll, onColumnsResized);
         header.render([], new Set(), { field: '', direction: SortDirection.NONE });
 
         const element = header.getElement();
@@ -35,7 +35,7 @@ describe('GridHeader', () => {
 
     it('should apply resizable-column class', () => {
         const columns = createColumns();
-        const header = new GridHeader(columns, false, false, false, onSort, onSelectAll, onColumnsResized);
+        const header = new GridHeader(columns, false, false, 0, onSort, onSelectAll, onColumnsResized);
         header.render([], new Set(), { field: '', direction: SortDirection.NONE });
 
         const cells = header.getElement().querySelectorAll('.resizable-column');
@@ -45,7 +45,7 @@ describe('GridHeader', () => {
 
     it('should apply prev-resizable class', () => {
         const columns = createColumns();
-        const header = new GridHeader(columns, false, false, false, onSort, onSelectAll, onColumnsResized);
+        const header = new GridHeader(columns, false, false, 0, onSort, onSelectAll, onColumnsResized);
         header.render([], new Set(), { field: '', direction: SortDirection.NONE });
 
         const cells = header.getElement().querySelectorAll('.prev-resizable');
@@ -55,21 +55,41 @@ describe('GridHeader', () => {
 
     it('should show sort icons for sortable columns', () => {
         const columns = createColumns();
-        const header = new GridHeader(columns, false, false, false, onSort, onSelectAll, onColumnsResized);
+        const header = new GridHeader(columns, false, false, 0, onSort, onSelectAll, onColumnsResized);
         header.render([], new Set(), { field: '', direction: SortDirection.NONE });
 
-        const sortIcons = header.getElement().querySelectorAll('.fa-sort');
-        expect(sortIcons.length).toBe(1);
+        const sortWrappers = header.getElement().querySelectorAll(`.${GridStyles.sortIcon.split(' ')[0]}`);
+        expect(sortWrappers.length).toBe(1);
+        expect(sortWrappers[0].querySelector('svg')).not.toBeNull();
     });
 
     it('should trigger onSort on click', () => {
         const columns = createColumns();
-        const header = new GridHeader(columns, false, false, false, onSort, onSelectAll, onColumnsResized);
+        const header = new GridHeader(columns, false, false, 0, onSort, onSelectAll, onColumnsResized);
         header.render([], new Set(), { field: '', direction: SortDirection.NONE });
 
         const sortableCell = header.getElement().querySelector(`.${GridStyles.headerCellSortable.split(' ')[0]}`) as HTMLElement;
         sortableCell.click();
 
         expect(onSort).toHaveBeenCalledWith('id', SortDirection.ASC);
+    });
+
+    it('should render action header cell with correct width when actionCount > 0', () => {
+        const columns = createColumns();
+        const header = new GridHeader(columns, false, false, 2, onSort, onSelectAll, onColumnsResized);
+        header.render([], new Set(), { field: '', direction: SortDirection.NONE });
+
+        const actionCell = header.getElement().querySelector(`.${GridStyles.actionHeaderCell.split(' ')[0]}`) as HTMLElement;
+        expect(actionCell).not.toBeNull();
+        expect(actionCell.style.width).toBe('80px');
+    });
+
+    it('should not render action header cell when actionCount is 0', () => {
+        const columns = createColumns();
+        const header = new GridHeader(columns, false, false, 0, onSort, onSelectAll, onColumnsResized);
+        header.render([], new Set(), { field: '', direction: SortDirection.NONE });
+
+        const actionCell = header.getElement().querySelector(`.${GridStyles.actionHeaderCell.split(' ')[0]}`);
+        expect(actionCell).toBeNull();
     });
 });

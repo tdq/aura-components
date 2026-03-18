@@ -11,6 +11,7 @@ export class GridRow<ITEM> {
     private element: HTMLElement;
     private actionCell?: HTMLElement;
     private checkbox?: HTMLInputElement;
+    private listenerAbort?: AbortController;
     private readonly rowHeight = 52;
 
     constructor(
@@ -43,6 +44,9 @@ export class GridRow<ITEM> {
     }
 
     private populateRow(row: HTMLElement) {
+        this.listenerAbort = new AbortController();
+        const { signal } = this.listenerAbort;
+
         let firstCell: HTMLElement | null = null;
 
         if (this.isMultiSelect) {
@@ -56,7 +60,7 @@ export class GridRow<ITEM> {
             checkbox.addEventListener('change', (e) => {
                 e.stopPropagation();
                 this.onToggleSelection(this.item);
-            });
+            }, { signal });
 
             this.checkbox = checkbox;
             checkCell.appendChild(checkbox);
@@ -92,26 +96,50 @@ export class GridRow<ITEM> {
                 this.isSelected ? GridStyles.actionCellSelected : (this.index % 2 === 1 ? GridStyles.actionCellOdd : GridStyles.actionCellEven),
                 'group-hover:bg-surface-variant/20 dark:group-hover:bg-slate-800/60'
             );
+            const actionWidth = this.actions.length * 36 + 8;
+            actionCell.style.width = `${actionWidth}px`;
 
-            this.actions.forEach(action => {
+            this.actions.forEach((action) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = GridStyles.tooltipWrapper;
+
                 const btn = document.createElement('button');
                 btn.className = GridStyles.actionButton;
-                btn.title = action.label;
+                btn.setAttribute('aria-label', action.label);
 
-                if (action.icon) {
-                    const icon = document.createElement('i');
-                    icon.className = action.icon;
-                    btn.appendChild(icon);
-                } else {
-                    btn.textContent = action.label;
-                    btn.className = cn(btn.className, GridStyles.actionButtonText);
-                }
+                const iconWrapper = document.createElement('span');
+                iconWrapper.className = 'w-4 h-4 inline-flex items-center justify-center [&_svg]:w-full [&_svg]:h-full [&_svg]:block';
+                iconWrapper.innerHTML = action.icon;
+                btn.appendChild(iconWrapper);
 
-                btn.onclick = (e) => {
+                const tooltip = document.createElement('div');
+                tooltip.className = GridStyles.tooltip;
+                tooltip.setAttribute('popover', 'manual');
+                tooltip.textContent = action.label;
+
+                btn.addEventListener('mouseenter', () => {
+                    const rect = btn.getBoundingClientRect();
+                    tooltip.style.left = `${rect.left + rect.width / 2}px`;
+                    tooltip.style.top = `${rect.top}px`;
+                    if (!tooltip.matches(':popover-open')) {
+                        tooltip.showPopover();
+                    }
+                }, { signal });
+
+                btn.addEventListener('mouseleave', () => {
+                    if (tooltip.matches(':popover-open')) {
+                        tooltip.hidePopover();
+                    }
+                }, { signal });
+
+                btn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     action.onClick(this.item);
-                };
-                actionCell.appendChild(btn);
+                }, { signal });
+
+                wrapper.appendChild(btn);
+                wrapper.appendChild(tooltip);
+                actionCell.appendChild(wrapper);
             });
             this.actionCell = actionCell;
             row.appendChild(actionCell);
@@ -159,6 +187,11 @@ export class GridRow<ITEM> {
         this.level = level;
         this.actionCell = undefined;
         this.checkbox = undefined;
+        this.element.querySelectorAll('[popover]').forEach(el => {
+            const htmlEl = el as HTMLElement;
+            if (htmlEl.matches(':popover-open')) htmlEl.hidePopover();
+        });
+        this.listenerAbort?.abort();
         this.element.innerHTML = '';
         this.element.className = cn(
             GridStyles.row,

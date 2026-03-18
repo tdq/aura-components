@@ -24,6 +24,7 @@ Dialogs are draggable by pressing mouse button on header.
 It uses existing components: layout, label
 Use HTML <dialog> tag for implementation.
 Always display dialog as modal.
+On opening dialog must be displayed in center.
 
 ## Styling
 Style according to Material Design 3 

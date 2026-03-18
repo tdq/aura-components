@@ -134,7 +134,7 @@ export class GridBuilder<ITEM> implements ComponentBuilder {
             columns,
             this.isGlass,
             this.isMultiSelect,
-            actions.length > 0,
+            actions.length,
             (field, direction) => this.logic.setSort(field, direction),
             (checked) => {
                 if (checked) {

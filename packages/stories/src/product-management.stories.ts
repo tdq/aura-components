@@ -9,6 +9,7 @@ import { TextFieldBuilder, TextFieldStyle } from 'aura-components';
 import { NumberFieldStyle } from 'aura-components';
 import { ComboBoxBuilder, ComboBoxStyle } from 'aura-components';
 import { ButtonBuilder, ButtonStyle } from 'aura-components';
+import { Icons } from '@/core/icons';
 
 export default {
     title: 'Examples/Product Management',
@@ -223,8 +224,8 @@ export const ProductManagement = () => {
     columns.addBooleanColumn('active').withHeader('Active').withWidth('80px');
 
     const actions = grid.withActions();
-    actions.addAction('Edit', (product) => openProductDialog(product));
-    actions.addAction('Delete', (product) => deleteProduct(product));
+    actions.addAction(Icons.EDIT, 'Edit', (product) => openProductDialog(product));
+    actions.addAction(Icons.DELETE, 'Delete', (product) => deleteProduct(product));
 
     // 3. Main Layout
     const mainLayout = new LayoutBuilder()

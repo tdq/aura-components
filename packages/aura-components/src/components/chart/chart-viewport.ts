@@ -89,7 +89,7 @@ export class ChartViewport<ITEM> {
     }
 
     private render(state: ChartState<ITEM>) {
-        this.element.className = cn(ChartStyles.container, state.isGlass && ChartStyles.glass);
+        this.element.className = cn(ChartStyles.container/*, state.isGlass && ChartStyles.glass*/);
         if (state.height > 0) {
             this.element.style.height = `${state.height}px`;
         } else {
