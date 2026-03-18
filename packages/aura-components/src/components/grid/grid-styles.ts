@@ -1,6 +1,6 @@
 export const GridStyles = {
     container: 'flex flex-col w-full text-sm text-foreground bg-background rounded-lg border border-outline/30 dark:border-stone-50/20 overflow-hidden',
-    glass: 'glass-effect bg-surface-container-low/50',
+    glass: 'glass-effect bg-transparent',
     
     header: 'flex flex-row items-stretch bg-surface-container-low/80 backdrop-blur-md font-semibold h-[52px] sticky top-0 z-20 text-on-surface-variant text-[11px] uppercase tracking-wider border-b border-outline/20 dark:border-stone-50/20',
     headerGlass: 'bg-white/20 backdrop-blur-xl',
