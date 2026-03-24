@@ -11,7 +11,7 @@ export const GridStyles = {
     checkboxCell: 'w-12 flex-none flex items-center justify-center',
     checkboxInput: 'rounded border-outline w-4 h-4 cursor-pointer accent-primary',
     
-    headerCell: 'px-4 h-full flex items-center text-left truncate font-semibold text-on-surface-variant group relative transition-colors hover:bg-surface-variant/30 after:absolute after:right-0 after:top-[10%] after:h-[80%] after:w-0.5 after:bg-outline/30 after:opacity-0 [&.resizable-column]:hover:after:opacity-100 before:absolute before:left-0 before:top-[10%] before:h-[80%] before:w-0.5 before:bg-outline/30 before:opacity-0 [&.prev-resizable]:hover:before:opacity-100',
+    headerCell: 'px-4 h-full flex items-center text-left truncate font-semibold text-on-surface-variant group relative transition-colors hover:bg-surface-variant/30 select-none after:absolute after:right-0 after:top-[10%] after:h-[80%] after:w-0.5 after:bg-outline/30 after:opacity-0 [&.resizable-column]:hover:after:opacity-100 before:absolute before:left-0 before:top-[10%] before:h-[80%] before:w-0.5 before:bg-outline/30 before:opacity-0 [&.prev-resizable]:hover:before:opacity-100',
     headerCellSortable: 'cursor-pointer hover:text-primary',
     headerCellActive: 'bg-surface-variant/30',
     
@@ -36,14 +36,14 @@ export const GridStyles = {
     
     groupRow: 'absolute w-full flex items-center bg-surface-container-high border-b border-outline/10 cursor-pointer hover:bg-surface-container-highest transition-colors z-10 [will-change:transform]',
     groupRowGlass: 'glass-effect !bg-white/10 hover:bg-white/20',
-    groupToggle: 'w-10 h-10 flex items-center justify-center text-on-surface-variant transition-transform duration-200',
+    groupToggle: 'w-5 h-5 flex items-center justify-center text-on-surface-variant transition-transform duration-200',
     groupToggleExpanded: 'rotate-90',
     groupIcon: 'w-5 h-5 flex items-center justify-center',
     groupContent: 'flex items-center gap-2 font-medium',
     groupValue: 'text-primary',
     groupCount: 'text-xs text-on-surface-variant/60 font-normal',
     
-    actionCell: 'flex-none flex items-center justify-center gap-1 sticky right-0 z-10 border-l border-outline/10 dark:border-stone-50/10 transition-colors duration-200 bg-surface-container-low/80 backdrop-blur',
+    actionCell: 'flex-none flex items-center justify-center gap-1 sticky right-0 z-10 border-l border-outline/10 dark:border-stone-50/10 transition-colors duration-200 bg-surface-container-low/80',
     actionCellSelected: 'bg-primary/10',
     actionCellOdd: 'bg-surface-container-low/20',
     actionCellEven: 'bg-background',

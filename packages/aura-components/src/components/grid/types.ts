@@ -34,8 +34,10 @@ export interface GridColumn<ITEM> {
     sortable?: boolean;
     filterable?: boolean;
     resizable?: boolean;
+    editable?: boolean;
     cellClass?: Observable<string>;
     render: (item: ITEM) => HTMLElement | string;
+    onEdit?: (item: ITEM, field: keyof ITEM | string, newValue: string) => void;
 }
 
 export interface GridAction<ITEM> {
@@ -76,6 +78,7 @@ export interface ColumnBuilder<ITEM> {
     withWidth(width: string): this;
     asSortable(sortable?: boolean): this;
     asResizable(resizable?: boolean): this;
+    asEditable(onEdit: (item: ITEM, field: keyof ITEM | string, newValue: string) => void): this;
     withClass(className: Observable<string>): this;
     build(): GridColumn<ITEM>;
 }

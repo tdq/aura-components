@@ -85,10 +85,35 @@ export class GridRow<ITEM> {
             }
 
             const content = col.render(this.item);
-            if (content instanceof HTMLElement) {
+            if (this.isEditable && col.editable && col.onEdit) {
+                const onEdit = col.onEdit;
+                const rawContent = content instanceof HTMLElement ? content.textContent ?? '' : (content != null ? String(content) : '');
+                const span = document.createElement('span');
+                span.className = 'outline-none block w-full';
+                span.contentEditable = 'true';
+                span.textContent = rawContent;
+                let cancelled = false;
+                span.addEventListener('blur', () => {
+                    if (!cancelled) {
+                        onEdit(this.item, col.field, span.textContent ?? '');
+                    }
+                    cancelled = false;
+                }, { signal });
+                span.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        span.blur();
+                    } else if (e.key === 'Escape') {
+                        cancelled = true;
+                        span.textContent = String(col.render(this.item));
+                        span.blur();
+                    }
+                }, { signal });
+                cell.appendChild(span);
+            } else if (content instanceof HTMLElement) {
                 cell.appendChild(content);
             } else {
-                cell.textContent = String(content);
+                cell.textContent = content != null ? String(content) : '';
             }
             row.appendChild(cell);
             if (!firstCell && index === 0) {
