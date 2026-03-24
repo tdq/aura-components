@@ -51,7 +51,8 @@ This component uses the following shared parts from `src/components/component-pa
 ## Styling
 Style according to Material Design 3.
 - Error and label use `md-label-small` typography.
-- Border is defined as outline so changing its size does not affect the input size. Border size is 1px.
+- Border is defined as outline so changing its size does not affect the input size. Border size is 1px (`outline-1`).
+- In error state the input wrapper has a 1px outline rendered **outside** the element (`outline-1 outline-offset-1 outline-error`).
 - Height is 48px (`h-[48px]`).
 - Reserve space for error text below the field only if not in inline error mode.
 - Use Tailwind CSS utilities with standard notation (e.g. `px-4`, `h-[48px]`, `w-6`).

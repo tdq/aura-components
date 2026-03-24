@@ -8,7 +8,7 @@
 > vite build && npm run build:css && npm run build:types && node scripts/reorganize-types.mjs && node scripts/generate-manifest.mjs
 
 [1G[0K[36mvite v5.4.21 [32mbuilding for production...[36m[39m
-[2K[1Gtransforming (1) [2msrc/components/button/index.ts[22m[2K[1Gtransforming (34) [2msrc/components/layout/layout.ts[22m[2K[1Gtransforming (151) [2msrc/components/number-field/number-field.ts[22m[2K[1Gtransforming (243) [2msrc/router/index.ts[22m[2K[1G[32m✓[39m 300 modules transformed.
+[2K[1Gtransforming (1) [2msrc/components/form/index.ts[22m[2K[1Gtransforming (40) [2msrc/components/text-field/text-field.ts[22m[2K[1Gtransforming (179) [2msrc/components/date-picker/calendar.ts[22m[2K[1Gtransforming (275) [2msrc/components/component-parts/field-label.ts[22m[2K[1G[32m✓[39m 300 modules transformed.
 [2K[1Grendering chunks (1)...[2K[1Grendering chunks (2)...[2K[1Grendering chunks (3)...[2K[1Grendering chunks (4)...[2K[1Grendering chunks (5)...[2K[1Grendering chunks (6)...[2K[1Grendering chunks (7)...[2K[1Grendering chunks (8)...[2K[1Grendering chunks (9)...[2K[1Grendering chunks (10)...[2K[1Grendering chunks (11)...[2K[1Grendering chunks (12)...[2K[1Grendering chunks (13)...[2K[1Grendering chunks (14)...[2K[1Grendering chunks (15)...[2K[1Grendering chunks (16)...[2K[1Grendering chunks (17)...[2K[1Grendering chunks (18)...[2K[1Grendering chunks (19)...[2K[1Grendering chunks (20)...[2K[1Grendering chunks (21)...[2K[1Grendering chunks (22)...[2K[1Grendering chunks (23)...[2K[1Grendering chunks (24)...[2K[1Grendering chunks (25)...[2K[1Grendering chunks (26)...[2K[1Grendering chunks (27)...[2K[1Grendering chunks (28)...[2K[1Grendering chunks (29)...[2K[1Grendering chunks (30)...[2K[1Grendering chunks (31)...[2K[1Grendering chunks (32)...[2K[1Grendering chunks (33)...[2K[1Grendering chunks (34)...[2K[1Grendering chunks (35)...[2K[1Grendering chunks (36)...[2K[1Grendering chunks (37)...[2K[1Grendering chunks (38)...[2K[1G[2K[1Gcomputing gzip size (0)...[2K[1Gcomputing gzip size (1)...[2K[1Gcomputing gzip size (2)...[2K[1Gcomputing gzip size (3)...[2K[1Gcomputing gzip size (4)...[2K[1Gcomputing gzip size (5)...[2K[1Gcomputing gzip size (6)...[2K[1Gcomputing gzip size (7)...[2K[1Gcomputing gzip size (8)...[2K[1Gcomputing gzip size (9)...[2K[1Gcomputing gzip size (10)...[2K[1Gcomputing gzip size (11)...[2K[1Gcomputing gzip size (12)...[2K[1Gcomputing gzip size (13)...[2K[1Gcomputing gzip size (14)...[2K[1Gcomputing gzip size (15)...[2K[1Gcomputing gzip size (16)...[2K[1Gcomputing gzip size (17)...[2K[1Gcomputing gzip size (18)...[2K[1Gcomputing gzip size (19)...[2K[1Gcomputing gzip size (20)...[2K[1Gcomputing gzip size (21)...[2K[1Gcomputing gzip size (22)...[2K[1Gcomputing gzip size (23)...[2K[1Gcomputing gzip size (24)...[2K[1Gcomputing gzip size (25)...[2K[1Gcomputing gzip size (26)...[2K[1Gcomputing gzip size (27)...[2K[1Gcomputing gzip size (28)...[2K[1Gcomputing gzip size (29)...[2K[1Gcomputing gzip size (30)...[2K[1Gcomputing gzip size (31)...[2K[1Gcomputing gzip size (32)...[2K[1Gcomputing gzip size (33)...[2K[1Gcomputing gzip size (34)...[2K[1Gcomputing gzip size (35)...[2K[1Gcomputing gzip size (36)...[2K[1Gcomputing gzip size (37)...[2K[1Gcomputing gzip size (38)...[2K[1G[2mdist/[22m[36mcheckbox/index.js                [39m[1m[2m 0.09 kB[22m[1m[22m[2m │ gzip:  0.09 kB[22m
 [2mdist/[22m[36mbutton/index.js                  [39m[1m[2m 0.10 kB[22m[1m[22m[2m │ gzip:  0.10 kB[22m
 [2mdist/[22m[36mpanel/index.js                   [39m[1m[2m 0.10 kB[22m[1m[22m[2m │ gzip:  0.11 kB[22m
@@ -21,33 +21,33 @@
 [2mdist/[22m[36mlayout/index.js                  [39m[1m[2m 0.16 kB[22m[1m[22m[2m │ gzip:  0.14 kB[22m
 [2mdist/[22m[36mtextfield/index.js               [39m[1m[2m 0.16 kB[22m[1m[22m[2m │ gzip:  0.13 kB[22m
 [2mdist/[22m[36mnumberfield/index.js             [39m[1m[2m 0.17 kB[22m[1m[22m[2m │ gzip:  0.14 kB[22m
-[2mdist/[22m[36mdatepicker/index.js              [39m[1m[2m 0.27 kB[22m[1m[22m[2m │ gzip:  0.19 kB[22m
 [2mdist/[22m[36mchart/index.js                   [39m[1m[2m 0.29 kB[22m[1m[22m[2m │ gzip:  0.19 kB[22m
-[2mdist/[22m[36mgrid/index.js                    [39m[1m[2m 0.66 kB[22m[1m[22m[2m │ gzip:  0.31 kB[22m
+[2mdist/[22m[36mdatepicker/index.js              [39m[1m[2m 0.30 kB[22m[1m[22m[2m │ gzip:  0.20 kB[22m
+[2mdist/[22m[36mgrid/index.js                    [39m[1m[2m 0.69 kB[22m[1m[22m[2m │ gzip:  0.32 kB[22m
 [2mdist/[22m[36mdestroyable-element-D51cI_tZ.js  [39m[1m[2m 0.85 kB[22m[1m[22m[2m │ gzip:  0.45 kB[22m
-[2mdist/[22m[36mpanel-DTs5a9v9.js                [39m[1m[2m 1.53 kB[22m[1m[22m[2m │ gzip:  0.75 kB[22m
+[2mdist/[22m[36mpanel-WS02yeA7.js                [39m[1m[2m 1.53 kB[22m[1m[22m[2m │ gzip:  0.75 kB[22m
 [2mdist/[22m[36mlabel/index.js                   [39m[1m[2m 1.67 kB[22m[1m[22m[2m │ gzip:  0.70 kB[22m
-[2mdist/[22m[36mtoolbar-builder-y88nD1d9.js      [39m[1m[2m 2.60 kB[22m[1m[22m[2m │ gzip:  0.82 kB[22m
+[2mdist/[22m[36mtoolbar-builder-KG6yNZ2-.js      [39m[1m[2m 2.60 kB[22m[1m[22m[2m │ gzip:  0.81 kB[22m
 [2mdist/[22m[36mfield-id-C-zBAp8C.js             [39m[1m[2m 2.98 kB[22m[1m[22m[2m │ gzip:  1.31 kB[22m
 [2mdist/[22m[36mcheckbox-Cpdp_3ZS.js             [39m[1m[2m 3.32 kB[22m[1m[22m[2m │ gzip:  1.21 kB[22m
 [2mdist/[22m[36micons-Cq3lvI8e.js                [39m[1m[2m 3.37 kB[22m[1m[22m[2m │ gzip:  1.37 kB[22m
 [2mdist/[22m[36mlayout-CBV_miip.js               [39m[1m[2m 3.62 kB[22m[1m[22m[2m │ gzip:  1.35 kB[22m
-[2mdist/[22m[36mbutton-BK6qIwy3.js               [39m[1m[2m 3.95 kB[22m[1m[22m[2m │ gzip:  1.48 kB[22m
-[2mdist/[22m[36mform-builder-r41tCUko.js         [39m[1m[2m 4.20 kB[22m[1m[22m[2m │ gzip:  1.30 kB[22m
+[2mdist/[22m[36mbutton-oCAfGPAy.js               [39m[1m[2m 3.99 kB[22m[1m[22m[2m │ gzip:  1.49 kB[22m
+[2mdist/[22m[36mform-builder-DZuBDQ32.js         [39m[1m[2m 4.20 kB[22m[1m[22m[2m │ gzip:  1.30 kB[22m
 [2mdist/[22m[36mtabs-BgnqcGWL.js                 [39m[1m[2m 4.70 kB[22m[1m[22m[2m │ gzip:  1.56 kB[22m
-[2mdist/[22m[36mdialog-B_7-H_s3.js               [39m[1m[2m 4.84 kB[22m[1m[22m[2m │ gzip:  1.66 kB[22m
+[2mdist/[22m[36mdialog-DHJmDnHT.js               [39m[1m[2m 4.84 kB[22m[1m[22m[2m │ gzip:  1.66 kB[22m
 [2mdist/[22m[36mlistbox-AgQCL32E.js              [39m[1m[2m 5.01 kB[22m[1m[22m[2m │ gzip:  1.73 kB[22m
-[2mdist/[22m[36mtext-field-BB16H2Et.js           [39m[1m[2m 9.07 kB[22m[1m[22m[2m │ gzip:  2.98 kB[22m
+[2mdist/[22m[36mtext-field-BOFVfSzQ.js           [39m[1m[2m 9.25 kB[22m[1m[22m[2m │ gzip:  3.02 kB[22m
 [2mdist/[22m[36mstartWith-D7k5baRl.js            [39m[1m[2m10.09 kB[22m[1m[22m[2m │ gzip:  2.75 kB[22m
-[2mdist/[22m[36mindex.js                         [39m[1m[2m10.48 kB[22m[1m[22m[2m │ gzip:  3.49 kB[22m
+[2mdist/[22m[36mindex.js                         [39m[1m[2m10.54 kB[22m[1m[22m[2m │ gzip:  3.51 kB[22m
 [2mdist/[22m[36mnumber-field-CFwde23x.js         [39m[1m[2m12.38 kB[22m[1m[22m[2m │ gzip:  3.65 kB[22m
 [2mdist/[22m[36mcombobox-builder-UIIWv5cs.js     [39m[1m[2m12.67 kB[22m[1m[22m[2m │ gzip:  3.89 kB[22m
 [2mdist/[22m[36mmap-DqDc5iNP.js                  [39m[1m[2m13.06 kB[22m[1m[22m[2m │ gzip:  3.73 kB[22m
-[2mdist/[22m[36mdatepicker-builder-C9B01mnZ.js   [39m[1m[2m14.81 kB[22m[1m[22m[2m │ gzip:  4.46 kB[22m
-[2mdist/[22m[36mchart-builder-B7zAMyVo.js        [39m[1m[2m24.82 kB[22m[1m[22m[2m │ gzip:  6.28 kB[22m
-[2mdist/[22m[36mgrid-builder-BkhcbmlG.js         [39m[1m[2m36.56 kB[22m[1m[22m[2m │ gzip:  8.93 kB[22m
+[2mdist/[22m[36mdatepicker-builder-CSRpS8xd.js   [39m[1m[2m15.35 kB[22m[1m[22m[2m │ gzip:  4.69 kB[22m
+[2mdist/[22m[36mchart-builder-CCANKbNf.js        [39m[1m[2m27.21 kB[22m[1m[22m[2m │ gzip:  7.02 kB[22m
+[2mdist/[22m[36mgrid-builder-BnFdwtOM.js         [39m[1m[2m39.29 kB[22m[1m[22m[2m │ gzip:  9.50 kB[22m
 [2mdist/[22m[36mbundle-mjs-C-fAsw3z.js           [39m[1m[2m59.63 kB[22m[1m[22m[2m │ gzip: 10.67 kB[22m
-[32m✓ built in 1.28s[39m
+[32m✓ built in 1.22s[39m
 
 > aura-components@0.1.1 build:css
 > tailwindcss -i ./src/index.css -o ./dist/a1-components.css --minify
@@ -58,7 +58,7 @@
 
 Rebuilding...
 
-Done in 611ms.
+Done in 621ms.
 [1G[0K\[1G[0K
 > aura-components@0.1.1 build:types
 > tsc -p tsconfig.build.json
@@ -160,24 +160,24 @@ Done in 611ms.
   components/toolbar/toolbar-builder.d.ts → toolbar/toolbar-builder.d.ts
   removed dist/components/
   rewrote imports in index.d.ts
-Generated manifest with 26 components
+Generated manifest with 27 components
 [1G[0K\[1G[0K[1G[0K\[1G[0K|[1G[0K[1mnpm[22m [96mnotice[39m
 [1G[0K|[1G[0K[1mnpm[22m [96mnotice[39m package: aura-components@0.1.1
 [1G[0K|[1G[0K[1mnpm[22m [96mnotice[39m [94mTarball Contents[39m
-[1G[0K|[1G[0K[1mnpm[22m [96mnotice[39m 33.1kB dist/a1-components.css
+[1G[0K|[1G[0K[1mnpm[22m [96mnotice[39m 33.4kB dist/a1-components.css
 [1mnpm[22m [96mnotice[39m 59.6kB dist/bundle-mjs-C-fAsw3z.js
-[1mnpm[22m [96mnotice[39m 3.9kB dist/button-BK6qIwy3.js
+[1mnpm[22m [96mnotice[39m 4.0kB dist/button-oCAfGPAy.js
 [1mnpm[22m [96mnotice[39m 981B dist/button/button.d.ts
 [1mnpm[22m [96mnotice[39m 26B dist/button/index.d.ts
 [1mnpm[22m [96mnotice[39m 99B dist/button/index.js
-[1mnpm[22m [96mnotice[39m 24.8kB dist/chart-builder-B7zAMyVo.js
-[1mnpm[22m [96mnotice[39m 262B dist/chart/axis-renderer.d.ts
+[1mnpm[22m [96mnotice[39m 27.2kB dist/chart-builder-CCANKbNf.js
+[1mnpm[22m [96mnotice[39m 548B dist/chart/axis-renderer.d.ts
 [1mnpm[22m [96mnotice[39m 710B dist/chart/builders/axis-builder.d.ts
 [1mnpm[22m [96mnotice[39m 1.5kB dist/chart/builders/chart-type-builders.d.ts
 [1mnpm[22m [96mnotice[39m 1.1kB dist/chart/chart-builder.d.ts
 [1mnpm[22m [96mnotice[39m 195B dist/chart/chart-legend.d.ts
 [1mnpm[22m [96mnotice[39m 1.3kB dist/chart/chart-logic.d.ts
-[1mnpm[22m [96mnotice[39m 644B dist/chart/chart-svg-area.d.ts
+[1mnpm[22m [96mnotice[39m 665B dist/chart/chart-svg-area.d.ts
 [1mnpm[22m [96mnotice[39m 247B dist/chart/chart-tooltip.d.ts
 [1mnpm[22m [96mnotice[39m 427B dist/chart/chart-viewport.d.ts
 [1mnpm[22m [96mnotice[39m 290B dist/chart/index.d.ts
@@ -198,9 +198,9 @@ Generated manifest with 26 components
 [1mnpm[22m [96mnotice[39m 123B dist/combobox/index.js
 [1mnpm[22m [96mnotice[39m 205B dist/combobox/styles.d.ts
 [1mnpm[22m [96mnotice[39m 206B dist/combobox/types.d.ts
-[1mnpm[22m [96mnotice[39m 69.9kB dist/component-manifest.json
+[1mnpm[22m [96mnotice[39m 65.6kB dist/component-manifest.json
 [1mnpm[22m [96mnotice[39m 220B dist/component-parts/error-popover.d.ts
-[1mnpm[22m [96mnotice[39m 334B dist/component-parts/field-affix.d.ts
+[1mnpm[22m [96mnotice[39m 382B dist/component-parts/field-affix.d.ts
 [1mnpm[22m [96mnotice[39m 65B dist/component-parts/field-id.d.ts
 [1mnpm[22m [96mnotice[39m 210B dist/component-parts/field-label.d.ts
 [1mnpm[22m [96mnotice[39m 211B dist/component-parts/field-support-text.d.ts
@@ -208,29 +208,29 @@ Generated manifest with 26 components
 [1mnpm[22m [96mnotice[39m 135B dist/core/component-builder.d.ts
 [1mnpm[22m [96mnotice[39m 138B dist/core/destroyable-element.d.ts
 [1mnpm[22m [96mnotice[39m 3.5kB dist/core/icons.d.ts
-[1mnpm[22m [96mnotice[39m 14.8kB dist/datepicker-builder-C9B01mnZ.js
+[1mnpm[22m [96mnotice[39m 15.4kB dist/datepicker-builder-CSRpS8xd.js
 [1mnpm[22m [96mnotice[39m 122B dist/datepicker/calendar.d.ts
 [1mnpm[22m [96mnotice[39m 427B dist/datepicker/date-utils.d.ts
-[1mnpm[22m [96mnotice[39m 1.1kB dist/datepicker/datepicker-builder.d.ts
+[1mnpm[22m [96mnotice[39m 1.2kB dist/datepicker/datepicker-builder.d.ts
 [1mnpm[22m [96mnotice[39m 93B dist/datepicker/index.d.ts
-[1mnpm[22m [96mnotice[39m 270B dist/datepicker/index.js
-[1mnpm[22m [96mnotice[39m 478B dist/datepicker/types.d.ts
+[1mnpm[22m [96mnotice[39m 296B dist/datepicker/index.js
+[1mnpm[22m [96mnotice[39m 663B dist/datepicker/types.d.ts
 [1mnpm[22m [96mnotice[39m 846B dist/destroyable-element-D51cI_tZ.js
-[1mnpm[22m [96mnotice[39m 4.8kB dist/dialog-B_7-H_s3.js
+[1mnpm[22m [96mnotice[39m 4.8kB dist/dialog-DHJmDnHT.js
 [1mnpm[22m [96mnotice[39m 1.1kB dist/dialog/dialog.d.ts
 [1mnpm[22m [96mnotice[39m 26B dist/dialog/index.d.ts
 [1mnpm[22m [96mnotice[39m 108B dist/dialog/index.js
 [1mnpm[22m [96mnotice[39m 3.0kB dist/field-id-C-zBAp8C.js
-[1mnpm[22m [96mnotice[39m 4.2kB dist/form-builder-r41tCUko.js
+[1mnpm[22m [96mnotice[39m 4.2kB dist/form-builder-DZuBDQ32.js
 [1mnpm[22m [96mnotice[39m 1.3kB dist/form/fields-builder.d.ts
 [1mnpm[22m [96mnotice[39m 796B dist/form/form-builder.d.ts
 [1mnpm[22m [96mnotice[39m 91B dist/form/index.d.ts
 [1mnpm[22m [96mnotice[39m 115B dist/form/index.js
 [1mnpm[22m [96mnotice[39m 186B dist/form/styles.d.ts
 [1mnpm[22m [96mnotice[39m 932B dist/form/types.d.ts
-[1mnpm[22m [96mnotice[39m 36.6kB dist/grid-builder-BkhcbmlG.js
-[1mnpm[22m [96mnotice[39m 219B dist/grid/actions-builder.d.ts
-[1mnpm[22m [96mnotice[39m 754B dist/grid/columns/base-column-builder.d.ts
+[1mnpm[22m [96mnotice[39m 39.3kB dist/grid-builder-BnFdwtOM.js
+[1mnpm[22m [96mnotice[39m 481B dist/grid/actions-builder.d.ts
+[1mnpm[22m [96mnotice[39m 1.0kB dist/grid/columns/base-column-builder.d.ts
 [1mnpm[22m [96mnotice[39m 411B dist/grid/columns/boolean-column.d.ts
 [1mnpm[22m [96mnotice[39m 513B dist/grid/columns/button-column.d.ts
 [1mnpm[22m [96mnotice[39m 1.4kB dist/grid/columns/columns-builder.d.ts
@@ -248,13 +248,13 @@ Generated manifest with 26 components
 [1mnpm[22m [96mnotice[39m 481B dist/grid/grid-group-row.d.ts
 [1mnpm[22m [96mnotice[39m 776B dist/grid/grid-header.d.ts
 [1mnpm[22m [96mnotice[39m 1.1kB dist/grid/grid-logic.d.ts
-[1mnpm[22m [96mnotice[39m 1.0kB dist/grid/grid-row.d.ts
+[1mnpm[22m [96mnotice[39m 1.1kB dist/grid/grid-row.d.ts
 [1mnpm[22m [96mnotice[39m 1.0kB dist/grid/grid-styles.d.ts
 [1mnpm[22m [96mnotice[39m 1.1kB dist/grid/grid-viewport.d.ts
 [1mnpm[22m [96mnotice[39m 119B dist/grid/index.d.ts
-[1mnpm[22m [96mnotice[39m 664B dist/grid/index.js
+[1mnpm[22m [96mnotice[39m 694B dist/grid/index.js
 [1mnpm[22m [96mnotice[39m 502B dist/grid/pivot-logic.d.ts
-[1mnpm[22m [96mnotice[39m 2.1kB dist/grid/types.d.ts
+[1mnpm[22m [96mnotice[39m 2.4kB dist/grid/types.d.ts
 [1mnpm[22m [96mnotice[39m 3.4kB dist/icons-Cq3lvI8e.js
 [1mnpm[22m [96mnotice[39m 583B dist/index.d.ts
 [1mnpm[22m [96mnotice[39m 10.5kB dist/index.js
@@ -279,7 +279,7 @@ Generated manifest with 26 components
 [1mnpm[22m [96mnotice[39m 78B dist/numberfield/number-field-label.d.ts
 [1mnpm[22m [96mnotice[39m 1.5kB dist/numberfield/number-field-logic.d.ts
 [1mnpm[22m [96mnotice[39m 1.5kB dist/numberfield/number-field.d.ts
-[1mnpm[22m [96mnotice[39m 1.5kB dist/panel-DTs5a9v9.js
+[1mnpm[22m [96mnotice[39m 1.5kB dist/panel-WS02yeA7.js
 [1mnpm[22m [96mnotice[39m 25B dist/panel/index.d.ts
 [1mnpm[22m [96mnotice[39m 104B dist/panel/index.js
 [1mnpm[22m [96mnotice[39m 578B dist/panel/panel.d.ts
@@ -296,7 +296,7 @@ Generated manifest with 26 components
 [1mnpm[22m [96mnotice[39m 391B dist/tabs/tab-builder.d.ts
 [1mnpm[22m [96mnotice[39m 586B dist/tabs/tabs.d.ts
 [1mnpm[22m [96mnotice[39m 54B dist/tabs/types.d.ts
-[1mnpm[22m [96mnotice[39m 9.1kB dist/text-field-BB16H2Et.js
+[1mnpm[22m [96mnotice[39m 9.2kB dist/text-field-BOFVfSzQ.js
 [1mnpm[22m [96mnotice[39m 30B dist/textfield/index.d.ts
 [1mnpm[22m [96mnotice[39m 161B dist/textfield/index.js
 [1mnpm[22m [96mnotice[39m 155B dist/textfield/text-field-error.d.ts
@@ -307,7 +307,7 @@ Generated manifest with 26 components
 [1mnpm[22m [96mnotice[39m 58B dist/theme/index.d.ts
 [1mnpm[22m [96mnotice[39m 466B dist/theme/theme-manager.d.ts
 [1mnpm[22m [96mnotice[39m 157B dist/theme/types.d.ts
-[1mnpm[22m [96mnotice[39m 2.6kB dist/toolbar-builder-y88nD1d9.js
+[1mnpm[22m [96mnotice[39m 2.6kB dist/toolbar-builder-KG6yNZ2-.js
 [1mnpm[22m [96mnotice[39m 61B dist/toolbar/index.d.ts
 [1mnpm[22m [96mnotice[39m 122B dist/toolbar/index.js
 [1mnpm[22m [96mnotice[39m 65B dist/toolbar/styles.d.ts
@@ -319,10 +319,10 @@ Generated manifest with 26 components
 [1G[0K|[1G[0K[1mnpm[22m [96mnotice[39m name: aura-components
 [1G[0K|[1G[0K[1mnpm[22m [96mnotice[39m version: 0.1.1
 [1G[0K|[1G[0K[1mnpm[22m [96mnotice[39m filename: aura-components-0.1.1.tgz
-[1G[0K|[1G[0K[1mnpm[22m [96mnotice[39m package size: 86.1 kB
-[1G[0K|[1G[0K[1mnpm[22m [96mnotice[39m unpacked size: 415.4 kB
-[1G[0K|[1G[0K[1mnpm[22m [96mnotice[39m shasum: e91c091112672bf9144d49f073d49e8b2c0f3d62
-[1G[0K|[1G[0K[1mnpm[22m [96mnotice[39m integrity: sha512-WU8jptDHkSAGI[...]iuQEUBo4DDSdg==
+[1G[0K|[1G[0K[1mnpm[22m [96mnotice[39m package size: 87.4 kB
+[1G[0K|[1G[0K[1mnpm[22m [96mnotice[39m unpacked size: 419.1 kB
+[1G[0K|[1G[0K[1mnpm[22m [96mnotice[39m shasum: 561723617bd7c447562bdaa659c9e7d1b583cdd1
+[1G[0K|[1G[0K[1mnpm[22m [96mnotice[39m integrity: sha512-zgLAY1jndtxrG[...]EDnikezpTaUQg==
 [1G[0K|[1G[0K[1mnpm[22m [96mnotice[39m total files: 151
 [1G[0K|[1G[0K[1mnpm[22m [96mnotice[39m
 [1G[0K|[1G[0Kaura-components-0.1.1.tgz

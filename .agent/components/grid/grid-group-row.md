@@ -10,7 +10,7 @@ The `GridGroupRow` class renders a collapsible header row for a group of items. 
 
 ## Components
 - **Element**: An absolute-positioned flex container (`GridStyles.groupRow`) positioned via `transform: translateY`.
-- **Toggle Icon**: A chevron icon (cached, uses `Icons.CHEVRON_RIGHT`) that rotates 90 degrees when expanded.
+- **Toggle Icon**: A chevron icon (`w-5 h-5`, uses `Icons.CHEVRON_RIGHT`) that rotates 90 degrees when expanded.
 - **Label**: Displays the field name (e.g., "Category:").
 - **Value**: Displays the specific group value (e.g., "Electronics").
 - **Count**: Displays the total number of items within the group in parentheses.

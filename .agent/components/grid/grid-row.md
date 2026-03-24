@@ -41,6 +41,16 @@ All event listeners (checkbox `change`, action button `mouseenter`/`mouseleave`/
 ### Ghost Tooltip Cleanup
 `update()` queries all `[popover]` elements inside the row and calls `hidePopover()` on any that match `:popover-open` before clearing the DOM. This prevents tooltips stranded in the top layer after a row is recycled.
 
+### Inline Cell Editing
+When both the grid has `asEditable()` enabled and a column has `col.editable && col.onEdit` set (via `asEditable(onEdit)` on the column builder), cells render as `contenteditable` spans instead of plain text nodes:
+
+- The span has `outline-none block w-full` to fill the cell without extra focus outlines.
+- **Commit**: `blur` event fires `col.onEdit(item, field, newValue)`. Also triggered by pressing **Enter** (which calls `span.blur()`).
+- **Revert**: **Escape** sets a `cancelled = true` flag, resets `textContent` to the original rendered value, then calls `span.blur()`. The blur handler checks the flag and skips calling `onEdit`.
+- If `col.render()` returns an `HTMLElement`, its `textContent` is extracted as the initial editable value.
+- Null/undefined field values default to an empty string in the editable span.
+- All event listeners use the row's `AbortController` `signal` for automatic cleanup during recycling.
+
 ### Performance
 - Selection updates are highly optimized. Caching `checkbox` and `actionCell` during `populateRow` means `updateSelection` never calls `querySelector` during scroll-heavy selection changes.
 - Positioning uses `transform: translateY` to enable GPU-composited virtualization.

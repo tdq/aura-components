@@ -25,6 +25,9 @@ Button style is an enum with the following values:
 ## Styling
 Style according to Material Design 3
 
+### Text Selection
+Button caption text has `select-none` — it is not user-selectable to prevent accidental text highlights on click.
+
 ### Glass effect
 Button styles:
 1. Filled button has glass background, border and caption color according to generic glass effect instructions and color theme.

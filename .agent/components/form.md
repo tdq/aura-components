@@ -26,13 +26,16 @@ It has the folowing methods:
 "colspan" - defines amount of columns this component takes (width in columns amount).
 
 ## Styling
-Style according to Material Design 3 
+Style according to Material Design 3
 Error and description are small text.
 Caption is a big text.
 FormBuilder should use LayoutBuilder as a basis.
 LayoutBuilder should have large gap.
 Form error message should be displayed above toolbar.
 Toolbar should be on the bottom of the form.
+
+### Field error state
+Fields in error state render a 1px outline border **outside** the input wrapper (`outline-1 outline-offset-1 outline-error`). This is implemented in `text-field-logic.ts` via `getValidationClasses()` and applies to all text-based fields.
 
 ### Glass effect
 Glass effect applied only for fields and toolbar. **Form itself is not affected by glass effect**.
