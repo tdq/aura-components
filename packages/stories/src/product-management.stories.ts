@@ -1,6 +1,6 @@
 import { BehaviorSubject, combineLatest, of, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { GridBuilder } from 'aura-components';
+import { GridBuilder, Money } from 'aura-components';
 import { FormBuilder } from 'aura-components';
 import { PanelBuilder, PanelGap } from 'aura-components';
 import { LayoutBuilder, LayoutGap, Alignment } from 'aura-components';
@@ -19,7 +19,7 @@ interface Product {
     id: number;
     name: string;
     category: 'Electronics' | 'Clothing' | 'Food' | 'Furniture';
-    price: number;
+    price: Money;
     stock: number;
     active: boolean;
 }
@@ -31,7 +31,10 @@ const generateProducts = (count: number): Product[] => {
         id: i + 1,
         name: `Product ${i + 1}`,
         category: CATEGORIES[i % CATEGORIES.length] as any,
-        price: Math.floor(Math.random() * 1000) + 10,
+        price: { 
+            amount: Math.floor(Math.random() * 1000) + 10, 
+            currencyId: 'USD' 
+        },
         stock: Math.floor(Math.random() * 100),
         active: i % 5 !== 0,
     }));
@@ -82,7 +85,7 @@ export const ProductManagement = () => {
         const isEdit = !!product;
         const name$ = new BehaviorSubject(product?.name || '');
         const category$ = new BehaviorSubject(product?.category || CATEGORIES[0]);
-        const price$ = new BehaviorSubject<number | null>(product?.price ?? null);
+        const price$ = new BehaviorSubject<number | null>(product?.price?.amount ?? null);
         const stock$ = new BehaviorSubject<number | null>(product?.stock ?? null);
         const active$ = new BehaviorSubject(product?.active ?? true);
 
@@ -141,7 +144,10 @@ export const ProductManagement = () => {
             const data = {
                 name: name$.value,
                 category: category$.value as any,
-                price: price$.value || 0,
+                price: { 
+                    amount: price$.value || 0, 
+                    currencyId: 'USD' 
+                },
                 stock: stock$.value || 0,
                 active: active$.value
             };

@@ -6,6 +6,7 @@ import { GridGroupRow } from './grid-group-row';
 export class GridViewport<ITEM> {
     private element: HTMLElement;
     private contentElement: HTMLElement;
+    private rowsContainer: HTMLElement;
     private renderedRows = new Map<number, GridRow<ITEM> | GridGroupRow>();
     private readonly rowHeight = 52;
     private readonly buffer = 5;
@@ -32,6 +33,10 @@ export class GridViewport<ITEM> {
         this.contentElement = document.createElement('div');
         this.contentElement.className = GridStyles.content;
         this.element.appendChild(this.contentElement);
+
+        this.rowsContainer = document.createElement('div');
+        this.rowsContainer.className = GridStyles.rowsContainer;
+        this.contentElement.appendChild(this.rowsContainer);
 
         this.element.addEventListener('scroll', () => {
             if (!this.ticking) {
@@ -62,8 +67,8 @@ export class GridViewport<ITEM> {
     update(rows: GridRowData<ITEM>[], selected: Set<ITEM>) {
         this.lastRows = rows;
         this.lastSelected = selected;
-        const totalHeight = rows.length * this.rowHeight;
-        this.contentElement.style.height = `${totalHeight}px`;
+        //const totalHeight = rows.length * this.rowHeight;
+        //this.contentElement.style.height = `${totalHeight}px`;
         this.renderVisibleRows();
     }
 
@@ -114,7 +119,7 @@ export class GridViewport<ITEM> {
                 existing.getElement().remove();
             }
             const groupRow = new GridGroupRow(header, index, (key) => this.onToggleGroup(key), this.isGlass);
-            this.contentElement.appendChild(groupRow.getElement());
+            this.rowsContainer.appendChild(groupRow.getElement());
             this.renderedRows.set(index, groupRow);
         }
     }
@@ -143,7 +148,7 @@ export class GridViewport<ITEM> {
                 level,
                 this.isGlass
             );
-            this.contentElement.appendChild(row.getElement());
+            this.rowsContainer.appendChild(row.getElement());
             this.renderedRows.set(index, row);
         }
     }

@@ -41,6 +41,44 @@ describe('GridLogic', () => {
         expect(sorted[2].name).toBe('A');
     });
 
+    it('should sort Money objects by amount', async () => {
+        interface MoneyItem {
+            id: number;
+            price: { amount: number; currencyId: string };
+        }
+        const moneyItems: MoneyItem[] = [
+            { id: 1, price: { amount: 100, currencyId: 'USD' } },
+            { id: 2, price: { amount: 50, currencyId: 'EUR' } },
+            { id: 3, price: { amount: 150, currencyId: 'GBP' } },
+        ];
+        const moneyLogic = new GridLogic<MoneyItem>();
+        moneyLogic.setItems(of(moneyItems));
+        
+        const priceColumn = {
+            id: 'price',
+            field: 'price',
+            type: 'MONEY' as any,
+            header: 'Price',
+            render: () => '',
+            sortValue: (item: MoneyItem) => item.price.amount
+        };
+        moneyLogic.setColumns([priceColumn]);
+
+        moneyLogic.setSort('price', SortDirection.ASC);
+        let sorted = await firstValueFrom(moneyLogic.sortedItems$);
+        expect(sorted[0].id).toBe(2); // 50
+        expect(sorted[1].id).toBe(1); // 100
+        expect(sorted[2].id).toBe(3); // 150
+
+        moneyLogic.setSort('price', SortDirection.DESC);
+        sorted = await firstValueFrom(moneyLogic.sortedItems$);
+        expect(sorted[0].id).toBe(3); // 150
+        expect(sorted[1].id).toBe(1); // 100
+        expect(sorted[2].id).toBe(2); // 50
+        
+        moneyLogic.destroy();
+    });
+
     it('should toggle selection', async () => {
         const item = items[0];
         logic.toggleSelection(item);

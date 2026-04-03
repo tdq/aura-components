@@ -1,4 +1,4 @@
-import { GridBuilder } from 'aura-components';
+import { GridBuilder, Money } from 'aura-components';
 import { BehaviorSubject, of } from 'rxjs';
 
 export default {
@@ -13,7 +13,7 @@ interface Product {
     name: string;
     category: string;
     subcategory: string;
-    price: number;
+    price: Money;
     status: 'In Stock' | 'Low Stock' | 'Out of Stock';
 }
 
@@ -33,7 +33,10 @@ const createMockData = (count: number): Product[] => {
             name: `${subcategory} Item ${i + 1}`,
             category,
             subcategory,
-            price: Math.floor(Math.random() * 1000) + 10,
+            price: { 
+                amount: Math.floor(Math.random() * 1000) + 10, 
+                currencyId: 'USD' 
+            },
             status: ['In Stock', 'Low Stock', 'Out of Stock'][Math.floor(Math.random() * 3)] as any
         };
     });

@@ -19,7 +19,7 @@ The grid is refactored into modular components to separate concerns and improve 
 The `GridBuilder<ITEM>` class uses a generic type `ITEM` to ensure type safety across columns, actions, and selection state.
 
 ### Data & Dimensions
-- `withHeight(height: Observable<number>): this`: Sets the fixed height of the grid container.
+- `withHeight(height: Observable<number>): this`: Sets the fixed height of the grid container in pixels. If not called, the grid defaults to `height: 100%` of its parent container.
 - `withItems(items: Observable<ITEM[]>): this`: Sets the data source for the grid.
 - `withGrouping(fields$: Observable<(keyof ITEM | string)[]>): this`: Enables multi-level grouping by the provided fields.
 - `withSort(field: keyof ITEM | string, direction: SortDirection): this`: Sets the initial sort configuration.
@@ -62,7 +62,7 @@ All column builders inherit these common methods:
 - `asSortable()`: Enables the sorting UI for the column.
 - `asResizable()`: Enables column resizing via a handle in the header.
 - `asEditable(onEdit: (item: ITEM, field: keyof ITEM | string, newValue: string) => void)`: Marks the column as inline-editable. When the parent grid has `asEditable()` called, cells for this column render as `contenteditable` spans. The `onEdit` callback fires on blur (commit). Press **Enter** to commit, **Escape** to revert without firing the callback.
-- `withClass(className: Observable<string>)`: Adds custom CSS classes to all cells in this column.
+- `withClass(classProvider: (item: ITEM) => string)`: Adds custom CSS classes to all cells in this column via a provider function. Useful for conditional styling based on item data.
 
 ## Implementation Requirements
 

@@ -1,4 +1,3 @@
-import { Observable } from 'rxjs';
 import { ColumnBuilder, GridColumn, ColumnType } from '../types';
 
 export abstract class BaseColumnBuilder<ITEM> implements ColumnBuilder<ITEM> {
@@ -8,8 +7,9 @@ export abstract class BaseColumnBuilder<ITEM> implements ColumnBuilder<ITEM> {
     protected _resizable: boolean = false;
     protected _editable: boolean = false;
     protected _field: string;
-    protected _cellClass?: Observable<string>;
+    protected _cellClass?: (item: ITEM) => string;
     protected _onEdit?: (item: ITEM, field: keyof ITEM | string, newValue: string) => void;
+    protected _sortValue?: (item: ITEM) => any;
 
     constructor(field: string) {
         this._field = field;
@@ -42,8 +42,13 @@ export abstract class BaseColumnBuilder<ITEM> implements ColumnBuilder<ITEM> {
         return this;
     }
 
-    withClass(className: Observable<string>): this {
-        this._cellClass = className;
+    withClass(classProvider: (item: ITEM) => string): this {
+        this._cellClass = classProvider;
+        return this;
+    }
+
+    withSortValue(provider: (item: ITEM) => any): this {
+        this._sortValue = provider;
         return this;
     }
 
@@ -61,7 +66,8 @@ export abstract class BaseColumnBuilder<ITEM> implements ColumnBuilder<ITEM> {
             editable: this._editable,
             cellClass: this._cellClass,
             render: (item: ITEM) => this.render(item),
-            onEdit: this._onEdit
+            onEdit: this._onEdit,
+            sortValue: this._sortValue
         };
     }
 

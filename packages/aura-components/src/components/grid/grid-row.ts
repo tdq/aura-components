@@ -74,46 +74,7 @@ export class GridRow<ITEM> {
 
         this.columns.forEach((col, index) => {
             const cell = document.createElement('div');
-            this.applyColumnWidth(cell, col);
-            cell.className = cn(GridStyles.cell);
-            if (col.cellClass) {
-                const sub = col.cellClass.subscribe(cls => {
-                    cell.className = cn(GridStyles.cell, cls);
-                });
-                this.columnSubscriptions.push(sub);
-            }
-
-            const content = col.render(this.item);
-            if (this.isEditable && col.editable && col.onEdit) {
-                const onEdit = col.onEdit;
-                const rawContent = content instanceof HTMLElement ? content.textContent ?? '' : (content != null ? String(content) : '');
-                const span = document.createElement('span');
-                span.className = 'outline-none block w-full';
-                span.contentEditable = 'true';
-                span.textContent = rawContent;
-                let cancelled = false;
-                span.addEventListener('blur', () => {
-                    if (!cancelled) {
-                        onEdit(this.item, col.field, span.textContent ?? '');
-                    }
-                    cancelled = false;
-                }, { signal });
-                span.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        span.blur();
-                    } else if (e.key === 'Escape') {
-                        cancelled = true;
-                        span.textContent = String(col.render(this.item));
-                        span.blur();
-                    }
-                }, { signal });
-                cell.appendChild(span);
-            } else if (content instanceof HTMLElement) {
-                cell.appendChild(content);
-            } else {
-                cell.textContent = content != null ? String(content) : '';
-            }
+            this.populateCell(cell, col, signal);
             row.appendChild(cell);
             if (!firstCell && index === 0) {
                 firstCell = cell;
@@ -216,6 +177,50 @@ export class GridRow<ITEM> {
         }
     }
 
+    private populateCell(cell: HTMLElement, col: GridColumn<ITEM>, signal: AbortSignal) {
+        cell.innerHTML = '';
+        this.applyColumnWidth(cell, col);
+        
+        if (col.cellClass) {
+            const cls = col.cellClass(this.item);
+            cell.className = cn(GridStyles.cell, cls);
+        } else {
+            cell.className = cn(GridStyles.cell);
+        }
+
+        const content = col.render(this.item);
+        if (this.isEditable && col.editable && col.onEdit) {
+            const onEdit = col.onEdit;
+            const rawContent = content instanceof HTMLElement ? content.textContent ?? '' : (content != null ? String(content) : '');
+            const span = document.createElement('span');
+            span.className = 'outline-none block w-full';
+            span.contentEditable = 'true';
+            span.textContent = rawContent;
+            let cancelled = false;
+            span.addEventListener('blur', () => {
+                if (!cancelled) {
+                    onEdit(this.item, col.field, span.textContent ?? '');
+                }
+                cancelled = false;
+            }, { signal });
+            span.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    span.blur();
+                } else if (e.key === 'Escape') {
+                    cancelled = true;
+                    span.textContent = String(col.render(this.item));
+                    span.blur();
+                }
+            }, { signal });
+            cell.appendChild(span);
+        } else if (content instanceof HTMLElement) {
+            cell.appendChild(content);
+        } else {
+            cell.textContent = content != null ? String(content) : '';
+        }
+    }
+
     getElement(): HTMLElement {
         return this.element;
     }
@@ -285,17 +290,15 @@ export class GridRow<ITEM> {
         this.columnSubscriptions.forEach(s => s.unsubscribe());
         this.columnSubscriptions = [];
         this.columns = columns;
+        
+        const signal = this.listenerAbort?.signal;
+        if (!signal) return;
+
         let cellIndex = this.isMultiSelect ? 1 : 0;
         columns.forEach(col => {
             const cell = this.element.children[cellIndex] as HTMLElement;
             if (cell) {
-                this.applyColumnWidth(cell, col);
-                if (col.cellClass) {
-                    const sub = col.cellClass.subscribe(cls => {
-                        cell.className = cn(GridStyles.cell, cls);
-                    });
-                    this.columnSubscriptions.push(sub);
-                }
+                this.populateCell(cell, col, signal);
             }
             cellIndex++;
         });

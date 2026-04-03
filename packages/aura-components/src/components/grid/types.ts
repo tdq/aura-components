@@ -1,4 +1,8 @@
-import { Observable } from 'rxjs';
+
+export interface Money {
+    amount: number;
+    currencyId: string;
+}
 
 export enum ColumnType {
     TEXT = 'TEXT',
@@ -35,9 +39,10 @@ export interface GridColumn<ITEM> {
     filterable?: boolean;
     resizable?: boolean;
     editable?: boolean;
-    cellClass?: Observable<string>;
+    cellClass?: (item: ITEM) => string;
     render: (item: ITEM) => HTMLElement | string;
     onEdit?: (item: ITEM, field: keyof ITEM | string, newValue: string) => void;
+    sortValue?: (item: ITEM) => any;
 }
 
 export interface GridAction<ITEM> {
@@ -79,7 +84,8 @@ export interface ColumnBuilder<ITEM> {
     asSortable(sortable?: boolean): this;
     asResizable(resizable?: boolean): this;
     asEditable(onEdit: (item: ITEM, field: keyof ITEM | string, newValue: string) => void): this;
-    withClass(className: Observable<string>): this;
+    withClass(classProvider: (item: ITEM) => string): this;
+    withSortValue(provider: (item: ITEM) => any): this;
     build(): GridColumn<ITEM>;
 }
 

@@ -78,7 +78,7 @@ export class GridGroupRow {
         this.element.style.transform = `translateY(${this.index * this.rowHeight}px)`;
         this.element.style.paddingLeft = `${this.header.level * 24}px`;
         
-        const toggle = this.element.querySelector(`.${GridStyles.groupToggle.split(' ')[0]}`);
+        const toggle = this.element.querySelector('.aura-grid-group-toggle');
         if (toggle) {
             toggle.className = cn(
                 GridStyles.groupToggle,
