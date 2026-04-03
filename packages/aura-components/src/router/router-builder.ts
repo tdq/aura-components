@@ -4,6 +4,7 @@ import { registerDestroy } from '../core/destroyable-element';
 import { RouteBuilder } from './route-builder';
 import { matchRoute } from './route-matcher';
 import { RouteDefinition, RouteMatch, RouteParams, RouterOptions } from './types';
+import { cn } from '@/components/combobox/styles';
 
 export class RouterBuilder implements ComponentBuilder {
     private routes: RouteDefinition[] = [];
@@ -61,6 +62,7 @@ export class RouterBuilder implements ComponentBuilder {
     build(): HTMLElement {
         const outlet = document.createElement('div');
         this.outlet = outlet;
+        this.outlet.className = cn('w-full', 'h-full');
 
         const onPopState = () => {
             const pathname = this.stripBase(window.location.pathname);

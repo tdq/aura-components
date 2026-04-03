@@ -127,14 +127,39 @@ describe('DialogBuilder', () => {
     it('should show and close the dialog', () => {
         const dialogBuilder = new DialogBuilder()
             .withCaption(of('Popup Test'));
-        
+
         dialogBuilder.show();
         const element = dialogBuilder.build() as HTMLDialogElement;
         expect(document.body.contains(element)).toBe(true);
         expect(element.open).toBe(true);
-        
+
         dialogBuilder.close();
         expect(document.body.contains(element)).toBe(false);
         expect(element.open).toBe(false);
+    });
+
+    it('should be centered (no inline positioning styles) on reopen after drag', () => {
+        const dialogBuilder = new DialogBuilder().withCaption(of('Centered Test'));
+        dialogBuilder.show();
+
+        // Simulate drag positioning
+        const elementBeforeClose = dialogBuilder.build() as HTMLDialogElement;
+        elementBeforeClose.style.transform = 'none';
+        elementBeforeClose.style.margin = '0';
+        elementBeforeClose.style.left = '200px';
+        elementBeforeClose.style.top = '100px';
+
+        // Close and reopen
+        dialogBuilder.close();
+        dialogBuilder.show();
+
+        // Get element reference after reopen to avoid stale reference issues
+        const element = dialogBuilder.build() as HTMLDialogElement;
+
+        // Inline positioning styles should be cleared so native centering applies
+        expect(element.style.transform).toBe('');
+        expect(element.style.margin).toBe('');
+        expect(element.style.left).toBe('');
+        expect(element.style.top).toBe('');
     });
 });

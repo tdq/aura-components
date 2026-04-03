@@ -1,3 +1,9 @@
+
+export interface Money {
+    amount: number;
+    currencyId: string;
+}
+
 export enum ColumnType {
     TEXT = 'TEXT',
     NUMBER = 'NUMBER',
@@ -32,14 +38,19 @@ export interface GridColumn<ITEM> {
     sortable?: boolean;
     filterable?: boolean;
     resizable?: boolean;
-    cellClass?: string;
+    editable?: boolean;
+    cellClass?: (item: ITEM) => string;
     render: (item: ITEM) => HTMLElement | string;
+    onEdit?: (item: ITEM, field: keyof ITEM | string, newValue: string) => void;
+    sortValue?: (item: ITEM) => any;
 }
 
 export interface GridAction<ITEM> {
     label: string;
-    icon?: string;
+    icon: string;
     onClick: (item: ITEM) => void;
+    enable?: (item: ITEM) => boolean;
+    visible?: (item: ITEM) => boolean;
 }
 
 export interface GridGroupHeader {
@@ -72,7 +83,9 @@ export interface ColumnBuilder<ITEM> {
     withWidth(width: string): this;
     asSortable(sortable?: boolean): this;
     asResizable(resizable?: boolean): this;
-    withClass(className: string): this;
+    asEditable(onEdit: (item: ITEM, field: keyof ITEM | string, newValue: string) => void): this;
+    withClass(classProvider: (item: ITEM) => string): this;
+    withSortValue(provider: (item: ITEM) => any): this;
     build(): GridColumn<ITEM>;
 }
 

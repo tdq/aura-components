@@ -19,7 +19,7 @@ The grid is refactored into modular components to separate concerns and improve 
 The `GridBuilder<ITEM>` class uses a generic type `ITEM` to ensure type safety across columns, actions, and selection state.
 
 ### Data & Dimensions
-- `withHeight(height: Observable<number>): this`: Sets the fixed height of the grid container.
+- `withHeight(height: Observable<number>): this`: Sets the fixed height of the grid container in pixels. If not called, the grid defaults to `height: 100%` of its parent container.
 - `withItems(items: Observable<ITEM[]>): this`: Sets the data source for the grid.
 - `withGrouping(fields$: Observable<(keyof ITEM | string)[]>): this`: Enables multi-level grouping by the provided fields.
 - `withSort(field: keyof ITEM | string, direction: SortDirection): this`: Sets the initial sort configuration.
@@ -36,7 +36,7 @@ The `GridBuilder<ITEM>` class uses a generic type `ITEM` to ensure type safety a
 - `withActions(): ActionsBuilder<ITEM>`: Adds per-row action buttons in a dedicated trailing column.
 - `withPivot(config: PivotConfig): this`: Enables the [Pivoting Mode](pivot.md) for data aggregation.
 - `asGlass(): this`: Enables translucent glass styling with backdrop blur.
-- `asEditable(): this`: Enables visual cues for edit mode (e.g., specific cursors or state layers).
+- `asEditable(): this`: Enables inline cell editing mode. Rows get `cursor-text` styling. Columns that have `asEditable(onEdit)` configured become content-editable on render. Press **Enter** to commit, **Escape** to revert.
 - `asMultiSelect(): this`: Enables row selection via checkboxes and "Select All" functionality in the header.
 
 ## Column Configuration
@@ -61,7 +61,8 @@ All column builders inherit these common methods:
 - `withWidth(width: string)`: Sets CSS width (e.g., `'100px'`, `'2fr'`, `'15%'`).
 - `asSortable()`: Enables the sorting UI for the column.
 - `asResizable()`: Enables column resizing via a handle in the header.
-- `withClass(className: string)`: Adds custom CSS classes to all cells in this column.
+- `asEditable(onEdit: (item: ITEM, field: keyof ITEM | string, newValue: string) => void)`: Marks the column as inline-editable. When the parent grid has `asEditable()` called, cells for this column render as `contenteditable` spans. The `onEdit` callback fires on blur (commit). Press **Enter** to commit, **Escape** to revert without firing the callback.
+- `withClass(classProvider: (item: ITEM) => string)`: Adds custom CSS classes to all cells in this column via a provider function. Useful for conditional styling based on item data.
 
 ## Implementation Requirements
 
@@ -82,7 +83,7 @@ When `asMultiSelect()` is enabled:
 
 ### Sticky Panels
 - **Sticky Header**: Managed by `GridHeader`, remains fixed at the top (`sticky top-0`) with a higher z-index (`z-20`). Includes a backdrop blur for high-end visual feedback.
-- **Sticky Actions**: Rendered in a dedicated column that is `sticky right-0`. To prevent scroll lag, this panel uses an opaque background (`bg-surface-container-low/80`) and avoids expensive backdrop filters.
+- **Sticky Actions**: Rendered in a dedicated column that is `sticky right-0`. To prevent scroll lag, this panel uses an opaque background (`bg-surface-container-low/80`) and **must not** use `backdrop-blur` or any backdrop filter — these create per-row composite layers that tank scroll performance.
 
 ### Column Sorting
 - **State**: Managed in `GridLogic` (field and direction).
@@ -121,6 +122,10 @@ When `asMultiSelect()` is enabled:
 ## Styling (Material Design 3)
 Styling is centralized in `grid-styles.ts` and uses Tailwind CSS utilities following MD3 specifications.
 
+### Glass effect
+Grid rows do not have background in case of glass effect. Grid header has background with blur.
+**Grid itself is not affected by glass effect**.
+
 ### Components
 - **Container**: `bg-background`, `border-outline/30`, `dark:border-stone-50/20`, `rounded-lg`.
 - **Header**:
@@ -137,4 +142,4 @@ Styling is centralized in `grid-styles.ts` and uses Tailwind CSS utilities follo
     - **Alignment**: `flex items-center`.
 - **Sticky Actions Column**:
     - **Position**: `sticky right-0 z-10`.
-    - **Styling**: `border-l border-outline/10 bg-surface-container-low/80 backdrop-blur-sm`.
+    - **Styling**: `border-l border-outline/10 bg-surface-container-low/80`. No `backdrop-blur` — see Performance Mandates.

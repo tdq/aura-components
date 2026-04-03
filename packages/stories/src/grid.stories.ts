@@ -1,6 +1,7 @@
-import { GridBuilder } from 'aura-components';
+import { GridBuilder, Icons } from 'aura-components';
 import { SortDirection } from 'aura-components';
 import { of, Subject } from 'rxjs';
+import { Money } from 'aura-components';
 
 export default {
     title: 'Components/Grid',
@@ -13,7 +14,7 @@ interface User {
     role: 'ADMIN' | 'USER' | 'GUEST';
     active: boolean;
     lastLogin: Date;
-    balance: number;
+    balance: Money;
     progress: number;
 }
 
@@ -26,7 +27,10 @@ const generateUsers = (count: number): User[] => {
         role: roles[i % 3],
         active: i % 2 === 0,
         lastLogin: new Date(Date.now() - Math.random() * 10000000000),
-        balance: Math.floor(Math.random() * 10000) / 100,
+        balance: { 
+            amount: Math.floor(Math.random() * 10000) / 100, 
+            currencyId: ['USD', 'EUR', 'GBP'][i % 3] 
+        },
         progress: Math.floor(Math.random() * 100)
     }));
 };
@@ -90,8 +94,8 @@ export const WithActions = () => {
     const deleteClick = (user: User) => alert(`Deleting ${user.name}`);
 
     const actions = grid.withActions();
-    actions.addAction('Edit', editClick);
-    actions.addAction('Delete', deleteClick);
+    actions.addAction(Icons.EDIT, 'Edit', editClick);
+    actions.addAction(Icons.DELETE, 'Delete', deleteClick);
 
     return grid.build();
 };
@@ -122,8 +126,14 @@ export const Editable = () => {
         .asEditable();
 
     const columns = grid.withColumns();
-    columns.addTextColumn('name').withHeader('Name');
-    columns.addTextColumn('email').withHeader('Email');
+    columns.addTextColumn('name').withHeader('Name').asEditable((item, field, val) => {
+        item.name = val;
+        alert(`Name updated: ${val}`);
+    });
+    columns.addTextColumn('email').withHeader('Email').asEditable((item, field, val) => {
+        item.email = val;
+        alert(`Email updated: ${val}`);
+    });
     columns.addEnumColumn('role').withHeader('Role');
 
     return grid.build();
@@ -232,6 +242,49 @@ export const ResizableColumns = () => {
     columns.addTextColumn('email').withHeader('Email (Resizable)').withWidth('250px').asResizable();
     columns.addEnumColumn('role').withHeader('Role').withWidth('100px');
     columns.addMoneyColumn('balance').withHeader('Balance').withWidth('100px');
+
+    return grid.build();
+};
+
+export const FullHeight = () => {
+    const grid = new GridBuilder<User>()
+        .withItems(of(users));
+
+    const columns = grid.withColumns();
+    columns.addTextColumn('name').withHeader('Name');
+    columns.addTextColumn('email').withHeader('Email');
+    columns.addEnumColumn('role').withHeader('Role');
+
+    const container = document.createElement('div');
+    container.className = 'p-4 border-2 border-dashed border-primary/30 h-[600px] flex flex-col';
+
+    const label = document.createElement('div');
+    label.className = 'mb-4 font-bold text-lg';
+    label.textContent = 'Grid in a 600px container (Default 100% height)';
+
+    container.appendChild(label);
+    
+    const gridEl = grid.build();
+    gridEl.classList.add('flex-1');
+    container.appendChild(gridEl);
+
+    return container;
+};
+export const ConditionalStyling = () => {
+    const grid = new GridBuilder<User>()
+        .withItems(of(users.slice(0, 20)))
+        .withHeight(of(400));
+
+    const columns = grid.withColumns();
+    columns.addTextColumn('name').withHeader('Name');
+    columns.addEnumColumn('role').withHeader('Role');
+    
+    // Demonstrate withClass using item provider
+    columns.addMoneyColumn('balance').withHeader('Balance')
+        .withClass(user => user.balance.amount > 50 ? 'text-green-600 font-bold' : 'text-red-600');
+    
+    columns.addPercentageColumn('progress').withHeader('Progress')
+        .withClass(user => user.progress > 80 ? 'bg-green-50' : (user.progress < 20 ? 'bg-red-50' : ''));
 
     return grid.build();
 };

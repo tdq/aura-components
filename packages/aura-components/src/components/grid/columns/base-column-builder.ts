@@ -5,8 +5,11 @@ export abstract class BaseColumnBuilder<ITEM> implements ColumnBuilder<ITEM> {
     protected _width: string = '1fr';
     protected _sortable: boolean = false;
     protected _resizable: boolean = false;
+    protected _editable: boolean = false;
     protected _field: string;
-    protected _cellClass: string = '';
+    protected _cellClass?: (item: ITEM) => string;
+    protected _onEdit?: (item: ITEM, field: keyof ITEM | string, newValue: string) => void;
+    protected _sortValue?: (item: ITEM) => any;
 
     constructor(field: string) {
         this._field = field;
@@ -33,8 +36,19 @@ export abstract class BaseColumnBuilder<ITEM> implements ColumnBuilder<ITEM> {
         return this;
     }
 
-    withClass(className: string): this {
-        this._cellClass = className;
+    asEditable(onEdit: (item: ITEM, field: keyof ITEM | string, newValue: string) => void): this {
+        this._editable = true;
+        this._onEdit = onEdit;
+        return this;
+    }
+
+    withClass(classProvider: (item: ITEM) => string): this {
+        this._cellClass = classProvider;
+        return this;
+    }
+
+    withSortValue(provider: (item: ITEM) => any): this {
+        this._sortValue = provider;
         return this;
     }
 
@@ -49,8 +63,11 @@ export abstract class BaseColumnBuilder<ITEM> implements ColumnBuilder<ITEM> {
             width: this._width,
             sortable: this._sortable,
             resizable: this._resizable,
+            editable: this._editable,
             cellClass: this._cellClass,
-            render: (item: ITEM) => this.render(item)
+            render: (item: ITEM) => this.render(item),
+            onEdit: this._onEdit,
+            sortValue: this._sortValue
         };
     }
 

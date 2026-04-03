@@ -26,8 +26,14 @@ export class Icons {
     /** Checkmark for checkboxes and success states */
     static readonly CHECKMARK = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><path d="M5 13l4 4L19 7"/></svg>`;
 
-    /** Grid sorting icons (FontAwesome classes for now, as used in GridHeader) */
-    static readonly SORT = 'fa-sort';
-    static readonly SORT_UP = 'fa-sort-up';
-    static readonly SORT_DOWN = 'fa-sort-down';
+    /** Grid sorting icons */
+    static readonly SORT = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5.83L15.17 9l1.41-1.41L12 3 7.41 7.59 8.83 9 12 5.83zm0 12.34L8.83 15l-1.41 1.41L12 21l4.59-4.59L15.17 15 12 18.17z"/></svg>`;
+    static readonly SORT_UP = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 14l5-5 5 5z"/></svg>`;
+    static readonly SORT_DOWN = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>`;
+
+    /** Edit / pencil icon for row edit actions */
+    static readonly EDIT = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>`;
+
+    /** Delete / trash icon for row delete actions */
+    static readonly DELETE = `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>`;
 }

@@ -1,5 +1,5 @@
 import { BehaviorSubject, combineLatest, map, Observable, Subscription } from 'rxjs';
-import { SortConfig, SortDirection, GridState, GridRowData, GridGroupHeader, PivotConfig } from './types';
+import { SortConfig, SortDirection, GridState, GridRowData, GridGroupHeader, PivotConfig, GridColumn } from './types';
 import { PivotLogic } from './pivot-logic';
 
 export class GridLogic<ITEM> {
@@ -9,6 +9,7 @@ export class GridLogic<ITEM> {
     private _groupBy$ = new BehaviorSubject<string[]>([]);
     private _pivotConfig$ = new BehaviorSubject<PivotConfig | undefined>(undefined);
     private _expandedGroups$ = new BehaviorSubject<Set<string>>(new Set());
+    private _columns$ = new BehaviorSubject<GridColumn<ITEM>[]>([]);
     private _itemsSubscription?: Subscription;
     private _groupBySubscription?: Subscription;
     private _pivotSubscription?: Subscription;
@@ -40,6 +41,10 @@ export class GridLogic<ITEM> {
         this._sortConfig$.next({ field, direction });
     }
 
+    setColumns(columns: GridColumn<ITEM>[]) {
+        this._columns$.next(columns);
+    }
+
     toggleSelection(item: ITEM) {
         const current = new Set(this._selectedItems$.value);
         if (current.has(item)) {
@@ -65,8 +70,8 @@ export class GridLogic<ITEM> {
     }
 
     get sortedItems$(): Observable<ITEM[]> {
-        return combineLatest([this._items$, this._sortConfig$, this._pivotConfig$]).pipe(
-            map(([items, sort, pivotConfig]) => {
+        return combineLatest([this._items$, this._sortConfig$, this._pivotConfig$, this._columns$]).pipe(
+            map(([items, sort, pivotConfig, columns]) => {
                 let processedItems = items;
                 if (pivotConfig) {
                     processedItems = PivotLogic.pivot(items, pivotConfig);
@@ -75,17 +80,26 @@ export class GridLogic<ITEM> {
                 if (!sort.field || sort.direction === SortDirection.NONE) {
                     return processedItems;
                 }
-                return this.sortItems(processedItems, sort.field, sort.direction);
+                return this.sortItems(processedItems, sort.field, sort.direction, columns);
             })
         );
     }
 
-    private sortItems(items: ITEM[], field: string, direction: SortDirection): ITEM[] {
+    private sortItems(items: ITEM[], field: string, direction: SortDirection, columns: GridColumn<ITEM>[] = []): ITEM[] {
+        const column = columns.find(c => c.field === field);
+        const sortValueProvider = column?.sortValue;
+
         return [...items].sort((a, b) => {
-            const valA = (a as any)[field];
-            const valB = (b as any)[field];
+            const valA = sortValueProvider ? sortValueProvider(a) : (a as any)[field];
+            const valB = sortValueProvider ? sortValueProvider(b) : (b as any)[field];
+            
             if (valA === valB) return 0;
             const modifier = direction === SortDirection.ASC ? 1 : -1;
+            
+            // Handle null/undefined
+            if (valA === null || valA === undefined) return 1 * modifier;
+            if (valB === null || valB === undefined) return -1 * modifier;
+
             return valA > valB ? modifier : -modifier;
         });
     }
@@ -178,7 +192,8 @@ export class GridLogic<ITEM> {
                 } else {
                     // Final level, add items
                     // We might want to sort items within group if sortConfig matches
-                    const sortedGroupItems = sortConfig.field ? this.sortItems(groupItems, sortConfig.field, sortConfig.direction) : groupItems;
+                    const columns = this._columns$.value;
+                    const sortedGroupItems = sortConfig.field ? this.sortItems(groupItems, sortConfig.field, sortConfig.direction, columns) : groupItems;
                     sortedGroupItems.forEach((item) => {
                         result.push({
                             type: 'ITEM',

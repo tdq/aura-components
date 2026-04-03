@@ -1,6 +1,6 @@
 import { BehaviorSubject, combineLatest, take } from 'rxjs';
 import { getDaysInMonth, getFirstDayOfMonth, isSameDay, isValidDate } from './date-utils';
-import { CalendarOptions } from './types';
+import { CalendarOptions, DayOfWeek } from './types';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { Icons } from '@/core/icons';
@@ -48,7 +48,10 @@ export function renderCalendar(options: CalendarOptions): HTMLElement {
     const prevBtn = document.createElement('button');
     prevBtn.className = 'p-px-8 hover:bg-surface-variant rounded-full text-on-surface focus:outline-primary';
     prevBtn.setAttribute('aria-label', 'Previous Month');
-    prevBtn.innerHTML = Icons.CHEVRON_LEFT.replace('<svg', '<svg class="w-px-20 h-px-20"');
+    const prevIconWrapper = document.createElement('span');
+    prevIconWrapper.className = 'w-5 h-5 inline-flex items-center justify-center [&_svg]:w-full [&_svg]:h-full [&_svg]:block';
+    prevIconWrapper.innerHTML = Icons.CHEVRON_LEFT;
+    prevBtn.appendChild(prevIconWrapper);
     prevBtn.onclick = (e) => {
         e.stopPropagation();
         const current = viewDate$.value;
@@ -58,7 +61,10 @@ export function renderCalendar(options: CalendarOptions): HTMLElement {
     const nextBtn = document.createElement('button');
     nextBtn.className = 'p-px-8 hover:bg-surface-variant rounded-full text-on-surface focus:outline-primary';
     nextBtn.setAttribute('aria-label', 'Next Month');
-    nextBtn.innerHTML = Icons.CHEVRON_RIGHT.replace('<svg', '<svg class="w-px-20 h-px-20"');
+    const nextIconWrapper = document.createElement('span');
+    nextIconWrapper.className = 'w-5 h-5 inline-flex items-center justify-center [&_svg]:w-full [&_svg]:h-full [&_svg]:block';
+    nextIconWrapper.innerHTML = Icons.CHEVRON_RIGHT;
+    nextBtn.appendChild(nextIconWrapper);
     nextBtn.onclick = (e) => {
         e.stopPropagation();
         const current = viewDate$.value;
@@ -82,7 +88,9 @@ export function renderCalendar(options: CalendarOptions): HTMLElement {
     grid.className = 'grid grid-cols-7 gap-px-2 text-center outline-none';
     grid.tabIndex = 0;
     
-    const weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+    const firstDayOfWeek = options.firstDayOfWeek ?? DayOfWeek.MONDAY;
+    const allWeekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+    const weekdays = [...allWeekdays.slice(firstDayOfWeek), ...allWeekdays.slice(0, firstDayOfWeek)];
     weekdays.forEach(day => {
         const d = document.createElement('div');
         d.className = cn(
@@ -153,11 +161,12 @@ export function renderCalendar(options: CalendarOptions): HTMLElement {
 
         const daysInMonth = getDaysInMonth(year, month);
         const firstDay = getFirstDayOfMonth(year, month);
-        
+        const offset = (firstDay - firstDayOfWeek + 7) % 7;
+
         const fragment = document.createDocumentFragment();
 
         // Empty cells for first week
-        for (let i = 0; i < firstDay; i++) {
+        for (let i = 0; i < offset; i++) {
             const empty = document.createElement('div');
             fragment.appendChild(empty);
         }

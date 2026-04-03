@@ -1,4 +1,5 @@
 export * from './core/component-builder';
+export * from './core/destroyable-element';
 export * from './core/icons';
 export * from './components/button';
 export * from './components/combobox';

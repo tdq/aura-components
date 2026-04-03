@@ -33,7 +33,7 @@ describe('GridBuilder', () => {
 
         // Should be sorted DESC: C, B, A
         // We look for the first row's cell content
-        const rows = container.querySelectorAll('.absolute');
+        const rows = container.querySelectorAll('.absolute.w-full');
         const firstRow = rows[0];
         const cells = firstRow.querySelectorAll('div');
         // The first cell in our case is 'name' column since we only added one
@@ -63,7 +63,7 @@ describe('GridBuilder', () => {
         // Actually, since we use 'of()', it should be synchronous if we are careful
 
         // Rows are rendered in virtualized mode
-        const rows = container.querySelectorAll('.absolute');
+        const rows = container.querySelectorAll('.absolute.w-full');
         expect(rows.length).toBeGreaterThan(0);
 
         document.body.removeChild(container);
@@ -88,7 +88,7 @@ describe('GridBuilder', () => {
         firstRowCheckbox.click();
 
         // Check if row has selection background
-        const firstRow = container.querySelector('.absolute') as HTMLElement;
+        const firstRow = container.querySelector('.absolute.w-full') as HTMLElement;
         expect(firstRow.classList.contains('bg-primary/10')).toBe(true);
 
         document.body.removeChild(container);
@@ -111,7 +111,7 @@ describe('GridBuilder', () => {
         const rowCheckboxes = Array.from(container.querySelectorAll('input[type="checkbox"]')).slice(1) as HTMLInputElement[];
         expect(rowCheckboxes.every(cb => cb.checked)).toBe(true);
 
-        const rows = container.querySelectorAll('.absolute');
+        const rows = container.querySelectorAll('.absolute.w-full');
         rows.forEach(row => {
             expect(row.classList.contains('bg-primary/10')).toBe(true);
         });
@@ -136,18 +136,18 @@ describe('GridBuilder', () => {
         const headerCell = container.querySelector('.cursor-pointer') as HTMLElement;
 
         // Initial state (unsorted or original order)
-        let firstRowName = container.querySelector('.absolute div')?.textContent;
+        let firstRowName = container.querySelector('.absolute.w-full div')?.textContent;
         // The original order was C, A, B.
 
         // Click to sort ASC (A, B, C)
         headerCell.click();
-        firstRowName = container.querySelector('.absolute div')?.textContent;
+        firstRowName = container.querySelector('.absolute.w-full div')?.textContent;
         expect(firstRowName).toBe('A');
 
         // Click to sort DESC (C, B, A)
         const headerCell2 = container.querySelector('.cursor-pointer') as HTMLElement;
         headerCell2.click();
-        firstRowName = container.querySelector('.absolute div')?.textContent;
+        firstRowName = container.querySelector('.absolute.w-full div')?.textContent;
         expect(firstRowName).toBe('C');
 
         document.body.removeChild(container);
@@ -194,7 +194,7 @@ describe('GridBuilder', () => {
         expect(headerCell.style.width).toBe('150px');
 
         // Check if row cell width also updated
-        const rowCell = container.querySelector('.absolute div') as HTMLElement;
+        const rowCell = container.querySelector('.absolute.w-full div') as HTMLElement;
         expect(rowCell.style.width).toBe('150px');
 
         // Simulate mouse up
@@ -203,6 +203,21 @@ describe('GridBuilder', () => {
             cancelable: true
         } as any);
         document.dispatchEvent(mouseUp);
+
+        document.body.removeChild(container);
+    });
+
+    it('should set height to 100% by default', () => {
+        const grid = new GridBuilder<TestItem>()
+            .withItems(of(items));
+
+        grid.withColumns().addTextColumn('name').withHeader('Name');
+
+        container = grid.build();
+        document.body.appendChild(container);
+
+        expect(container.style.height).toBe('100%');
+        expect(container.style.minHeight).toBe('0');
 
         document.body.removeChild(container);
     });

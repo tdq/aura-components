@@ -1,4 +1,4 @@
-import { BehaviorSubject, Observable, Subscription, combineLatest, isObservable, of } from 'rxjs';
+import { Observable, Subscription, combineLatest, isObservable, of } from 'rxjs';
 import { ComponentBuilder } from '../core/component-builder';
 import { registerDestroy } from '../core/destroyable-element';
 import { RouterBuilder } from './router-builder';

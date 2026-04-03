@@ -6,6 +6,7 @@ import { GridGroupRow } from './grid-group-row';
 export class GridViewport<ITEM> {
     private element: HTMLElement;
     private contentElement: HTMLElement;
+    private rowsContainer: HTMLElement;
     private renderedRows = new Map<number, GridRow<ITEM> | GridGroupRow>();
     private readonly rowHeight = 52;
     private readonly buffer = 5;
@@ -22,7 +23,8 @@ export class GridViewport<ITEM> {
         private isMultiSelect: boolean,
         private isEditable: boolean,
         private onToggleSelection: (item: ITEM) => void,
-        private onToggleGroup: (groupKey: string) => void
+        private onToggleGroup: (groupKey: string) => void,
+        private isGlass: boolean = false
     ) {
         this.element = document.createElement('div');
         this.element.className = GridStyles.viewport;
@@ -31,6 +33,10 @@ export class GridViewport<ITEM> {
         this.contentElement = document.createElement('div');
         this.contentElement.className = GridStyles.content;
         this.element.appendChild(this.contentElement);
+
+        this.rowsContainer = document.createElement('div');
+        this.rowsContainer.className = GridStyles.rowsContainer;
+        this.contentElement.appendChild(this.rowsContainer);
 
         this.element.addEventListener('scroll', () => {
             if (!this.ticking) {
@@ -51,6 +57,7 @@ export class GridViewport<ITEM> {
     }
 
     destroy() {
+        this.clearRenderedRows();
         if (this.resizeObserver) {
             this.resizeObserver.disconnect();
             this.resizeObserver = null;
@@ -60,8 +67,8 @@ export class GridViewport<ITEM> {
     update(rows: GridRowData<ITEM>[], selected: Set<ITEM>) {
         this.lastRows = rows;
         this.lastSelected = selected;
-        const totalHeight = rows.length * this.rowHeight;
-        this.contentElement.style.height = `${totalHeight}px`;
+        //const totalHeight = rows.length * this.rowHeight;
+        //this.contentElement.style.height = `${totalHeight}px`;
         this.renderVisibleRows();
     }
 
@@ -85,6 +92,7 @@ export class GridViewport<ITEM> {
 
         for (const [index, row] of this.renderedRows.entries()) {
             if (index < startIndex || index > endIndex) {
+                if (row instanceof GridRow) row.destroy();
                 row.getElement().remove();
                 this.renderedRows.delete(index);
             }
@@ -107,10 +115,11 @@ export class GridViewport<ITEM> {
             existing.update(header, index);
         } else {
             if (existing) {
+                if (existing instanceof GridRow) existing.destroy();
                 existing.getElement().remove();
             }
-            const groupRow = new GridGroupRow(header, index, (key) => this.onToggleGroup(key));
-            this.contentElement.appendChild(groupRow.getElement());
+            const groupRow = new GridGroupRow(header, index, (key) => this.onToggleGroup(key), this.isGlass);
+            this.rowsContainer.appendChild(groupRow.getElement());
             this.renderedRows.set(index, groupRow);
         }
     }
@@ -136,9 +145,10 @@ export class GridViewport<ITEM> {
                 this.isMultiSelect,
                 this.isEditable,
                 this.onToggleSelection,
-                level
+                level,
+                this.isGlass
             );
-            this.contentElement.appendChild(row.getElement());
+            this.rowsContainer.appendChild(row.getElement());
             this.renderedRows.set(index, row);
         }
     }
@@ -161,7 +171,10 @@ export class GridViewport<ITEM> {
     }
 
     private clearRenderedRows() {
-        this.renderedRows.forEach(row => row.getElement().remove());
+        this.renderedRows.forEach(row => {
+            if (row instanceof GridRow) row.destroy();
+            row.getElement().remove();
+        });
         this.renderedRows.clear();
     }
 }

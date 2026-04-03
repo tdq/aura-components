@@ -18,7 +18,7 @@ function cn(...inputs: ClassValue[]) {
 }
 
 export class GridBuilder<ITEM> implements ComponentBuilder {
-    private height$: Observable<number> = of(400);
+    private height$: Observable<number | null> = of(null);
     private columnsBuilder?: ColumnsBuilder<ITEM>;
     private toolbarBuilder?: ToolbarBuilder;
     private actionsBuilder?: ActionsBuilder<ITEM>;
@@ -93,7 +93,7 @@ export class GridBuilder<ITEM> implements ComponentBuilder {
             width: '150px',
             sortable: true,
             resizable: true,
-            cellClass: col.id.startsWith('total_') ? GridStyles.totalCell : undefined,
+            cellClass: col.id.startsWith('total_') ? () => GridStyles.totalCell : undefined,
             render: (item: any) => {
                 const val = item[col.field];
                 return typeof val === 'number' ? val.toLocaleString() : (val ?? '');
@@ -125,8 +125,11 @@ export class GridBuilder<ITEM> implements ComponentBuilder {
             this.isMultiSelect,
             this.isEditable,
             (item) => this.logic.toggleSelection(item),
-            (groupKey) => this.logic.toggleGroup(groupKey)
+            (groupKey) => this.logic.toggleGroup(groupKey),
+            this.isGlass
         );
+
+        this.logic.setColumns(columns);
 
         let currentItems: ITEM[] = [];
 
@@ -134,7 +137,7 @@ export class GridBuilder<ITEM> implements ComponentBuilder {
             columns,
             this.isGlass,
             this.isMultiSelect,
-            actions.length > 0,
+            actions.length,
             (field, direction) => this.logic.setSort(field, direction),
             (checked) => {
                 if (checked) {
@@ -150,11 +153,23 @@ export class GridBuilder<ITEM> implements ComponentBuilder {
         viewport.addHeader(header.getElement());
         container.appendChild(viewport.getElement());
 
+        let lastRawItems: ITEM[] | null = null;
+        let lastPivotConfig: PivotConfig | undefined = undefined;
+
         const sub = combineLatest([this.logic.state$, this.height$]).subscribe(([state, height]) => {
             currentItems = state.items;
-            container.style.height = `${height}px`;
+            if (height === null) {
+                container.style.height = '100%';
+                container.style.minHeight = '0';
+            } else {
+                container.style.height = `${height}px`;
+                container.style.minHeight = '';
+            }
 
-            if (state.pivotConfig) {
+            if (state.pivotConfig && (state.rawItems !== lastRawItems || state.pivotConfig !== lastPivotConfig)) {
+                lastRawItems = state.rawItems;
+                lastPivotConfig = state.pivotConfig;
+                
                 // In pivot mode, we might need to regenerate columns if items change
                 // or if it's the first time.
                 // We must use rawItems because state.items are already pivoted!
@@ -167,6 +182,7 @@ export class GridBuilder<ITEM> implements ComponentBuilder {
                 // Update viewport and header with new columns
                 viewport.updateColumns(columns);
                 header.updateColumns(columns);
+                this.logic.setColumns(columns);
             }
 
             header.render(state.items, state.selectedItems, state.sortConfig);

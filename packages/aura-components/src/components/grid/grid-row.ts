@@ -1,3 +1,4 @@
+import { Subscription } from 'rxjs';
 import { GridColumn, GridAction } from './types';
 import { GridStyles } from './grid-styles';
 import { clsx, type ClassValue } from 'clsx';
@@ -11,6 +12,8 @@ export class GridRow<ITEM> {
     private element: HTMLElement;
     private actionCell?: HTMLElement;
     private checkbox?: HTMLInputElement;
+    private listenerAbort?: AbortController;
+    private columnSubscriptions: Subscription[] = [];
     private readonly rowHeight = 52;
 
     constructor(
@@ -22,7 +25,8 @@ export class GridRow<ITEM> {
         private isMultiSelect: boolean,
         private isEditable: boolean,
         private onToggleSelection: (item: ITEM) => void,
-        private level: number = 0
+        private level: number = 0,
+        private isGlass: boolean = false
     ) {
         this.element = this.createRow();
     }
@@ -31,7 +35,8 @@ export class GridRow<ITEM> {
         const row = document.createElement('div');
         row.className = cn(
             GridStyles.row,
-            this.index % 2 === 1 && GridStyles.rowOdd,
+            !this.isGlass && this.index % 2 === 1 && GridStyles.rowOdd,
+            this.isGlass && GridStyles.rowGlass,
             this.isEditable && GridStyles.rowEditable,
             this.isSelected && GridStyles.rowSelected
         );
@@ -43,6 +48,9 @@ export class GridRow<ITEM> {
     }
 
     private populateRow(row: HTMLElement) {
+        this.listenerAbort = new AbortController();
+        const { signal } = this.listenerAbort;
+
         let firstCell: HTMLElement | null = null;
 
         if (this.isMultiSelect) {
@@ -56,7 +64,7 @@ export class GridRow<ITEM> {
             checkbox.addEventListener('change', (e) => {
                 e.stopPropagation();
                 this.onToggleSelection(this.item);
-            });
+            }, { signal });
 
             this.checkbox = checkbox;
             checkCell.appendChild(checkbox);
@@ -66,15 +74,7 @@ export class GridRow<ITEM> {
 
         this.columns.forEach((col, index) => {
             const cell = document.createElement('div');
-            this.applyColumnWidth(cell, col);
-            cell.className = cn(GridStyles.cell, col.cellClass);
-
-            const content = col.render(this.item);
-            if (content instanceof HTMLElement) {
-                cell.appendChild(content);
-            } else {
-                cell.textContent = String(content);
-            }
+            this.populateCell(cell, col, signal);
             row.appendChild(cell);
             if (!firstCell && index === 0) {
                 firstCell = cell;
@@ -89,30 +89,63 @@ export class GridRow<ITEM> {
             const actionCell = document.createElement('div');
             actionCell.className = cn(
                 GridStyles.actionCell,
-                this.isSelected ? GridStyles.actionCellSelected : (this.index % 2 === 1 ? GridStyles.actionCellOdd : GridStyles.actionCellEven),
-                'group-hover:bg-surface-variant/20 dark:group-hover:bg-slate-800/60'
+                this.isSelected ? GridStyles.actionCellSelected : (this.isGlass ? GridStyles.actionCellGlass : (this.index % 2 === 1 ? GridStyles.actionCellOdd : GridStyles.actionCellEven)),
+                !this.isGlass && 'group-hover:bg-surface-variant/20 dark:group-hover:bg-slate-800/60'
             );
+            const actionWidth = this.actions.length * 36 + 8;
+            actionCell.style.width = `${actionWidth}px`;
 
-            this.actions.forEach(action => {
+            this.actions.forEach((action) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = GridStyles.tooltipWrapper;
+
                 const btn = document.createElement('button');
                 btn.className = GridStyles.actionButton;
-                btn.title = action.label;
+                btn.setAttribute('aria-label', action.label);
 
-                if (action.icon) {
-                    const icon = document.createElement('i');
-                    icon.className = action.icon;
-                    btn.appendChild(icon);
-                } else {
-                    btn.textContent = action.label;
-                    btn.className = cn(btn.className, GridStyles.actionButtonText);
-                }
+                const iconWrapper = document.createElement('span');
+                iconWrapper.className = 'w-4 h-4 inline-flex items-center justify-center [&_svg]:w-full [&_svg]:h-full [&_svg]:block';
+                iconWrapper.innerHTML = action.icon;
+                btn.appendChild(iconWrapper);
 
-                btn.onclick = (e) => {
+                const tooltip = document.createElement('div');
+                tooltip.className = GridStyles.tooltip;
+                tooltip.setAttribute('popover', 'manual');
+                tooltip.textContent = action.label;
+
+                btn.addEventListener('mouseenter', () => {
+                    const rect = btn.getBoundingClientRect();
+                    tooltip.style.left = `${rect.left + rect.width / 2}px`;
+                    tooltip.style.top = `${rect.top}px`;
+                    if (!tooltip.matches(':popover-open')) {
+                        tooltip.showPopover();
+                    }
+                }, { signal });
+
+                btn.addEventListener('mouseleave', () => {
+                    if (tooltip.matches(':popover-open')) {
+                        tooltip.hidePopover();
+                    }
+                }, { signal });
+
+                btn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     action.onClick(this.item);
-                };
-                actionCell.appendChild(btn);
+                }, { signal });
+
+                if (action.enable) {
+                    btn.disabled = !action.enable(this.item);
+                }
+                if (action.visible) {
+                    const visible = action.visible(this.item);
+                    wrapper.style.display = visible ? '' : 'none';
+                }
+
+                wrapper.appendChild(btn);
+                wrapper.appendChild(tooltip);
+                actionCell.appendChild(wrapper);
             });
+
             this.actionCell = actionCell;
             row.appendChild(actionCell);
         }
@@ -144,6 +177,50 @@ export class GridRow<ITEM> {
         }
     }
 
+    private populateCell(cell: HTMLElement, col: GridColumn<ITEM>, signal: AbortSignal) {
+        cell.innerHTML = '';
+        this.applyColumnWidth(cell, col);
+        
+        if (col.cellClass) {
+            const cls = col.cellClass(this.item);
+            cell.className = cn(GridStyles.cell, cls);
+        } else {
+            cell.className = cn(GridStyles.cell);
+        }
+
+        const content = col.render(this.item);
+        if (this.isEditable && col.editable && col.onEdit) {
+            const onEdit = col.onEdit;
+            const rawContent = content instanceof HTMLElement ? content.textContent ?? '' : (content != null ? String(content) : '');
+            const span = document.createElement('span');
+            span.className = 'outline-none block w-full';
+            span.contentEditable = 'true';
+            span.textContent = rawContent;
+            let cancelled = false;
+            span.addEventListener('blur', () => {
+                if (!cancelled) {
+                    onEdit(this.item, col.field, span.textContent ?? '');
+                }
+                cancelled = false;
+            }, { signal });
+            span.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    span.blur();
+                } else if (e.key === 'Escape') {
+                    cancelled = true;
+                    span.textContent = String(col.render(this.item));
+                    span.blur();
+                }
+            }, { signal });
+            cell.appendChild(span);
+        } else if (content instanceof HTMLElement) {
+            cell.appendChild(content);
+        } else {
+            cell.textContent = content != null ? String(content) : '';
+        }
+    }
+
     getElement(): HTMLElement {
         return this.element;
     }
@@ -159,10 +236,18 @@ export class GridRow<ITEM> {
         this.level = level;
         this.actionCell = undefined;
         this.checkbox = undefined;
+        this.element.querySelectorAll('[popover]').forEach(el => {
+            const htmlEl = el as HTMLElement;
+            if (htmlEl.matches(':popover-open')) htmlEl.hidePopover();
+        });
+        this.columnSubscriptions.forEach(s => s.unsubscribe());
+        this.columnSubscriptions = [];
+        this.listenerAbort?.abort();
         this.element.innerHTML = '';
         this.element.className = cn(
             GridStyles.row,
-            this.index % 2 === 1 && GridStyles.rowOdd,
+            !this.isGlass && this.index % 2 === 1 && GridStyles.rowOdd,
+            this.isGlass && GridStyles.rowGlass,
             this.isEditable && GridStyles.rowEditable,
             this.isSelected && GridStyles.rowSelected
         );
@@ -179,37 +264,41 @@ export class GridRow<ITEM> {
         }
 
         if (this.actionCell) {
-            if (isSelected) {
-                this.actionCell.classList.add(GridStyles.actionCellSelected);
-                this.actionCell.classList.remove(GridStyles.actionCellEven, GridStyles.actionCellOdd);
-            } else {
-                this.actionCell.classList.remove(GridStyles.actionCellSelected);
-                if (this.index % 2 === 1) {
-                    this.actionCell.classList.add(GridStyles.actionCellOdd);
-                    this.actionCell.classList.remove(GridStyles.actionCellEven);
-                } else {
-                    this.actionCell.classList.add(GridStyles.actionCellEven);
-                    this.actionCell.classList.remove(GridStyles.actionCellOdd);
-                }
-            }
+            this.actionCell.className = cn(
+                GridStyles.actionCell,
+                this.isSelected ? GridStyles.actionCellSelected : (this.isGlass ? GridStyles.actionCellGlass : (this.index % 2 === 1 ? GridStyles.actionCellOdd : GridStyles.actionCellEven)),
+                !this.isGlass && 'group-hover:bg-surface-variant/20 dark:group-hover:bg-slate-800/60'
+            );
         }
 
-        if (isSelected) {
-            this.element.classList.add('bg-primary/10', 'border-l-primary');
-            this.element.classList.remove('border-l-transparent');
-        } else {
-            this.element.classList.remove('bg-primary/10', 'border-l-primary');
-            this.element.classList.add('border-l-transparent');
-        }
+        this.element.className = cn(
+            GridStyles.row,
+            !this.isGlass && this.index % 2 === 1 && GridStyles.rowOdd,
+            this.isGlass && GridStyles.rowGlass,
+            this.isEditable && GridStyles.rowEditable,
+            this.isSelected && GridStyles.rowSelected
+        );
+    }
+
+    destroy(): void {
+        this.columnSubscriptions.forEach(s => s.unsubscribe());
+        this.columnSubscriptions = [];
+        this.listenerAbort?.abort();
     }
 
     updateColumns(columns: GridColumn<ITEM>[]) {
+        this.columnSubscriptions.forEach(s => s.unsubscribe());
+        this.columnSubscriptions = [];
         this.columns = columns;
+        
+        const signal = this.listenerAbort?.signal;
+        if (!signal) return;
+
         let cellIndex = this.isMultiSelect ? 1 : 0;
         columns.forEach(col => {
             const cell = this.element.children[cellIndex] as HTMLElement;
             if (cell) {
-                this.applyColumnWidth(cell, col);
+                this.populateCell(cell, col, signal);
             }
             cellIndex++;
         });

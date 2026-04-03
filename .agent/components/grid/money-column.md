@@ -1,16 +1,15 @@
 # Money Column
 
 ## Description
-The `MoneyColumnBuilder` formats numeric data as currency.
+The `MoneyColumnBuilder` formats monetary data using the `Money` object and `CurrencyRegistry`.
 
 ## Builder Methods
 In addition to [BaseColumnBuilder](grid.md#basecolumnbuilder-shared-methods) methods:
-
-- `withCurrency(currency: string): this`: Sets the ISO currency code (default: `'USD'`).
+(No specific methods, as currency is part of the data object)
 
 ## Implementation Details
-- **Field**: Expects a number or a string that can be parsed as a number.
-- **Rendering**: Uses `Intl.NumberFormat` with `style: 'currency'` for formatting.
+- **Field**: Expects a `Money` object: `{ amount: number; currencyId: string; }`.
+- **Rendering**: Uses `CurrencyRegistry` which utilizes `Intl.NumberFormat` for localized formatting based on the `currencyId`.
 
 ## Styling
 - **Alignment**: Right-aligned is recommended.

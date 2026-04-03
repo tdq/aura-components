@@ -74,6 +74,10 @@ export class ColumnsBuilder<ITEM> {
         return builder;
     }
 
+    /**
+     * Adds a column for displaying monetary values.
+     * @param dtoField The field in the data item containing a Money object { amount: number, currencyId: string }.
+     */
     addMoneyColumn(dtoField: string): MoneyColumnBuilder<ITEM> {
         const builder = new MoneyColumnBuilder<ITEM>(dtoField);
         this.builders.push(builder);

@@ -80,6 +80,7 @@ export class ButtonBuilder implements ComponentBuilder {
         iconSpan.className = 'w-5 h-5 flex items-center justify-center';
         
         const captionSpan = document.createElement('span');
+        captionSpan.className = 'select-none';
 
         const captionSub = this.caption$ ? this.caption$.subscribe(caption => {
             captionSpan.textContent = caption;

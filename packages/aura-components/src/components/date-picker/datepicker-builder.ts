@@ -3,7 +3,7 @@ import { ComponentBuilder } from '../../core/component-builder';
 import { registerDestroy } from '@/core/destroyable-element';
 import { formatDate, parseDate, isValidDate } from './date-utils';
 import { renderCalendar } from './calendar';
-import { DatePickerStyle } from './types';
+import { DatePickerStyle, DayOfWeek } from './types';
 import { Icons } from '@/core/icons';
 
 export class DatePickerBuilder implements ComponentBuilder {
@@ -17,6 +17,7 @@ export class DatePickerBuilder implements ComponentBuilder {
     private style$?: Observable<DatePickerStyle>;
     private className$?: Observable<string>;
     private isGlass: boolean = false;
+    private firstDayOfWeek: DayOfWeek = DayOfWeek.MONDAY;
 
     withValue(value: Subject<Date | null>): this {
         this.value$ = value;
@@ -68,6 +69,11 @@ export class DatePickerBuilder implements ComponentBuilder {
         return this;
     }
 
+    withFirstDayOfTheWeek(day: DayOfWeek): this {
+        this.firstDayOfWeek = day;
+        return this;
+    }
+
     build(): HTMLElement {
         const container = document.createElement('div');
         container.className = 'flex flex-col gap-px-4 w-full relative';
@@ -115,7 +121,8 @@ export class DatePickerBuilder implements ComponentBuilder {
             onClose: () => {
                 isExpanded$.next(false);
             },
-            isGlass: this.isGlass
+            isGlass: this.isGlass,
+            firstDayOfWeek: this.firstDayOfWeek
         });
         popup.appendChild(calendar);
 
@@ -153,18 +160,21 @@ export class DatePickerBuilder implements ComponentBuilder {
 
         // Input Field Container
         const inputWrapper = document.createElement('div');
-        inputWrapper.className = 'flex items-center relative bg-surface-variant rounded-t-small border-b border-outline-variant focus-within:border-primary transition-colors';
-        
+        inputWrapper.className = 'flex items-center relative bg-surface-variant rounded-t-small border-b border-outline-variant focus-within:border-primary transition-colors h-[48px]';
+
         const input = document.createElement('input');
         input.type = 'text';
-        input.className = 'px-px-16 py-px-12 w-full bg-transparent outline-none body-large text-on-surface placeholder:text-on-surface-variant/50';
+        input.className = 'px-px-16 w-full h-full bg-transparent outline-none body-large text-on-surface placeholder:text-on-surface-variant/50';
         input.placeholder = this.format;
         inputWrapper.appendChild(input);
 
         const iconButton = document.createElement('button');
         iconButton.type = 'button';
         iconButton.className = 'p-px-12 text-on-surface-variant hover:text-primary transition-colors focus:outline-none';
-        iconButton.innerHTML = Icons.CALENDAR.replace('<svg', '<svg class="w-px-24 h-px-24"');
+        const calendarIconWrapper = document.createElement('span');
+        calendarIconWrapper.className = 'w-6 h-6 inline-flex items-center justify-center [&_svg]:w-full [&_svg]:h-full [&_svg]:block';
+        calendarIconWrapper.innerHTML = Icons.CALENDAR;
+        iconButton.appendChild(calendarIconWrapper);
         inputWrapper.appendChild(iconButton);
 
         // Error message
