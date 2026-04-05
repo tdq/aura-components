@@ -172,8 +172,10 @@ export function renderCalendar(options: CalendarOptions): HTMLElement {
         }
 
         // Day cells
+        const today = new Date();
         for (let day = 1; day <= daysInMonth; day++) {
             const date = new Date(year, month, day);
+            const isToday = isSameDay(date, today);
             const isSelected = selectedDate && isSameDay(date, selectedDate);
             const isFocused = focusedDate && isSameDay(date, focusedDate);
             
@@ -195,7 +197,13 @@ export function renderCalendar(options: CalendarOptions): HTMLElement {
             } else if (isSelected) {
                 cell.className += options.isGlass ? ' bg-gray-900 text-white dark:bg-white dark:text-gray-900' : ' bg-primary text-on-primary';
             } else if (isFocused) {
-                cell.className += options.isGlass ? ' bg-white/20 text-gray-900 dark:text-white outline outline-2 outline-white/50 outline-offset-[-2px]' : ' bg-surface-variant text-on-surface outline outline-2 outline-primary outline-offset-[-2px]';
+                cell.className += options.isGlass 
+                    ? ' bg-gray-900/10 dark:bg-white/20 text-gray-900 dark:text-white outline outline-2 outline-primary/50 dark:outline-white/50 outline-offset-[-2px]' 
+                    : ' bg-surface-variant text-on-surface outline outline-2 outline-primary outline-offset-[-2px]';
+            } else if (isToday) {
+                cell.className += options.isGlass
+                    ? ' text-primary font-bold outline outline-1 outline-primary/30 outline-offset-[-2px]'
+                    : ' text-primary font-bold outline outline-1 outline-primary/30 outline-offset-[-2px]';
             } else {
                 cell.className += options.isGlass ? ' text-gray-900 hover:bg-white/20 dark:text-white' : ' text-on-surface hover:bg-surface-variant';
             }

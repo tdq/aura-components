@@ -5,4 +5,5 @@
 4. [ ] Implement component which accepts observable and allows to define how to render observable value
 5. [x] Export `registerDestroy`
 6. [x] **GridBuilder** columns method `withClass` should be changed to `withClass(classProvider: (item: ITEM) => string)`
-7. [ ] **GridBuilder** Actions panel should be of the width according to the content and not being expanded. It should be aligned to the right.
+7. [x] **GridBuilder** Actions panel should be of the width according to the content and not being expanded. It should be aligned to the right.
+8. [x] **DatePickerBuilder** On light theme with glass effect highlighting of current date is not visible
