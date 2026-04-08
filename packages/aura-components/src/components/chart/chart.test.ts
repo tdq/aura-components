@@ -2,7 +2,7 @@ import { ChartBuilder } from './chart-builder';
 import { ChartLogic } from './chart-logic';
 import { ChartState } from './types';
 import { AxisRenderer } from './axis-renderer';
-import { of } from 'rxjs';
+import { of, BehaviorSubject } from 'rxjs';
 import '@testing-library/jest-dom';
 
 // ---------------------------------------------------------------------------
@@ -363,6 +363,28 @@ describe('ChartBuilder', () => {
 
         expect(areaIndex).toBeLessThan(barIndex);
         expect(barIndex).toBeLessThan(lineIndex);
+    });
+
+    it('should update color reactively when color observable emits', () => {
+        const color$ = new BehaviorSubject<string>('red');
+        const chartBuilder = new ChartBuilder<any>()
+            .withData(of(testData))
+            .withCategoryField('category')
+            .withAnimation(false);
+        
+        chartBuilder.addLineChart('value1').withColor(color$);
+        
+        const chart = chartBuilder.build();
+        
+        // Find the path for line chart
+        const path = chart.querySelector('path[stroke="red"]');
+        expect(path).not.toBeNull();
+
+        color$.next('blue');
+        
+        // Wait for potential microtasks? ChartLogic updates state$ synchronously on .next()
+        const updatedPath = chart.querySelector('path[stroke="blue"]');
+        expect(updatedPath).not.toBeNull();
     });
 });
 

@@ -31,6 +31,7 @@ export class ChartLogic<ITEM> {
 
     private _dataSubscription?: Subscription;
     private _titleSubscription?: Subscription;
+    private _colorSubscriptions: Subscription[] = [];
 
     public readonly state$: Observable<ChartState<ITEM>> = combineLatest([
         this._data$,
@@ -76,9 +77,19 @@ export class ChartLogic<ITEM> {
     addChart(config: IndividualChartConfig<ITEM>): void {
         const current = this._charts$.value;
         this._charts$.next([...current, config]);
+
+        if (config.color$) {
+            const sub = config.color$.subscribe(c => {
+                config.color = c;
+                this._charts$.next([...this._charts$.value]);
+            });
+            this._colorSubscriptions.push(sub);
+        }
     }
 
     resetCharts(): void {
+        this._colorSubscriptions.forEach(s => s.unsubscribe());
+        this._colorSubscriptions = [];
         this._charts$.next([]);
     }
 
@@ -236,6 +247,7 @@ export class ChartLogic<ITEM> {
     destroy(): void {
         this._dataSubscription?.unsubscribe();
         this._titleSubscription?.unsubscribe();
+        this._colorSubscriptions.forEach(s => s.unsubscribe());
         this._data$.complete();
         this._categoryField$.complete();
         this._charts$.complete();

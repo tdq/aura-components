@@ -1,3 +1,4 @@
+import { Observable } from 'rxjs';
 import { 
     AreaChartBuilder, 
     AreaChartConfig, 
@@ -8,7 +9,7 @@ import {
     LineChartConfig 
 } from '../types';
 
-abstract class IndividualChartBuilderImpl<ITEM, CONFIG extends { field: keyof ITEM | string; label: string; color?: string; tooltipRenderer?: (item: ITEM) => string; useSecondaryAxis?: boolean }> {
+abstract class IndividualChartBuilderImpl<ITEM, CONFIG extends { field: keyof ITEM | string; label: string; color?: string; color$?: Observable<string>; tooltipRenderer?: (item: ITEM) => string; useSecondaryAxis?: boolean }> {
     protected config: CONFIG;
 
     constructor(field: keyof ITEM | string) {
@@ -23,8 +24,13 @@ abstract class IndividualChartBuilderImpl<ITEM, CONFIG extends { field: keyof IT
         return this;
     }
 
-    withColor(color: string): this {
-        this.config.color = color;
+    withColor(color: string | Observable<string>): this {
+        if (typeof color === 'string') {
+            this.config.color = color;
+            this.config.color$ = undefined;
+        } else {
+            this.config.color$ = color;
+        }
         return this;
     }
 

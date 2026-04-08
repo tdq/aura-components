@@ -6,7 +6,7 @@ Each data series in a `Chart` is managed by a specialized builder. These builder
 ## Common Methods
 All specialized chart builders share these methods:
 - `withLabel(label: string): this`: Sets the name of the series (used for legend and tooltips).
-- `withColor(color: string): this`: Sets a custom color (CSS color or MD3 token).
+- `withColor(color: Observable<string>): this`: Sets a custom color (CSS color or MD3 token).
 - `withTooltip(renderer: (item: ITEM) => string): this`: Sets a custom tooltip renderer for the specific series.
 - `asSecondaryAxis(): this`: Links the series to the secondary Y-axis.
 

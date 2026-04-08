@@ -60,8 +60,8 @@ export class ChartViewport<ITEM> {
 
         const svg = this.svgArea.getElement();
         const handleMouseMove = (e: MouseEvent) => {
-            if (!this.lastState || !this.lastState.showTooltip) return;
-            const result = this.tooltip.show(e, svg, this.lastState, this.lastPadding);
+            if (!this.lastState || !this.lastState.showTooltip || !this.lastScales) return;
+            const result = this.tooltip.show(e, svg, this.lastState, this.lastPadding, this.lastScales);
             if (result) {
                 this.renderHoverEffects(result.index, result.xPos);
             } else {

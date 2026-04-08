@@ -1,4 +1,4 @@
-import { ChartState } from './types';
+import { ChartState, ChartScales } from './types';
 import { ChartStyles } from './styles';
 import { LabelBuilder, LabelSize } from '../label';
 import { of } from 'rxjs';
@@ -21,39 +21,49 @@ export class ChartTooltip<ITEM> {
         return this.element;
     }
 
-    show(e: MouseEvent, svg: SVGSVGElement, state: ChartState<ITEM>, padding: { left: number, right: number }): { index: number, xPos: number } | null {
+    show(e: MouseEvent, svg: SVGSVGElement, state: ChartState<ITEM>, padding: { left: number, right: number }, scales: ChartScales): { index: number, xPos: number } | null {
         const rect = svg.getBoundingClientRect();
-        const viewWidth = rect.width - padding.left - padding.right;
-        
         const x = e.clientX - rect.left - padding.left;
-        if (x < -10 || x > viewWidth + 10 || state.data.length === 0) {
+        
+        // Use scales from rendering instead of recalculating
+        const data = scales.displayData;
+        const N = data.length;
+        if (N === 0) {
             this.hide();
             return null;
         }
 
-        const N = state.data.length;
-        const barWidth = Math.min(((viewWidth - 16) / (N || 1)) * 0.8, 32);
+        const viewWidth = rect.width - padding.left - padding.right;
+        
+        // Relaxed interaction area: allow finding the closest point if within reasonable bounds
+        if (x < -20 || x > viewWidth + 20) {
+            this.hide();
+            return null;
+        }
+
+        const { xScale, xStep, barWidth } = scales;
         
         let index = 0;
         let xPos = viewWidth / 2;
-        let xStep = 0;
         
         if (N > 1) {
-            xStep = (viewWidth - 16 - barWidth) / (N - 1);
-            index = Math.max(0, Math.min(N - 1, Math.round((x - 8 - barWidth / 2) / xStep)));
-            xPos = 8 + barWidth / 2 + index * xStep;
+            const effectiveXStep = xStep || (viewWidth / (N - 1));
+            const effectiveBarWidth = barWidth || 0;
+            // Calculate index based on the same formula used in logic: xPos = 8 + barWidth/2 + index * xStep
+            index = Math.max(0, Math.min(N - 1, Math.round((x - 8 - effectiveBarWidth / 2) / effectiveXStep)));
+            xPos = xScale(index);
         }
 
-        const item = state.data[index];
+        const item = data[index];
         if (!item) return null;
 
-        const categories = state.data.map(d => String(d[state.categoryField as keyof ITEM]));
+        const category = String(item[state.categoryField as keyof ITEM]);
         
         while (this.element.firstChild) this.element.removeChild(this.element.firstChild);
 
         const header = new LabelBuilder()
             .withSize(LabelSize.MEDIUM)
-            .withCaption(of(categories[index]))
+            .withCaption(of(category))
             .withClass(of('font-semibold mb-1 block'))
             .build();
         this.element.appendChild(header);

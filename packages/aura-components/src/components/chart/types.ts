@@ -1,3 +1,5 @@
+import { Observable } from 'rxjs';
+
 export type ChartType = 'line' | 'bar' | 'area';
 export type CurveType = 'smooth' | 'step' | 'linear';
 export type ScaleType = 'linear' | 'log' | 'time' | 'category';
@@ -7,6 +9,7 @@ export interface BaseChartConfig<ITEM> {
     field: keyof ITEM | string;
     label: string;
     color?: string;
+    color$?: Observable<string>;
     tooltipRenderer?: (item: ITEM) => string;
     useSecondaryAxis?: boolean;
 }
@@ -94,7 +97,7 @@ export interface AxisBuilder {
 
 export interface IndividualChartBuilder<ITEM, CONFIG extends IndividualChartConfig<ITEM>> {
     withLabel(label: string): this;
-    withColor(color: string): this;
+    withColor(color: string | Observable<string>): this;
     withTooltip(renderer: (item: ITEM) => string): this;
     asSecondaryAxis(): this;
     build(): CONFIG;

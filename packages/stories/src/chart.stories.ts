@@ -1,5 +1,5 @@
-import { ChartBuilder } from 'aura-components';
-import { of } from 'rxjs';
+import { ChartBuilder, ButtonBuilder } from 'aura-components';
+import { of, BehaviorSubject } from 'rxjs';
 
 export default {
     title: 'Components/Chart',
@@ -152,6 +152,53 @@ export const GlassEffect = () => {
     const chart = builder.build();
     chart.style.width = '100%';
     chart.style.maxWidth = '800px';
+    container.appendChild(chart);
+
+    return container;
+};
+
+export const ReactiveColor = () => {
+    const color$ = new BehaviorSubject<string>('var(--md-sys-color-primary)');
+    
+    const builder = new ChartBuilder<DataItem>()
+        .withData(of(data))
+        .withCategoryField('month')
+        .withTitle(of('Click to Change Line Color'))
+        .withHeight(400);
+
+    builder.addLineChart('sales')
+        .withLabel('Sales')
+        .withColor(color$)
+        .withMarkers(true);
+
+    const container = document.createElement('div');
+    container.className = 'flex flex-col gap-4 p-8 bg-surface text-on-surface min-h-[600px]';
+    
+    const controls = document.createElement('div');
+    controls.className = 'flex flex-wrap gap-2 mb-4';
+
+    const colors = [
+        { label: 'Primary', value: 'var(--md-sys-color-primary)' },
+        { label: 'Secondary', value: 'var(--md-sys-color-secondary)' },
+        { label: 'Tertiary', value: 'var(--md-sys-color-tertiary)' },
+        { label: 'Error', value: 'var(--md-sys-color-error)' },
+        { label: 'Deep Pink', value: '#e91e63' },
+        { label: 'Lime Green', value: '#8bc34a' },
+    ];
+
+    colors.forEach(c => {
+        const button = new ButtonBuilder()
+            .withCaption(of(c.label))
+            .withClick(() => {
+                color$.next(c.value);
+            })
+            .build();
+        controls.appendChild(button);
+    });
+
+    container.appendChild(controls);
+    const chart = builder.build();
+    chart.style.width = '100%';
     container.appendChild(chart);
 
     return container;
