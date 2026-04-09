@@ -40,7 +40,7 @@ export function createProblem(): HTMLElement {
     // Top border
     const topBorder = document.createElement('div');
     topBorder.className = 'absolute top-0 left-0 right-0 h-px';
-    topBorder.style.cssText = 'background: linear-gradient(90deg, transparent 0%, rgba(103,80,164,0.2) 30%, rgba(125,82,96,0.2) 70%, transparent 100%);';
+    topBorder.style.cssText = 'background: linear-gradient(90deg, transparent 0%, rgba(2,132,199,0.2) 30%, rgba(14,165,233,0.2) 70%, transparent 100%);';
     section.appendChild(topBorder);
 
     const inner = document.createElement('div');
@@ -50,7 +50,7 @@ export function createProblem(): HTMLElement {
     const header = document.createElement('div');
     header.className = 'mb-px-64';
     header.innerHTML = `
-        <div class="inline-flex items-center gap-px-8 px-px-16 py-px-8 rounded-full text-label-medium mb-px-24" style="background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: #ef4444;">
+        <div class="inline-flex items-center gap-px-8 px-px-16 py-px-8 rounded-full text-label-medium mb-px-24 badge-accent opacity-80">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
             Sound familiar?
         </div>
@@ -113,11 +113,11 @@ export function createProblem(): HTMLElement {
     const resolution = document.createElement('div');
     resolution.className = 'mt-px-48 flex items-center gap-px-16';
     resolution.innerHTML = `
-        <div class="h-px flex-1" style="background: linear-gradient(90deg, rgba(103,80,164,0.2), transparent);"></div>
+        <div class="h-px flex-1" style="background: linear-gradient(90deg, rgba(2,132,199,0.2), transparent);"></div>
         <p class="text-body-large text-on-surface-variant text-center shrink-0" style="opacity: 0.7;">
             Aura Components was built to eliminate all three.
         </p>
-        <div class="h-px flex-1" style="background: linear-gradient(90deg, transparent, rgba(103,80,164,0.2));"></div>
+        <div class="h-px flex-1" style="background: linear-gradient(90deg, transparent, rgba(2,132,199,0.2));"></div>
     `;
     inner.appendChild(resolution);
 

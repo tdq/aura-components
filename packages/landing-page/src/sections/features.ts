@@ -2,8 +2,8 @@ const FEATURES = [
     {
         title: 'RxJS Reactive',
         description: 'Every component speaks RxJS natively. Declarative state streams, real-time updates, zero unnecessary re-renders.',
-        color: '#7D5260',
-        colorLight: 'rgba(125, 82, 96, 0.08)',
+        color: '#0369a1',
+        colorLight: 'rgba(3, 105, 161, 0.08)',
         icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
         </svg>`
@@ -11,8 +11,8 @@ const FEATURES = [
     {
         title: 'Tailwind CSS',
         description: 'Utility-first styling that scales with your project. Full Tailwind v3 support with custom Material 3 tokens baked in.',
-        color: '#625B71',
-        colorLight: 'rgba(98, 91, 113, 0.08)',
+        color: '#0284c7',
+        colorLight: 'rgba(2, 132, 199, 0.08)',
         icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="13.5" cy="6.5" r="2.5"/>
             <circle cx="17.5" cy="10.5" r="2.5"/>
@@ -24,8 +24,8 @@ const FEATURES = [
     {
         title: 'Material 3',
         description: 'Adheres to Google\'s latest design language. Dynamic color, expressive motion, and accessible typography built in.',
-        color: '#6750A4',
-        colorLight: 'rgba(103, 80, 164, 0.08)',
+        color: '#0ea5e9',
+        colorLight: 'rgba(14, 165, 233, 0.08)',
         icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z"/>
         </svg>`
@@ -33,8 +33,8 @@ const FEATURES = [
     {
         title: 'Type Safe',
         description: 'Fully typed with strict TypeScript. Builder pattern APIs that are impossible to misuse. IDE autocomplete everywhere.',
-        color: '#7D5260',
-        colorLight: 'rgba(125, 82, 96, 0.08)',
+        color: '#0369a1',
+        colorLight: 'rgba(3, 105, 161, 0.08)',
         icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
             <path d="m9 12 2 2 4-4"/>
@@ -43,8 +43,8 @@ const FEATURES = [
     {
         title: 'Zero Bundle Bloat',
         description: 'Tree-shakeable exports. Import only what you use. Each component is self-contained with minimal runtime overhead.',
-        color: '#625B71',
-        colorLight: 'rgba(98, 91, 113, 0.08)',
+        color: '#0284c7',
+        colorLight: 'rgba(2, 132, 199, 0.08)',
         icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
         </svg>`
@@ -60,7 +60,7 @@ export function createFeatures(): HTMLElement {
     const bgTexture = document.createElement('div');
     bgTexture.className = 'absolute inset-0 -z-10';
     bgTexture.innerHTML = `
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[800px] rounded-full opacity-30" style="background: radial-gradient(ellipse, rgba(103,80,164,0.05) 0%, transparent 70%);"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[800px] rounded-full opacity-30" style="background: radial-gradient(ellipse, rgba(2,132,199,0.05) 0%, transparent 70%);"></div>
     `;
     section.appendChild(bgTexture);
 
@@ -68,13 +68,13 @@ export function createFeatures(): HTMLElement {
     const header = document.createElement('div');
     header.className = 'max-w-7xl mx-auto mb-px-48';
     header.innerHTML = `
-        <div class="inline-flex items-center gap-px-8 px-px-16 py-px-8 rounded-full text-label-medium mb-px-24" style="background: rgba(103,80,164,0.06); border: 1px solid rgba(103,80,164,0.15); color: #6750A4;">
+        <div class="inline-flex items-center gap-px-8 px-px-16 py-px-8 rounded-full text-label-medium mb-px-24 badge-accent">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
             What makes it different
         </div>
         <h2 class="text-[36px] md:text-[44px] font-bold text-on-surface leading-tight" style="letter-spacing: -0.025em;">
             Not a framework wrapper.<br>
-            <span style="background: linear-gradient(135deg, #6750A4, #7D5260); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Not a Web Component.</span>
+            <span class="text-gradient-2">Not a Web Component.</span>
         </h2>
         <p class="mt-px-16 text-body-large text-on-surface-variant max-w-2xl" style="opacity: 0.75;">
             Builder-pattern APIs, RxJS-native props, full Tailwind styling — and the DOM is yours. No encapsulation, no workarounds.
@@ -189,8 +189,8 @@ function createHeroFeatureCard(): HTMLElement {
     card.className = 'rounded-extra-large border overflow-hidden';
     card.style.cssText = `
         background: linear-gradient(145deg, var(--md-sys-color-surface), var(--md-sys-color-surface-container-low));
-        border-color: rgba(103, 80, 164, 0.15);
-        box-shadow: 0 4px 24px rgba(103,80,164,0.06);
+        border-color: rgba(2, 132, 199, 0.15);
+        box-shadow: 0 4px 24px rgba(2,132,199,0.06);
     `;
 
     const inner = document.createElement('div');
@@ -202,7 +202,7 @@ function createHeroFeatureCard(): HTMLElement {
 
     const iconWrap = document.createElement('div');
     iconWrap.className = 'w-12 h-12 rounded-large flex items-center justify-center mb-px-24 border';
-    iconWrap.style.cssText = 'background: rgba(103, 80, 164, 0.08); border-color: rgba(103,80,164,0.2); color: #6750A4;';
+    iconWrap.style.cssText = 'background: rgba(2, 132, 199, 0.08); border-color: rgba(2,132,199,0.2); color: #0284c7;';
     iconWrap.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
         <path d="M4 6h16M4 12h16M4 18h7"/>
         <circle cx="17" cy="18" r="3"/>
@@ -210,8 +210,7 @@ function createHeroFeatureCard(): HTMLElement {
     </svg>`;
 
     const label = document.createElement('div');
-    label.className = 'text-label-medium mb-px-8 font-medium';
-    label.style.cssText = 'color: #6750A4;';
+    label.className = 'text-label-medium mb-px-8 font-medium text-primary opacity-80';
     label.textContent = 'No Shadow DOM';
 
     const title = document.createElement('h3');
@@ -232,11 +231,11 @@ function createHeroFeatureCard(): HTMLElement {
     // Right: before/after code comparison
     const comparison = document.createElement('div');
     comparison.className = 'border-l md:block hidden';
-    comparison.style.cssText = 'border-color: rgba(103,80,164,0.1);';
+    comparison.style.cssText = 'border-color: rgba(2,132,199,0.1);';
 
     const before = document.createElement('div');
     before.className = 'p-px-24 border-b';
-    before.style.cssText = 'border-color: rgba(103,80,164,0.1); background: rgba(239,68,68,0.02);';
+    before.style.cssText = 'border-color: rgba(2,132,199,0.1); background: rgba(239,68,68,0.02);';
     before.innerHTML = `
         <div class="flex items-center gap-px-8 mb-px-12">
             <span class="w-4 h-4 rounded-full flex items-center justify-center text-white" style="background: #ef4444; font-size: 9px; font-weight: 700;">✕</span>
@@ -250,13 +249,13 @@ my-btn::part(label) { ... }    /* good luck */</code></pre>
 
     const after = document.createElement('div');
     after.className = 'p-px-24';
-    after.style.cssText = 'background: rgba(103,80,164,0.02);';
+    after.style.cssText = 'background: rgba(2, 132, 199, 0.05);';
     after.innerHTML = `
         <div class="flex items-center gap-px-8 mb-px-12">
-            <span class="w-4 h-4 rounded-full flex items-center justify-center text-white" style="background: #22c55e; font-size: 9px; font-weight: 700;">✓</span>
-            <span class="text-label-small font-medium" style="color: #22c55e; font-size: 11px;">Aura Components (Direct DOM)</span>
+            <span class="w-4 h-4 rounded-full flex items-center justify-center text-white bg-primary" style="font-size: 9px; font-weight: 700;">✓</span>
+            <span class="text-label-small font-medium text-primary" style="font-size: 11px;">Aura Components (Direct DOM)</span>
         </div>
-        <pre style="margin:0; font-family: 'Fira Code', monospace; font-size: 11.5px; line-height: 1.7; color: var(--md-sys-color-on-surface-variant);"><code><span style="color: #a78bfa;">/* Standard CSS. Just works. */</span>
+        <pre style="margin:0; font-family: 'Fira Code', monospace; font-size: 11.5px; line-height: 1.7; color: var(--md-sys-color-on-surface-variant);"><code><span class="text-primary-alpha-80">/* Standard CSS. Just works. */</span>
 .my-button { color: blue; }
 [data-theme="dark"] .my-button { ... }
 <span style="color: rgba(255,255,255,0.3);">/* Tailwind, CSS vars, anything. */</span></code></pre>

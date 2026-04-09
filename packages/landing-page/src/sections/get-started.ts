@@ -21,7 +21,7 @@ export function createGetStarted(): HTMLElement {
     const bgDec = document.createElement('div');
     bgDec.className = 'absolute inset-0 -z-10';
     bgDec.innerHTML = `
-        <div class="absolute top-1/2 right-[-100px] w-[500px] h-[500px] rounded-full -translate-y-1/2" style="background: radial-gradient(circle, rgba(103,80,164,0.05) 0%, transparent 70%);"></div>
+        <div class="absolute top-1/2 right-[-100px] w-[500px] h-[500px] rounded-full -translate-y-1/2" style="background: radial-gradient(circle, rgba(2,132,199,0.05) 0%, transparent 70%);"></div>
     `;
     section.appendChild(bgDec);
 
@@ -29,17 +29,17 @@ export function createGetStarted(): HTMLElement {
     const header = document.createElement('div');
     header.className = 'max-w-7xl mx-auto text-center mb-px-64';
     header.innerHTML = `
-        <div class="inline-flex items-center gap-px-8 px-px-16 py-px-8 rounded-full text-label-medium mb-px-24" style="background: rgba(98,91,113,0.06); border: 1px solid rgba(98,91,113,0.15); color: #625B71;">
+        <div class="inline-flex items-center gap-px-8 px-px-16 py-px-8 rounded-full text-label-medium mb-px-24 badge-accent">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4zm2 2H5V5h14v14zm0-16H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
             Quick Start
         </div>
         <h2 class="text-[40px] font-bold text-on-surface leading-tight tracking-tight" style="letter-spacing: -0.025em;">
-            Try it in <span style="background: linear-gradient(135deg, #6750A4, #625B71); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">60 seconds</span>
+            Try it in <span class="text-gradient-2">60 seconds</span>
         </h2>
         <p class="mt-px-16 text-body-large text-on-surface-variant max-w-2xl mx-auto" style="opacity: 0.75;">
             One install. Pass your first observable to a component. That's it.
         </p>
-        <div class="mt-px-24 mx-auto w-24 h-px" style="background: linear-gradient(90deg, transparent, rgba(103,80,164,0.4), transparent);"></div>
+        <div class="mt-px-24 mx-auto w-24 h-px" style="background: linear-gradient(90deg, transparent, var(--md-sys-color-primary), transparent); opacity: 0.4;"></div>
     `;
     section.appendChild(header);
 
@@ -196,7 +196,7 @@ function createStats(): HTMLElement {
         item.style.cssText = 'background: linear-gradient(145deg, var(--md-sys-color-surface-container-low), var(--md-sys-color-surface)); border: 1px solid rgba(121,116,126,0.1);';
         item.innerHTML = `
             <div class="flex items-baseline gap-1">
-                <span class="text-[48px] font-bold leading-none tracking-tight" style="background: linear-gradient(135deg, #6750A4, #7D5260); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">${stat.number}</span>
+                <span class="text-[48px] font-bold leading-none tracking-tight text-gradient-1">${stat.number}</span>
                 <span class="text-headline-small font-semibold text-primary opacity-70">${stat.unit}</span>
             </div>
             <span class="mt-px-8 text-label-medium text-on-surface-variant" style="opacity: 0.65;">${stat.label}</span>
@@ -207,10 +207,22 @@ function createStats(): HTMLElement {
     return grid;
 }
 
+function getCTAThemeStyle(theme: string | null): string {
+    if (theme === 'dark') return 'background: linear-gradient(135deg, #4F378B 0%, #633B48 100%); box-shadow: 0 20px 60px rgba(79,55,139,0.3);';
+    if (theme === 'pink') return 'background: linear-gradient(135deg, #7D2950 0%, #5F1138 100%); box-shadow: 0 20px 60px rgba(125,41,80,0.3);';
+    return 'background: linear-gradient(135deg, #0284c7 0%, #0ea5e9 100%); box-shadow: 0 20px 60px rgba(2,132,199,0.3);';
+}
+
 function createBottomCTA(): HTMLElement {
     const cta = document.createElement('div');
     cta.className = 'max-w-4xl mx-auto mt-px-96 rounded-extra-large p-px-64 text-center relative overflow-hidden';
-    cta.style.cssText = 'background: linear-gradient(135deg, #6750A4 0%, #7D5260 100%); box-shadow: 0 20px 60px rgba(103,80,164,0.3);';
+    cta.style.cssText = getCTAThemeStyle(document.documentElement.getAttribute('data-theme'));
+
+    // React to theme changes
+    const observer = new MutationObserver(() => {
+        cta.style.cssText = getCTAThemeStyle(document.documentElement.getAttribute('data-theme'));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
     cta.innerHTML = `
         <div class="absolute inset-0 overflow-hidden">
@@ -222,7 +234,7 @@ function createBottomCTA(): HTMLElement {
             <h3 class="text-[36px] font-bold text-white leading-tight tracking-tight" style="letter-spacing: -0.025em;">npm install aura-components rxjs<br><span style="opacity: 0.7; font-size: 0.75em; font-weight: 400;">— and you're done.</span></h3>
             <p class="mt-px-16 text-white max-w-lg mx-auto text-body-large" style="opacity: 0.75;">No config. No boilerplate. Pass your first observable to a component and watch it react.</p>
             <div class="mt-px-40 flex flex-wrap gap-px-16 justify-center">
-                <button class="px-px-32 py-px-16 text-label-large font-semibold rounded-extra-large transition-all duration-200 hover:scale-105 active:scale-95 cta-primary-btn" style="background: white; color: #6750A4; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+                <button class="px-px-32 py-px-16 text-label-large font-semibold rounded-extra-large transition-all duration-200 hover:scale-105 active:scale-95 cta-primary-btn" style="background: white; color: var(--md-sys-color-primary); box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
                     Get Started Now
                 </button>
                 <button class="px-px-32 py-px-16 text-label-large font-semibold text-white rounded-extra-large transition-all duration-200 hover:scale-105 active:scale-95 cta-demo-btn" style="background: rgba(255,255,255,0.12); border: 1.5px solid rgba(255,255,255,0.3); backdrop-filter: blur(10px);">

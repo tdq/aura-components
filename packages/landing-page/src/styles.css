@@ -6,28 +6,28 @@
 
 @layer base {
   :root {
-    --md-sys-color-primary: #6750A4;
+    --md-sys-color-primary: #0284c7;
     --md-sys-color-on-primary: #FFFFFF;
-    --md-sys-color-primary-container: #EADDFF;
-    --md-sys-color-on-primary-container: #21005D;
-    --md-sys-color-secondary: #625B71;
+    --md-sys-color-primary-container: #e0f2fe;
+    --md-sys-color-on-primary-container: #0c4a6e;
+    --md-sys-color-secondary: #0369a1;
     --md-sys-color-on-secondary: #FFFFFF;
-    --md-sys-color-secondary-container: #E8DEF8;
-    --md-sys-color-on-secondary-container: #1D192B;
-    --md-sys-color-tertiary: #7D5260;
+    --md-sys-color-secondary-container: #bae6fd;
+    --md-sys-color-on-secondary-container: #0c4a6e;
+    --md-sys-color-tertiary: #0ea5e9;
     --md-sys-color-on-tertiary: #FFFFFF;
-    --md-sys-color-tertiary-container: #FFD8E4;
-    --md-sys-color-on-tertiary-container: #31111D;
+    --md-sys-color-tertiary-container: #e0f2fe;
+    --md-sys-color-on-tertiary-container: #0c4a6e;
     --md-sys-color-error: #B3261E;
     --md-sys-color-on-error: #FFFFFF;
-    --md-sys-color-background: #FEF7FF;
-    --md-sys-color-on-background: #1D1B20;
-    --md-sys-color-surface: #FEF7FF;
-    --md-sys-color-on-surface: #1D1B20;
-    --md-sys-color-surface-variant: #E7E0EB;
-    --md-sys-color-on-surface-variant: #49454F;
-    --md-sys-color-outline: #79747E;
-    --md-sys-color-surface-container-low: #F7F2FA;
+    --md-sys-color-background: #FFFFFF;
+    --md-sys-color-on-background: #0f172a;
+    --md-sys-color-surface: #FFFFFF;
+    --md-sys-color-on-surface: #0f172a;
+    --md-sys-color-surface-variant: #e0f2fe;
+    --md-sys-color-on-surface-variant: #1e3a5f;
+    --md-sys-color-outline: #7dd3fc;
+    --md-sys-color-surface-container-low: #f0f9ff;
   }
 
   [data-theme="dark"] {
@@ -53,6 +53,17 @@
     --md-sys-color-on-surface-variant: #CAC4D0;
     --md-sys-color-outline: #938F99;
     --md-sys-color-surface-container-low: #1D1B20;
+
+    /* Theme Accents */
+    --accent-blob-1: linear-gradient(to right, rgba(103, 80, 164, 0.35), rgba(125, 82, 96, 0.35));
+    --accent-blob-2: linear-gradient(to right, rgba(125, 82, 96, 0.35), rgba(103, 80, 164, 0.35));
+    --accent-gradient-text-1: linear-gradient(135deg, #ffffff, #dbeafe, #e9d5ff);
+    --accent-gradient-text-2: linear-gradient(135deg, #60a5fa, #c084fc);
+    --accent-badge-bg: rgba(103, 80, 164, 0.9);
+    --accent-badge-border: rgba(103, 80, 164, 0.9);
+    --accent-badge-text: #ffffff;
+    --accent-primary: #D0BCFF;
+    --accent-secondary: #CCC2DC;
   }
 
   [data-theme="pink"] {
@@ -71,10 +82,36 @@
     --md-sys-color-surface-variant: #F2DDE2;
     --md-sys-color-on-surface-variant: #514347;
     --md-sys-color-outline: #837377;
+    --md-sys-color-surface-container-low: #FFF5F8;
+
+    /* Theme Accents */
+    --accent-blob-1: linear-gradient(to right, rgba(244, 114, 182, 0.2), rgba(251, 113, 133, 0.2));
+    --accent-blob-2: linear-gradient(to right, rgba(251, 113, 133, 0.2), rgba(244, 114, 182, 0.2));
+    --accent-gradient-text-1: linear-gradient(135deg, #0f172a, #9d174d, #0f172a);
+    --accent-gradient-text-2: linear-gradient(135deg, #db2777, #e11d48);
+    --accent-badge-bg: rgba(255, 179, 209, 0.2);
+    --accent-badge-border: rgba(255, 179, 209, 0.3);
+    --accent-badge-text: #7d2950;
+    --accent-primary: #FFB3D1;
+    --accent-secondary: #E5BBD0;
+  }
+
+  :root:not([data-theme="dark"]):not([data-theme="pink"]) {
+    /* Default Light Theme Accents */
+    --accent-blob-1: linear-gradient(to right, rgba(14, 165, 233, 0.25), rgba(56, 189, 248, 0.25));
+    --accent-blob-2: linear-gradient(to right, rgba(56, 189, 248, 0.25), rgba(14, 165, 233, 0.25));
+    --accent-gradient-text-1: linear-gradient(135deg, #0f172a, #0369a1, #0f172a);
+    --accent-gradient-text-2: linear-gradient(135deg, #0284c7, #0ea5e9);
+    --accent-badge-bg: rgba(2, 132, 199, 0.1);
+    --accent-badge-border: rgba(2, 132, 199, 0.2);
+    --accent-badge-text: #0369a1;
+    --accent-primary: #0284c7;
+    --accent-secondary: #0369a1;
   }
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
@@ -82,11 +119,39 @@ html, body {
 }
 
 @layer utilities {
+  .text-gradient-1 {
+    background: var(--accent-gradient-text-1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-2 {
+    background: var(--accent-gradient-text-2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .bg-accent-blob-1 {
+    background: var(--accent-blob-1);
+  }
+
+  .bg-accent-blob-2 {
+    background: var(--accent-blob-2);
+  }
+
+  .badge-accent {
+    background: var(--accent-badge-bg);
+    border: 1px solid var(--accent-badge-border);
+    color: var(--accent-badge-text);
+  }
   @keyframes fadeInUp {
     from {
       opacity: 0;
       transform: translateY(20px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -98,10 +163,12 @@ html, body {
       opacity: 0;
       transform: translateY(20px);
     }
+
     50% {
       opacity: 0;
       transform: translateY(20px);
     }
+
     100% {
       opacity: 1;
       transform: translateY(0);
@@ -109,9 +176,12 @@ html, body {
   }
 
   @keyframes float {
-    0%, 100% {
+
+    0%,
+    100% {
       transform: translateY(0px);
     }
+
     50% {
       transform: translateY(-12px);
     }
@@ -121,15 +191,19 @@ html, body {
     0% {
       background-position: -200% center;
     }
+
     100% {
       background-position: 200% center;
     }
   }
 
   @keyframes pulseGlow {
-    0%, 100% {
+
+    0%,
+    100% {
       box-shadow: 0 0 20px rgba(103, 80, 164, 0.3), 0 0 40px rgba(103, 80, 164, 0.1);
     }
+
     50% {
       box-shadow: 0 0 30px rgba(103, 80, 164, 0.5), 0 0 60px rgba(103, 80, 164, 0.2);
     }
@@ -158,16 +232,51 @@ html, body {
 
   /* Opacity-modified color utilities — replaces broken Tailwind color/opacity notation
      (e.g. bg-primary/10) which silently no-ops when colors are defined as CSS var hex values. */
-  .bg-primary-alpha-10 { background-color: color-mix(in srgb, var(--md-sys-color-primary) 10%, transparent); }
-  .bg-primary-alpha-20 { background-color: color-mix(in srgb, var(--md-sys-color-primary) 20%, transparent); }
-  .border-primary-alpha-20 { border-color: color-mix(in srgb, var(--md-sys-color-primary) 20%, transparent); }
-  .border-primary-alpha-40 { border-color: color-mix(in srgb, var(--md-sys-color-primary) 40%, transparent); }
-  .border-outline-alpha-10 { border-color: color-mix(in srgb, var(--md-sys-color-outline) 10%, transparent); }
-  .border-outline-alpha-20 { border-color: color-mix(in srgb, var(--md-sys-color-outline) 20%, transparent); }
-  .bg-surface-variant-alpha-30 { background-color: color-mix(in srgb, var(--md-sys-color-surface-variant) 30%, transparent); }
-  .bg-surface-variant-alpha-40 { background-color: color-mix(in srgb, var(--md-sys-color-surface-variant) 40%, transparent); }
-  .bg-surface-variant-alpha-50 { background-color: color-mix(in srgb, var(--md-sys-color-surface-variant) 50%, transparent); }
-  .text-primary-alpha-80 { color: color-mix(in srgb, var(--md-sys-color-primary) 80%, transparent); }
-  .hover\:bg-surface-variant-alpha-40:hover { background-color: color-mix(in srgb, var(--md-sys-color-surface-variant) 40%, transparent); }
-  .focus\:border-primary-alpha-40:focus { border-color: color-mix(in srgb, var(--md-sys-color-primary) 40%, transparent); }
+  .bg-primary-alpha-10 {
+    background-color: color-mix(in srgb, var(--md-sys-color-primary) 10%, transparent);
+  }
+
+  .bg-primary-alpha-20 {
+    background-color: color-mix(in srgb, var(--md-sys-color-primary) 20%, transparent);
+  }
+
+  .border-primary-alpha-20 {
+    border-color: color-mix(in srgb, var(--md-sys-color-primary) 20%, transparent);
+  }
+
+  .border-primary-alpha-40 {
+    border-color: color-mix(in srgb, var(--md-sys-color-primary) 40%, transparent);
+  }
+
+  .border-outline-alpha-10 {
+    border-color: color-mix(in srgb, var(--md-sys-color-outline) 10%, transparent);
+  }
+
+  .border-outline-alpha-20 {
+    border-color: color-mix(in srgb, var(--md-sys-color-outline) 20%, transparent);
+  }
+
+  .bg-surface-variant-alpha-30 {
+    background-color: color-mix(in srgb, var(--md-sys-color-surface-variant) 30%, transparent);
+  }
+
+  .bg-surface-variant-alpha-40 {
+    background-color: color-mix(in srgb, var(--md-sys-color-surface-variant) 40%, transparent);
+  }
+
+  .bg-surface-variant-alpha-50 {
+    background-color: color-mix(in srgb, var(--md-sys-color-surface-variant) 50%, transparent);
+  }
+
+  .text-primary-alpha-80 {
+    color: color-mix(in srgb, var(--md-sys-color-primary) 80%, transparent);
+  }
+
+  .hover\:bg-surface-variant-alpha-40:hover {
+    background-color: color-mix(in srgb, var(--md-sys-color-surface-variant) 40%, transparent);
+  }
+
+  .focus\:border-primary-alpha-40:focus {
+    border-color: color-mix(in srgb, var(--md-sys-color-primary) 40%, transparent);
+  }
 }

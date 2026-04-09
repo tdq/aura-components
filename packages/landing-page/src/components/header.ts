@@ -4,26 +4,30 @@ import { ThemeManager } from 'aura-components';
 export function createHeader(): HTMLElement {
     const header = document.createElement('header');
     header.className = 'sticky top-0 z-50 px-px-24 py-px-16 flex flex-wrap items-center justify-between';
-    header.style.cssText = 'position: relative; background: rgba(254, 247, 255, 0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(121, 116, 126, 0.12);';
+    header.style.cssText = 'position: relative; background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(121, 116, 126, 0.12);';
 
-    // Update glass background when theme changes
+    // Theme-specific accent values
+    const getThemeAccents = (theme: string | null) => {
+        if (theme === 'dark') return { bg: 'rgba(20, 18, 24, 0.75)', gradient: 'linear-gradient(135deg, #4F378B, #633B48)', shadow: 'rgba(79,55,139,0.3)' };
+        if (theme === 'pink') return { bg: 'rgba(255, 240, 245, 0.75)', gradient: 'linear-gradient(135deg, #7D2950, #5F1138)', shadow: 'rgba(125,41,80,0.3)' };
+        return { bg: 'rgba(255, 255, 255, 0.75)', gradient: 'linear-gradient(135deg, #0284c7, #0ea5e9)', shadow: 'rgba(2,132,199,0.3)' };
+    };
+
+    // Update glass background + accent colors when theme changes
     const updateGlass = () => {
         const theme = document.documentElement.getAttribute('data-theme');
-        let bg = 'rgba(254, 247, 255, 0.75)'; // Default light
-        if (theme === 'dark') {
-            bg = 'rgba(20, 18, 24, 0.75)';
-        } else if (theme === 'pink') {
-            bg = 'rgba(255, 240, 245, 0.75)';
-        }
-        
-        header.style.cssText = `position: relative; background: ${bg}; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(121, 116, 126, 0.12);`;
+        const accents = getThemeAccents(theme);
+        header.style.cssText = `position: relative; background: ${accents.bg}; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(121, 116, 126, 0.12);`;
+        logoIcon.style.background = accents.gradient;
+        ctaBtn.style.cssText = `background: ${accents.gradient}; box-shadow: 0 2px 12px ${accents.shadow};`;
+        mobileDemoBtn.style.cssText = `background: ${accents.gradient};`;
     };
 
     // Logo
     const logo = document.createElement('div');
     logo.className = 'flex items-center gap-px-12 cursor-pointer group';
     logo.innerHTML = `
-        <div class="relative w-9 h-9 rounded-large flex items-center justify-center flex-shrink-0 overflow-hidden" style="background: linear-gradient(135deg, #6750A4, #7D5260);">
+        <div class="logo-icon relative w-9 h-9 rounded-large flex items-center justify-center flex-shrink-0 overflow-hidden" style="background: linear-gradient(135deg, #0284c7, #0ea5e9);">
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M9 2L15.5 14H2.5L9 2Z" fill="white" fill-opacity="0.9"/>
                 <circle cx="9" cy="10" r="2.5" fill="white" fill-opacity="0.6"/>
@@ -33,6 +37,7 @@ export function createHeader(): HTMLElement {
         <span class="text-title-large text-on-surface font-semibold tracking-tight group-hover:text-primary transition-colors duration-200">Aura Components</span>
     `;
     logo.onclick = () => router.navigate('/');
+    const logoIcon = logo.querySelector('.logo-icon') as HTMLElement;
 
     // Nav
     const nav = document.createElement('nav');
@@ -73,13 +78,17 @@ export function createHeader(): HTMLElement {
 
     const ctaBtn = document.createElement('button');
     ctaBtn.className = 'px-px-16 py-px-8 text-label-large text-white rounded-large font-medium transition-all duration-200 hover:shadow-level-3 hover:scale-105 active:scale-95';
-    ctaBtn.style.cssText = 'background: linear-gradient(135deg, #6750A4, #7D5260); box-shadow: 0 2px 12px rgba(103, 80, 164, 0.3);';
+    ctaBtn.style.cssText = 'background: linear-gradient(135deg, #0284c7, #0ea5e9); box-shadow: 0 2px 12px rgba(2,132,199,0.3);';
     ctaBtn.textContent = 'View Demo';
     ctaBtn.onmouseenter = () => {
-        ctaBtn.style.cssText = 'background: linear-gradient(135deg, #6750A4, #7D5260); box-shadow: 0 4px 20px rgba(103, 80, 164, 0.45); transform: scale(1.05);';
+        const theme = document.documentElement.getAttribute('data-theme');
+        const { gradient, shadow } = getThemeAccents(theme);
+        ctaBtn.style.cssText = `background: ${gradient}; box-shadow: 0 4px 20px ${shadow.replace('0.3', '0.45')}; transform: scale(1.05);`;
     };
     ctaBtn.onmouseleave = () => {
-        ctaBtn.style.cssText = 'background: linear-gradient(135deg, #6750A4, #7D5260); box-shadow: 0 2px 12px rgba(103, 80, 164, 0.3); transform: scale(1);';
+        const theme = document.documentElement.getAttribute('data-theme');
+        const { gradient, shadow } = getThemeAccents(theme);
+        ctaBtn.style.cssText = `background: ${gradient}; box-shadow: 0 2px 12px ${shadow}; transform: scale(1);`;
     };
     ctaBtn.onclick = () => router.navigate('/dashboard');
 
@@ -115,7 +124,7 @@ export function createHeader(): HTMLElement {
     mobileDemoBtnWrap.className = 'px-px-16 py-px-12';
     const mobileDemoBtn = document.createElement('button');
     mobileDemoBtn.className = 'w-full py-px-12 text-label-large text-white rounded-large font-medium transition-all duration-200';
-    mobileDemoBtn.style.cssText = 'background: linear-gradient(135deg, #6750A4, #7D5260);';
+    mobileDemoBtn.style.cssText = 'background: linear-gradient(135deg, #0284c7, #0ea5e9);';
     mobileDemoBtn.textContent = 'View Demo';
     mobileDemoBtn.onclick = () => {
         closeMobileMenu();
@@ -186,10 +195,12 @@ function createThemeToggle(onThemeChange?: () => void): HTMLElement {
         btn.title = t.label;
 
         const updateActive = () => {
+            const theme = document.documentElement.getAttribute('data-theme');
+            const activeColor = theme === 'dark' ? '#D0BCFF' : theme === 'pink' ? '#FFB3D1' : '#0284c7';
             buttons.forEach((b, i) => {
                 const isActive = themes[i].name === activeTheme;
                 b.style.cssText = isActive
-                    ? 'background: white; color: #6750A4; box-shadow: 0 1px 4px rgba(0,0,0,0.15);'
+                    ? `background: white; color: ${activeColor}; box-shadow: 0 1px 4px rgba(0,0,0,0.15);`
                     : '';
             });
         };
@@ -207,7 +218,7 @@ function createThemeToggle(onThemeChange?: () => void): HTMLElement {
     });
 
     // Set initial state
-    buttons[0].style.cssText = 'background: white; color: #6750A4; box-shadow: 0 1px 4px rgba(0,0,0,0.15);';
+    buttons[0].style.cssText = 'background: white; color: #0284c7; box-shadow: 0 1px 4px rgba(0,0,0,0.15);';
 
     return container;
 }

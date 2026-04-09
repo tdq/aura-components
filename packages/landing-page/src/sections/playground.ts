@@ -11,8 +11,8 @@ export function createPlayground(): HTMLElement {
     const bgDec = document.createElement('div');
     bgDec.className = 'absolute inset-0 -z-10 overflow-hidden';
     bgDec.innerHTML = `
-        <div class="absolute bottom-0 right-0 w-[600px] h-[600px] rounded-full" style="background: radial-gradient(circle, rgba(125,82,96,0.06) 0%, transparent 70%);"></div>
-        <div class="absolute top-0 left-0 w-[400px] h-[400px] rounded-full" style="background: radial-gradient(circle, rgba(103,80,164,0.05) 0%, transparent 70%);"></div>
+        <div class="absolute bottom-0 right-0 w-[600px] h-[600px] rounded-full" style="background: radial-gradient(circle, rgba(14,165,233,0.06) 0%, transparent 70%);"></div>
+        <div class="absolute top-0 left-0 w-[400px] h-[400px] rounded-full" style="background: radial-gradient(circle, rgba(2,132,199,0.05) 0%, transparent 70%);"></div>
     `;
     section.appendChild(bgDec);
 
@@ -20,17 +20,17 @@ export function createPlayground(): HTMLElement {
     const header = document.createElement('div');
     header.className = 'max-w-7xl mx-auto text-center mb-px-64';
     header.innerHTML = `
-        <div class="inline-flex items-center gap-px-8 px-px-16 py-px-8 rounded-full text-label-medium mb-px-24" style="background: rgba(125,82,96,0.06); border: 1px solid rgba(125,82,96,0.15); color: #7D5260;">
+        <div class="inline-flex items-center gap-px-8 px-px-16 py-px-8 rounded-full text-label-medium mb-px-24 badge-accent">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
             Interactive
         </div>
         <h2 class="text-[40px] font-bold text-on-surface leading-tight tracking-tight" style="letter-spacing: -0.025em;">
-            See it in <span style="background: linear-gradient(135deg, #7D5260, #6750A4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">action</span>
+            See it in <span class="text-gradient-2">action</span>
         </h2>
         <p class="mt-px-16 text-body-large text-on-surface-variant max-w-2xl mx-auto" style="opacity: 0.75;">
             Every component is fully functional right here. No setup required.
         </p>
-        <div class="mt-px-24 mx-auto w-24 h-px" style="background: linear-gradient(90deg, transparent, rgba(125,82,96,0.4), transparent);"></div>
+        <div class="mt-px-24 mx-auto w-24 h-px" style="background: linear-gradient(90deg, transparent, var(--md-sys-color-primary), transparent); opacity: 0.4;"></div>
     `;
     section.appendChild(header);
 
@@ -136,7 +136,7 @@ function createPlaygroundCard(
             <span class="text-title-small font-semibold text-on-surface">${title}</span>
             <span class="text-body-small text-on-surface-variant" style="opacity: 0.65;">${description}</span>
         </div>
-        <div class="flex items-center gap-px-8 px-px-12 py-px-4 rounded-full text-label-small" style="background: rgba(103,80,164,0.08); color: #6750A4; border: 1px solid rgba(103,80,164,0.15);">
+        <div class="flex items-center gap-px-8 px-px-12 py-px-4 rounded-full text-label-small badge-accent">
             <span class="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></span>
             Live Preview
         </div>
