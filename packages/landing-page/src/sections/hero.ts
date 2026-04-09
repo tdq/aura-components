@@ -3,15 +3,12 @@ import {
     ChartBuilder,
     GridBuilder,
     FormBuilder,
-    LabelBuilder,
-    LabelSize,
     ButtonStyle,
     PanelBuilder,
-    PanelGap,
     themeManager,
     registerDestroy
 } from 'aura-components';
-import { of, timer } from 'rxjs';
+import { of } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 export function createHero(): HTMLElement {
@@ -108,13 +105,13 @@ export function createHero(): HTMLElement {
             }
             return theme;
         })
-    ).subscribe(theme => {
+    ).subscribe((theme: any) => {
         const container = section.querySelector('#hero-container') as HTMLElement;
         const themeBg = theme === 'dark'
             ? 'bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900'
             : theme === 'pink'
-            ? 'bg-gradient-to-br from-white via-pink-50 to-pink-100'
-            : 'bg-gradient-to-br from-white via-indigo-50 to-indigo-100';
+                ? 'bg-gradient-to-br from-white via-pink-50 to-pink-100'
+                : 'bg-gradient-to-br from-white via-indigo-50 to-indigo-100';
 
         if (container) container.className = `min-h-screen relative overflow-hidden transition-colors duration-500 ${themeBg}`;
 
@@ -123,8 +120,8 @@ export function createHero(): HTMLElement {
             const btnGradient = theme === 'dark'
                 ? 'linear-gradient(to right, #4F378B, #633B48)'
                 : theme === 'pink'
-                ? 'linear-gradient(to right, #7D2950, #db2777)'
-                : 'linear-gradient(to right, #4f46e5, #818cf8)';
+                    ? 'linear-gradient(to right, #7D2950, #db2777)'
+                    : 'linear-gradient(to right, #4f46e5, #818cf8)';
             exploreBtn.style.background = btnGradient;
         }
     });
@@ -191,7 +188,9 @@ export function createHero(): HTMLElement {
     subscribeForm.withToolbar().withPrimaryButton().withCaption(of('Subscribe')).withStyle(of(ButtonStyle.FILLED));
 
     subscribePanel.withContent(subscribeForm);
-    visualGrid.appendChild(subscribePanel.build());
+    const subscribeElem = subscribePanel.build()
+    subscribeElem.style.backgroundColor = 'var(--subscribe-panel-bg)'
+    visualGrid.appendChild(subscribeElem);
 
     // Add event listeners
     const exploreBtn = section.querySelector('#explore-dashboard-btn');

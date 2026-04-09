@@ -1,5 +1,6 @@
-import { PanelBuilder, ChartBuilder, LabelBuilder } from 'aura-components';
-import { of } from 'rxjs';
+import { PanelBuilder, ChartBuilder, LabelBuilder, registerDestroy } from 'aura-components';
+import { of, timer, Subject, Subscription } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 export function createAnalytics(): HTMLElement {
     const container = document.createElement('div');
@@ -12,103 +13,164 @@ export function createAnalytics(): HTMLElement {
     grid.appendChild(createUsersChart());
     grid.appendChild(createDeviceChart());
     grid.appendChild(createRegionalChart());
+    grid.appendChild(createSessionChart());
+    grid.appendChild(createConversionChart());
 
     container.appendChild(grid);
 
     return container;
 }
 
-function createRevenueChart(): HTMLElement {
+function buildChartPanel(title: string): HTMLElement {
     const panel = new PanelBuilder()
-        .withContent(new LabelBuilder().withCaption(of('Revenue Growth')))
+        .withContent(new LabelBuilder().withCaption(of(title)))
         .build();
-    panel.classList.add('min-h-[350px]');
+    panel.classList.add('min-h-[350px]', 'flex', 'flex-col');
+    return panel;
+}
 
-    const body = panel.querySelector('.panel-body');
-    if (body) {
-        const data$ = of([
-            { x: 'Mon', y: 1200 },
-            { x: 'Tue', y: 1900 },
-            { x: 'Wed', y: 1500 },
-            { x: 'Thu', y: 2200 },
-            { x: 'Fri', y: 2800 },
-            { x: 'Sat', y: 2400 },
-            { x: 'Sun', y: 2100 }
-        ]);
+function createRevenueChart(): HTMLElement {
+    const panel = buildChartPanel('Monthly Revenue');
 
-        const chart = new ChartBuilder().withData(data$);
-        chart.addLineChart("x");
-        body.appendChild(chart.build());
-    }
+    // Realistic seasonal SaaS revenue pattern (Jan–Dec)
+    const BASE = [18200, 15800, 22400, 28100, 24600, 31500, 29800, 33200, 36700, 34100, 38500, 42300];
+    const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    const dataRelay$ = new Subject<Array<{ x: string; y: number }>>();
+    const sub: Subscription = timer(0, 4000).pipe(
+        map(() => MONTHS.map((x, i) => ({ x, y: BASE[i] + Math.round((Math.random() - 0.5) * 500) })))
+    ).subscribe(data => dataRelay$.next(data));
+
+    const chart = new ChartBuilder<{ x: string; y: number }>()
+        .withData(dataRelay$)
+        .withCategoryField('x');
+    chart.addAreaChart('y').withLabel('Revenue ($)').withColor('#6750A4');
+
+    const chartEl = chart.build();
+    chartEl.classList.add('flex-1', 'min-h-0');
+    panel.appendChild(chartEl);
+
+    registerDestroy(panel, () => {
+        sub.unsubscribe();
+        dataRelay$.complete();
+    });
+
     return panel;
 }
 
 function createUsersChart(): HTMLElement {
-    const panel = new PanelBuilder()
-        .withContent(new LabelBuilder().withCaption(of('Active Users')))
-        .build();
-    panel.classList.add('min-h-[350px]');
+    const panel = buildChartPanel('Daily Active Users');
 
-    const body = panel.querySelector('.panel-body');
-    if (body) {
-        const data$ = of([
-            { x: 'Mon', y: 400 },
-            { x: 'Tue', y: 500 },
-            { x: 'Wed', y: 450 },
-            { x: 'Thu', y: 600 },
-            { x: 'Fri', y: 700 },
-            { x: 'Sat', y: 850 },
-            { x: 'Sun', y: 750 }
-        ]);
+    const data$ = of([
+        { x: 'Mon', y: 3840 },
+        { x: 'Tue', y: 4210 },
+        { x: 'Wed', y: 4580 },
+        { x: 'Thu', y: 5120 },
+        { x: 'Fri', y: 4890 },
+        { x: 'Sat', y: 2760 },
+        { x: 'Sun', y: 2190 },
+    ]);
 
-        const chart = new ChartBuilder().withData(data$);
-        chart.addBarChart("x");
-        body.appendChild(chart.build());
-    }
+    const chart = new ChartBuilder<{ x: string; y: number }>()
+        .withData(data$)
+        .withCategoryField('x');
+    chart.addBarChart('y').withLabel('Users').withColor('#0EA5E9');
+
+    const chartEl = chart.build();
+    chartEl.classList.add('flex-1', 'min-h-0');
+    panel.appendChild(chartEl);
+
     return panel;
 }
 
 function createDeviceChart(): HTMLElement {
-    const panel = new PanelBuilder()
-        .withContent(new LabelBuilder().withCaption(of('Traffic by Device')))
-        .build();
-    panel.classList.add('min-h-[350px]');
+    const panel = buildChartPanel('Traffic by Device');
 
-    const body = panel.querySelector('.panel-body');
-    if (body) {
-        const data$ = of([
-            { x: 'Desktop', y: 45 },
-            { x: 'Mobile', y: 35 },
-            { x: 'Tablet', y: 15 },
-            { x: 'Other', y: 5 }
-        ]);
+    const data$ = of([
+        { x: 'Desktop', y: 52 },
+        { x: 'Mobile',  y: 33 },
+        { x: 'Tablet',  y: 11 },
+        { x: 'Other',   y:  4 },
+    ]);
 
-        const chart = new ChartBuilder().withData(data$);
-        chart.addBarChart("x");
-        body.appendChild(chart.build());
-    }
+    const chart = new ChartBuilder<{ x: string; y: number }>()
+        .withData(data$)
+        .withCategoryField('x');
+    chart.addBarChart('y').withLabel('Share (%)').withColor('#10B981');
+
+    const chartEl = chart.build();
+    chartEl.classList.add('flex-1', 'min-h-0');
+    panel.appendChild(chartEl);
+
     return panel;
 }
 
 function createRegionalChart(): HTMLElement {
-    const panel = new PanelBuilder()
-        .withContent(new LabelBuilder().withCaption(of('Regional Sales')))
-        .build();
-    panel.classList.add('min-h-[350px]');
+    const panel = buildChartPanel('Revenue by Region');
 
-    const body = panel.querySelector('.panel-body');
-    if (body) {
-        const data$ = of([
-            { x: 'North America', y: 4500 },
-            { x: 'Europe', y: 3200 },
-            { x: 'Asia', y: 2800 },
-            { x: 'Latin America', y: 1200 },
-            { x: 'Middle East', y: 800 }
-        ]);
+    const data$ = of([
+        { x: 'North America', y: 98400 },
+        { x: 'Europe',        y: 71200 },
+        { x: 'Asia Pacific',  y: 52800 },
+        { x: 'Latin America', y: 18600 },
+        { x: 'Middle East',   y:  7600 },
+    ]);
 
-        const chart = new ChartBuilder().withData(data$);
-        chart.addBarChart("x");
-        body.appendChild(chart.build());
-    }
+    const chart = new ChartBuilder<{ x: string; y: number }>()
+        .withData(data$)
+        .withCategoryField('x');
+    chart.addBarChart('y').withLabel('Revenue ($)').withColor('#F59E0B');
+
+    const chartEl = chart.build();
+    chartEl.classList.add('flex-1', 'min-h-0');
+    panel.appendChild(chartEl);
+
+    return panel;
+}
+
+function createSessionChart(): HTMLElement {
+    const panel = buildChartPanel('Avg Session Duration (min)');
+
+    const data$ = of([
+        { x: 'Mon', y: 6.8 },
+        { x: 'Tue', y: 7.4 },
+        { x: 'Wed', y: 7.1 },
+        { x: 'Thu', y: 8.2 },
+        { x: 'Fri', y: 9.0 },
+        { x: 'Sat', y: 11.3 },
+        { x: 'Sun', y: 9.6 },
+    ]);
+
+    const chart = new ChartBuilder<{ x: string; y: number }>()
+        .withData(data$)
+        .withCategoryField('x');
+    chart.addLineChart('y').withLabel('Minutes').withColor('#EC4899');
+
+    const chartEl = chart.build();
+    chartEl.classList.add('flex-1', 'min-h-0');
+    panel.appendChild(chartEl);
+
+    return panel;
+}
+
+function createConversionChart(): HTMLElement {
+    const panel = buildChartPanel('Conversion Funnel');
+
+    const data$ = of([
+        { x: 'Visits',    y: 48200 },
+        { x: 'Sign-ups',  y: 12400 },
+        { x: 'Trials',    y:  4100 },
+        { x: 'Paid',      y:  1980 },
+    ]);
+
+    const chart = new ChartBuilder<{ x: string; y: number }>()
+        .withData(data$)
+        .withCategoryField('x');
+    chart.addBarChart('y').withLabel('Users').withColor('#8B5CF6');
+
+    const chartEl = chart.build();
+    chartEl.classList.add('flex-1', 'min-h-0');
+    panel.appendChild(chartEl);
+
     return panel;
 }

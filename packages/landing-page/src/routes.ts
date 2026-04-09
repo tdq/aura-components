@@ -16,7 +16,7 @@ router.addRoute()
     .withContent(() => ({ build: () => createDashboardDemo() }));
 
 router.addRoute()
-    .withPattern('/dashboard/:page')
+    .withPattern('/dashboard/{page}')
     .withContent(() => ({ build: () => createDashboardDemo() }));
 
 router.addRoute()

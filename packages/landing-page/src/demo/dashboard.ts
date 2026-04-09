@@ -1,4 +1,4 @@
-import { LayoutBuilder, LayoutGap } from 'aura-components';
+import { LayoutBuilder, LayoutGap, SlotSize, registerDestroy } from 'aura-components';
 import { router } from '../routes';
 import { createSidebar } from './dashboard/sidebar';
 import { createDashboardHeader } from './dashboard/header';
@@ -14,7 +14,7 @@ export function createDashboardDemo(): HTMLElement {
         .withGap(LayoutGap.NONE);
 
     // Sidebar
-    layout.addSlot().withContent({build: () => createSidebar()});
+    layout.addSlot().withSize(SlotSize.FIT).withContent({build: () => createSidebar()});
 
     // Main Content Area
     const mainContent = document.createElement('div');
@@ -27,30 +27,21 @@ export function createDashboardDemo(): HTMLElement {
     const contentOutlet = document.createElement('div');
     contentOutlet.className = 'flex-1 overflow-hidden flex flex-col';
     
-    router.currentRoute$.subscribe(route => {
+    const routeSub = router.currentRoute$.subscribe(route => {
         contentOutlet.innerHTML = '';
         const page = route?.params?.page;
-        
+
         let content: HTMLElement;
-        switch(page) {
-            case 'analytics':
-                content = createAnalytics();
-                break;
-            case 'customers':
-                content = createCustomers();
-                break;
-            case 'orders':
-                content = createOrders();
-                break;
-            case 'settings':
-                content = createSettings();
-                break;
-            default:
-                content = createOverview();
-                break;
+        switch (page) {
+            case 'analytics':  content = createAnalytics();  break;
+            case 'customers':  content = createCustomers();  break;
+            case 'orders':     content = createOrders();     break;
+            case 'settings':   content = createSettings();   break;
+            default:           content = createOverview();   break;
         }
         contentOutlet.appendChild(content);
     });
+    registerDestroy(contentOutlet, () => routeSub.unsubscribe());
 
     mainContent.appendChild(contentOutlet);
 

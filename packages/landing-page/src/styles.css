@@ -28,6 +28,7 @@
     --md-sys-color-on-surface-variant: #1e1b4b;
     --md-sys-color-outline: #a5b4fc;
     --md-sys-color-surface-container-low: #eef2ff;
+    --subscribe-panel-bg: rgba(50, 50, 255, 0.05);
   }
 
   [data-theme="dark"] {
@@ -53,6 +54,7 @@
     --md-sys-color-on-surface-variant: #CAC4D0;
     --md-sys-color-outline: #938F99;
     --md-sys-color-surface-container-low: #1D1B20;
+    --subscribe-panel-bg: rgba(50, 50, 255, 0.1);
 
     /* Theme Accents */
     --accent-blob-1: linear-gradient(to right, rgba(103, 80, 164, 0.35), rgba(125, 82, 96, 0.35));
@@ -83,6 +85,7 @@
     --md-sys-color-on-surface-variant: #514347;
     --md-sys-color-outline: #837377;
     --md-sys-color-surface-container-low: #FFF5F8;
+    --subscribe-panel-bg: rgba(255, 100, 100, 0.1);
 
     /* Theme Accents */
     --accent-blob-1: linear-gradient(to right, rgba(244, 114, 182, 0.2), rgba(251, 113, 133, 0.2));
@@ -146,6 +149,7 @@ body {
     border: 1px solid var(--accent-badge-border);
     color: var(--accent-badge-text);
   }
+
   @keyframes fadeInUp {
     from {
       opacity: 0;

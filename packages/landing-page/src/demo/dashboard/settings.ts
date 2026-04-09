@@ -1,39 +1,65 @@
-import { PanelBuilder, FormBuilder, LabelBuilder, LabelSize } from 'aura-components';
+import { FormBuilder, LabelSize, TabsBuilder } from 'aura-components';
 import { of, BehaviorSubject } from 'rxjs';
 
 export function createSettings(): HTMLElement {
     const container = document.createElement('div');
     container.className = 'flex-1 overflow-y-auto p-px-24';
 
-    const panel = new PanelBuilder()
-        .withContent(new LabelBuilder().withCaption(of('Account Settings')))
-        .build();
-    panel.classList.add('max-w-2xl');
+    const profileForm = new FormBuilder()
+        .withCaption(of('Profile Settings'))
+        .withDescription(of('Manage your account information and preferences.'));
 
-    const body = panel.querySelector('.panel-body');
-    if (body) {
-        const form = new FormBuilder()
-            .withCaption(of('Profile Settings'))
-            .withDescription(of('Manage your account information and preferences.'));
-        
-        const fields = form.withFields();
-        
-        fields.addHeading().withCaption(of('Profile Information')).withSize(LabelSize.MEDIUM);
-        fields.addTextField().withLabel(of('Username')).withValue(new BehaviorSubject('admin_user'));
-        fields.addTextField().withLabel(of('Email Address')).withValue(new BehaviorSubject('admin@example.com'));
+    const profileFields = profileForm.withFields();
+    profileFields.addHeading().withCaption(of('Profile Information')).withSize(LabelSize.MEDIUM);
+    profileFields.addTextField().withLabel(of('Full Name')).withValue(new BehaviorSubject('Admin User'));
+    profileFields.addTextField().withLabel(of('Username')).withValue(new BehaviorSubject('admin_user'));
+    profileFields.addTextField().withLabel(of('Email Address')).withValue(new BehaviorSubject('admin@example.com'));
+    profileFields.addComboBoxField().withCaption(of('Timezone')).withItems(of(['UTC', 'EST', 'PST', 'CET', 'JST']));
 
-        fields.addHeading().withCaption(of('Notifications')).withSize(LabelSize.MEDIUM);
-        fields.addCheckBox().withCaption(of('Email Notifications')).withValue(new BehaviorSubject(true));
-        fields.addCheckBox().withCaption(of('SMS Notifications')).withValue(new BehaviorSubject(false));
+    const profileToolbar = profileForm.withToolbar();
+    profileToolbar.withPrimaryButton().withCaption(of('Save Changes'));
+    profileToolbar.addSecondaryButton().withCaption(of('Cancel'));
 
-        const toolbar = form.withToolbar();
-        toolbar.withPrimaryButton().withCaption(of('Save Changes'));
-        toolbar.addSecondaryButton().withCaption(of('Cancel'));
+    const securityForm = new FormBuilder()
+        .withCaption(of('Security Settings'))
+        .withDescription(of('Manage your password and authentication options.'));
 
-        body.appendChild(form.build());
-    }
+    const securityFields = securityForm.withFields();
+    securityFields.addHeading().withCaption(of('Change Password')).withSize(LabelSize.MEDIUM);
+    securityFields.addPasswordField().withLabel(of('Current Password'));
+    securityFields.addPasswordField().withLabel(of('New Password'));
+    securityFields.addPasswordField().withLabel(of('Confirm Password'));
+    securityFields.addHeading().withCaption(of('Two-Factor Authentication')).withSize(LabelSize.MEDIUM);
+    securityFields.addCheckBox().withCaption(of('Enable 2FA')).withValue(new BehaviorSubject(false));
 
-    container.appendChild(panel);
+    const securityToolbar = securityForm.withToolbar();
+    securityToolbar.withPrimaryButton().withCaption(of('Update Security'));
+
+    const notificationsForm = new FormBuilder()
+        .withCaption(of('Notification Preferences'))
+        .withDescription(of('Choose how and when you receive notifications.'));
+
+    const notificationsFields = notificationsForm.withFields();
+    notificationsFields.addHeading().withCaption(of('Notifications')).withSize(LabelSize.MEDIUM);
+    notificationsFields.addCheckBox().withCaption(of('Email Notifications')).withValue(new BehaviorSubject(true));
+    notificationsFields.addCheckBox().withCaption(of('SMS Notifications')).withValue(new BehaviorSubject(false));
+    notificationsFields.addCheckBox().withCaption(of('Push Notifications')).withValue(new BehaviorSubject(true));
+    notificationsFields.addCheckBox().withCaption(of('Weekly Digest')).withValue(new BehaviorSubject(true));
+    notificationsFields.addCheckBox().withCaption(of('Security Alerts')).withValue(new BehaviorSubject(true));
+    notificationsFields.addCheckBox().withCaption(of('Marketing Emails')).withValue(new BehaviorSubject(false));
+
+    const notificationsToolbar = notificationsForm.withToolbar();
+    notificationsToolbar.withPrimaryButton().withCaption(of('Save Preferences'));
+
+    const tabs = new TabsBuilder();
+    tabs.addTab().withCaption(of('Profile')).withContent(profileForm);
+    tabs.addTab().withCaption(of('Security')).withContent(securityForm);
+    tabs.addTab().withCaption(of('Notifications')).withContent(notificationsForm);
+
+    const tabsEl = tabs.build();
+    tabsEl.classList.add('max-w-2xl');
+
+    container.appendChild(tabsEl);
 
     return container;
 }

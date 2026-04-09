@@ -1,3 +1,4 @@
+import { registerDestroy } from 'aura-components';
 import { router } from '../../routes';
 import { map } from 'rxjs/operators';
 
@@ -72,7 +73,7 @@ export function createSidebar(): HTMLElement {
         btn.className = 'w-full flex items-center gap-px-12 px-px-12 py-px-8 rounded-large text-label-large mb-1 relative transition-all duration-200';
         
         const updateActive = (currentPath: string) => {
-            const isActive = item.exact ? currentPath === item.path : currentPath === item.path;
+            const isActive = item.exact ? currentPath === item.path : currentPath.startsWith(item.path);
             if (isActive) {
                 btn.style.cssText = 'background: rgba(103,80,164,0.1); color: #6750A4;';
                 if (!btn.querySelector('.accent-bar')) {
@@ -88,7 +89,8 @@ export function createSidebar(): HTMLElement {
             }
         };
 
-        router.currentRoute$.pipe(map(r => r?.path ?? '/')).subscribe(updateActive);
+        const sub = router.currentRoute$.pipe(map(r => r?.path ?? '/')).subscribe(updateActive);
+        registerDestroy(btn, () => sub.unsubscribe());
 
         btn.insertAdjacentHTML('beforeend', `${item.icon}<span>${item.label}</span>`);
         btn.onclick = () => router.navigate(item.path);

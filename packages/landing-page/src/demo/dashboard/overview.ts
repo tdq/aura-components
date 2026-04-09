@@ -1,4 +1,4 @@
-import { PanelBuilder, ChartBuilder, GridBuilder, LabelBuilder } from 'aura-components';
+import { PanelBuilder, ChartBuilder, GridBuilder, LabelBuilder, registerDestroy } from 'aura-components';
 import { of, timer, Subject, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -6,14 +6,10 @@ export function createOverview(): HTMLElement {
     const container = document.createElement('div');
     container.className = 'flex-1 overflow-y-auto p-px-24';
 
-    // Stats Grid
-    const statsGrid = createStatsGrid();
-    container.appendChild(statsGrid);
+    container.appendChild(createStatsGrid());
 
-    // Charts & Grid Section
     const mainGrid = document.createElement('div');
     mainGrid.className = 'grid grid-cols-1 lg:grid-cols-2 gap-px-24 mt-px-24';
-
     mainGrid.appendChild(createSalesChart());
     mainGrid.appendChild(createTransactionsGrid());
 
@@ -27,10 +23,14 @@ function createStatsGrid(): HTMLElement {
     grid.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px-16';
 
     const stats = [
-        { label: 'Total Sales', value: '$124,592', trend: '+12.5%', positive: true, color: '#6750A4', colorLight: 'rgba(103,80,164,0.08)' },
-        { label: 'Active Users', value: '12,482', trend: '+5.2%', positive: true, color: '#625B71', colorLight: 'rgba(98,91,113,0.08)' },
-        { label: 'Orders', value: '1,248', trend: '-2.1%', positive: false, color: '#7D5260', colorLight: 'rgba(125,82,96,0.08)' },
-        { label: 'Conversion', value: '3.2%', trend: '+0.8%', positive: true, color: '#6750A4', colorLight: 'rgba(103,80,164,0.08)' }
+        { label: 'Total Revenue',  value: '$248,592', trend: '+14.2%', positive: true,  color: '#6750A4', colorLight: 'rgba(103,80,164,0.08)' },
+        { label: 'Active Users',   value: '24,891',   trend: '+8.7%',  positive: true,  color: '#625B71', colorLight: 'rgba(98,91,113,0.08)'  },
+        { label: 'Orders (Apr)',   value: '2,847',    trend: '-1.4%',  positive: false, color: '#7D5260', colorLight: 'rgba(125,82,96,0.08)'  },
+        { label: 'Conversion',     value: '4.1%',     trend: '+0.6%',  positive: true,  color: '#6750A4', colorLight: 'rgba(103,80,164,0.08)' },
+        { label: 'New Signups',     value: '1,284',    trend: '+22.3%', positive: true,  color: '#0EA5E9', colorLight: 'rgba(14,165,233,0.08)'  },
+        { label: 'MRR',             value: '$31,240',  trend: '+9.1%',  positive: true,  color: '#10B981', colorLight: 'rgba(16,185,129,0.08)'  },
+        { label: 'Avg Order Value', value: '$447.30',  trend: '+3.8%',  positive: true,  color: '#F59E0B', colorLight: 'rgba(245,158,11,0.08)'  },
+        { label: 'Churn Rate',      value: '2.4%',     trend: '-0.3%',  positive: true,  color: '#EC4899', colorLight: 'rgba(236,72,153,0.08)'  },
     ];
 
     stats.forEach(s => {
@@ -62,40 +62,41 @@ function createSalesChart(): HTMLElement {
     const panel = new PanelBuilder()
         .withContent(new LabelBuilder().withCaption(of('Sales Performance')))
         .build();
-    panel.classList.add('min-h-[400px]');
+    panel.classList.add('min-h-[400px]', 'flex', 'flex-col');
 
-    const body = panel.querySelector('.panel-body');
-    if (body) {
-        const dataRelay$ = new Subject<Array<{ x: string; y: number }>>();
-        const sub: Subscription = timer(0, 5000).pipe(
-            map(() => [
-                { x: 'Jan', y: 400 + Math.random() * 100 },
-                { x: 'Feb', y: 300 + Math.random() * 100 },
-                { x: 'Mar', y: 600 + Math.random() * 100 },
-                { x: 'Apr', y: 800 + Math.random() * 100 },
-                { x: 'May', y: 500 + Math.random() * 100 },
-                { x: 'Jun', y: 700 + Math.random() * 100 }
-            ])
-        ).subscribe(data => dataRelay$.next(data));
+    const BASE: Array<{ x: string; y: number; orders: number }> = [
+        { x: 'Jan', y: 18200, orders: 210 },
+        { x: 'Feb', y: 15800, orders: 183 },
+        { x: 'Mar', y: 22400, orders: 258 },
+        { x: 'Apr', y: 28100, orders: 312 },
+        { x: 'May', y: 24600, orders: 287 },
+        { x: 'Jun', y: 31500, orders: 361 },
+    ];
 
-        const chart = new ChartBuilder()
-            .withData(dataRelay$)
-        chart.addLineChart("x");
+    const dataRelay$ = new Subject<typeof BASE>();
+    const sub: Subscription = timer(0, 5000).pipe(
+        map(() => BASE.map(d => ({
+            x: d.x,
+            y: d.y + Math.round((Math.random() - 0.5) * 800),
+            orders: d.orders + Math.round((Math.random() - 0.5) * 20),
+        })))
+    ).subscribe(data => dataRelay$.next(data));
 
-        body.appendChild(chart.build());
+    const chart = new ChartBuilder<typeof BASE[0]>()
+        .withData(dataRelay$)
+        .withCategoryField('x')
+        .withLegend(true);
+    chart.addAreaChart('y').withLabel('Revenue ($)').withColor('#6750A4');
+    chart.addBarChart('orders').withLabel('Orders').withColor('#0EA5E9');
 
-        const observer = new MutationObserver(() => {
-            if (!document.body.contains(panel)) {
-                sub.unsubscribe();
-                dataRelay$.complete();
-                observer.disconnect();
-            }
-        });
-        requestAnimationFrame(() => {
-            const parent = panel.parentElement ?? document.body;
-            observer.observe(parent, { childList: true });
-        });
-    }
+    const chartEl = chart.build();
+    chartEl.classList.add('flex-1', 'min-h-0');
+    panel.appendChild(chartEl);
+
+    registerDestroy(panel, () => {
+        sub.unsubscribe();
+        dataRelay$.complete();
+    });
 
     return panel;
 }
@@ -104,28 +105,30 @@ function createTransactionsGrid(): HTMLElement {
     const panel = new PanelBuilder()
         .withContent(new LabelBuilder().withCaption(of('Recent Transactions')))
         .build();
-    panel.classList.add('min-h-[400px]');
+    panel.classList.add('min-h-[400px]', 'flex', 'flex-col');
 
-    const body = panel.querySelector('.panel-body');
-    if (body) {
-        const data$ = of([
-            { id: '1', customer: 'Alice Johnson', amount: 120.00, status: 'Completed', date: '2026-03-16' },
-            { id: '2', customer: 'Bob Smith', amount: 85.50, status: 'Pending', date: '2026-03-15' },
-            { id: '3', customer: 'Charlie Brown', amount: 240.00, status: 'Completed', date: '2026-03-15' },
-            { id: '4', customer: 'Diana Prince', amount: 45.00, status: 'Cancelled', date: '2026-03-14' },
-            { id: '5', customer: 'Ethan Hunt', amount: 320.00, status: 'Completed', date: '2026-03-14' }
-        ]);
+    const data$ = of([
+        { customer: 'TechNova Corp',    amount: 1190.00, status: 'Completed', date: '2026-04-09' },
+        { customer: 'Kevin Park',        amount:  299.00, status: 'Pending',   date: '2026-04-09' },
+        { customer: 'Rachel Kim',        amount:   49.00, status: 'Completed', date: '2026-04-08' },
+        { customer: 'Tara Nguyen',       amount:   99.00, status: 'Completed', date: '2026-04-08' },
+        { customer: 'Cascade Ventures',  amount: 2490.00, status: 'Completed', date: '2026-04-07' },
+        { customer: 'Laura Chen',        amount: 1190.00, status: 'Completed', date: '2026-04-07' },
+        { customer: 'Oscar Ruiz',        amount:  199.00, status: 'Completed', date: '2026-04-06' },
+        { customer: 'Diana Prince',      amount:   99.00, status: 'Cancelled', date: '2026-04-04' },
+    ]);
 
-        const grid = new GridBuilder()
-            .withItems(data$)
-            const columns = grid.withColumns();
-            
-            columns.addTextColumn('customer').withHeader('Customer').withWidth('flex');
-            columns.addNumberColumn('amount').withHeader('Amount').withWidth('100px');
-            columns.addTextColumn('status').withHeader('Status').withWidth('120px');
+    const grid = new GridBuilder<{ customer: string; amount: number; status: string; date: string }>()
+        .withItems(data$);
+    const columns = grid.withColumns();
+    columns.addTextColumn('customer').withHeader('Customer').withWidth('1fr');
+    columns.addNumberColumn('amount').withHeader('Amount ($)').withWidth('110px');
+    columns.addTextColumn('status').withHeader('Status').withWidth('110px');
+    columns.addTextColumn('date').withHeader('Date').withWidth('110px');
 
-        body.appendChild(grid.build());
-    }
+    const gridEl = grid.build();
+    gridEl.classList.add('flex-1', 'min-h-0');
+    panel.appendChild(gridEl);
 
     return panel;
 }

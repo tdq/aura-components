@@ -9,126 +9,7 @@ ts-jest[config] (WARN) [94mmessage[0m[90m TS151001: [0mIf you have issues re
 ts-jest[config] (WARN) [94mmessage[0m[90m TS151001: [0mIf you have issues related to imports, you should consider setting `esModuleInterop` to `true` in your TypeScript configuration file (usually `tsconfig.json`). See https://blogs.msdn.microsoft.com/typescript/2018/01/31/announcing-typescript-2-7/#easier-ecmascript-module-interoperability for more information.
 ts-jest[config] (WARN) [94mmessage[0m[90m TS151001: [0mIf you have issues related to imports, you should consider setting `esModuleInterop` to `true` in your TypeScript configuration file (usually `tsconfig.json`). See https://blogs.msdn.microsoft.com/typescript/2018/01/31/announcing-typescript-2-7/#easier-ecmascript-module-interoperability for more information.
 ts-jest[config] (WARN) [94mmessage[0m[90m TS151001: [0mIf you have issues related to imports, you should consider setting `esModuleInterop` to `true` in your TypeScript configuration file (usually `tsconfig.json`). See https://blogs.msdn.microsoft.com/typescript/2018/01/31/announcing-typescript-2-7/#easier-ecmascript-module-interoperability for more information.
-FAIL src/components/dialog/dialog.test.ts
-  ● Console
-
-    console.warn
-      destroyable element observer started
-
-      2 |
-      3 | (function () {
-    > 4 |     console.warn('destroyable element observer started');
-        |             ^
-      5 |
-      6 |     /**
-      7 |      * Internal storage of destroy callbacks.
-
-      at src/core/destroyable-element.ts:4:13
-      at Object.<anonymous> (src/core/destroyable-element.ts:82:3)
-      at Object.<anonymous> (src/components/label/label.ts:5:1)
-      at Object.<anonymous> (src/components/dialog/dialog.ts:3:1)
-      at Object.<anonymous> (src/components/dialog/dialog.test.ts:1:1)
-
-  ● DialogBuilder › should be centered (no inline positioning styles) on reopen after drag
-
-    expect(received).toBe(expected) // Object.is equality
-
-    Expected: ""
-    Received: "none"
-
-      158 |
-      159 |         // Inline positioning styles should be cleared so native centering applies
-    > 160 |         expect(element.style.transform).toBe('');
-          |                                         ^
-      161 |         expect(element.style.margin).toBe('');
-      162 |         expect(element.style.left).toBe('');
-      163 |         expect(element.style.top).toBe('');
-
-      at Object.<anonymous> (src/components/dialog/dialog.test.ts:160:41)
-
-FAIL src/components/chart/chart.test.ts
-  ● Console
-
-    console.warn
-      destroyable element observer started
-
-      2 |
-      3 | (function () {
-    > 4 |     console.warn('destroyable element observer started');
-        |             ^
-      5 |
-      6 |     /**
-      7 |      * Internal storage of destroy callbacks.
-
-      at src/core/destroyable-element.ts:4:13
-      at Object.<anonymous> (src/core/destroyable-element.ts:82:3)
-      at Object.<anonymous> (src/components/label/label.ts:5:1)
-      at Object.<anonymous> (src/components/label/index.ts:1:1)
-      at Object.<anonymous> (src/components/chart/chart-legend.ts:3:1)
-      at Object.<anonymous> (src/components/chart/chart-viewport.ts:7:1)
-      at Object.<anonymous> (src/components/chart/chart-builder.ts:13:1)
-      at Object.<anonymous> (src/components/chart/chart.test.ts:1:1)
-
-  ● ChartBuilder › should apply glass style
-
-    expect(element).toHaveClass("backdrop-blur-md")
-
-    Expected the element to have class:
-      backdrop-blur-md
-    Received:
-      relative flex flex-col w-full h-full
-
-      222 |             .build();
-      223 |
-    > 224 |         expect(chart).toHaveClass('backdrop-blur-md');
-          |                       ^
-      225 |     });
-      226 |
-      227 |     it('should include animation elements when enabled', () => {
-
-      at Object.<anonymous> (src/components/chart/chart.test.ts:224:23)
-
-FAIL src/components/grid/grid-header.test.ts
-  ● Console
-
-    console.warn
-      destroyable element observer started
-
-      2 |
-      3 | (function () {
-    > 4 |     console.warn('destroyable element observer started');
-        |             ^
-      5 |
-      6 |     /**
-      7 |      * Internal storage of destroy callbacks.
-
-      at src/core/destroyable-element.ts:4:13
-      at Object.<anonymous> (src/core/destroyable-element.ts:82:3)
-      at Object.<anonymous> (src/components/component-parts/error-popover.ts:2:1)
-      at Object.<anonymous> (src/components/component-parts/index.ts:1:1)
-      at Object.<anonymous> (src/components/text-field/text-field.ts:4:1)
-      at Object.<anonymous> (src/components/grid/columns/text-column.ts:4:1)
-      at Object.<anonymous> (src/components/grid/columns/columns-builder.ts:2:1)
-      at Object.<anonymous> (src/components/grid/grid-header.test.ts:4:1)
-
-  ● GridHeader › should render action header cell with correct width when actionCount > 0
-
-    expect(received).toBe(expected) // Object.is equality
-
-    Expected: "80px"
-    Received: ""
-
-      82 |         const actionCell = header.getElement().querySelector(`.${GridStyles.actionHeaderCell.split(' ')[0]}`) as HTMLElement;
-      83 |         expect(actionCell).not.toBeNull();
-    > 84 |         expect(actionCell.style.width).toBe('80px');
-         |                                        ^
-      85 |     });
-      86 |
-      87 |     it('should not render action header cell when actionCount is 0', () => {
-
-      at Object.<anonymous> (src/components/grid/grid-header.test.ts:84:40)
-
-FAIL src/components/grid/grid-viewport.test.ts
+FAIL src/components/grid/grid-viewport.test.ts (12.858 s)
   ● GridViewport › should render visible rows
 
     expect(received).toBe(expected) // Object.is equality
@@ -180,7 +61,76 @@ FAIL src/components/grid/grid-viewport.test.ts
 
       at Object.<anonymous> (src/components/grid/grid-viewport.test.ts:110:25)
 
-FAIL src/components/form/form.test.ts
+FAIL src/theme/theme-manager.test.ts (14.498 s)
+  ● ThemeManager › should apply dark class when system preference is dark and theme is system
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      70 |     // It checks currentTheme ('system') and mediaQuery.matches (true).
+      71 |     expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
+    > 72 |     expect(document.documentElement.classList.contains('dark')).toBe(true);
+         |                                                                 ^
+      73 |   });
+      74 |
+      75 |   it('should not apply dark class when system preference is light and theme is system', () => {
+
+      at Object.<anonymous> (src/theme/theme-manager.test.ts:72:65)
+
+  ● ThemeManager › should explicitly set dark theme
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+       96 |     expect(manager.getTheme()).toBe('dark');
+       97 |     expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
+    >  98 |     expect(document.documentElement.classList.contains('dark')).toBe(true);
+          |                                                                 ^
+       99 |     expect(localStorage.getItem('theme')).toBe('dark');
+      100 |   });
+      101 |
+
+      at Object.<anonymous> (src/theme/theme-manager.test.ts:98:65)
+
+  ● ThemeManager › should explicitly set light theme
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      104 |     // First set to dark to ensure change happens
+      105 |     manager.setTheme('dark');
+    > 106 |     expect(document.documentElement.classList.contains('dark')).toBe(true);
+          |                                                                 ^
+      107 |     
+      108 |     manager.setTheme('light');
+      109 |     expect(manager.getTheme()).toBe('light');
+
+      at Object.<anonymous> (src/theme/theme-manager.test.ts:106:65)
+
+  ● ThemeManager › should load theme from localStorage on initialization
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      118 |     expect(manager.getTheme()).toBe('dark');
+      119 |     expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
+    > 120 |     expect(document.documentElement.classList.contains('dark')).toBe(true);
+          |                                                                 ^
+      121 |   });
+      122 |
+      123 |   it('should explicitly set green theme', () => {
+
+      at Object.<anonymous> (src/theme/theme-manager.test.ts:120:65)
+
+FAIL src/components/form/form.test.ts (17.23 s)
   ● Console
 
     console.warn
@@ -236,7 +186,122 @@ FAIL src/components/form/form.test.ts
 
       at Object.<anonymous> (src/components/form/form.test.ts:175:39)
 
-FAIL src/components/number-field/number-field.test.ts
+FAIL src/components/grid/grid-header.test.ts (17.995 s)
+  ● Console
+
+    console.warn
+      destroyable element observer started
+
+      2 |
+      3 | (function () {
+    > 4 |     console.warn('destroyable element observer started');
+        |             ^
+      5 |
+      6 |     /**
+      7 |      * Internal storage of destroy callbacks.
+
+      at src/core/destroyable-element.ts:4:13
+      at Object.<anonymous> (src/core/destroyable-element.ts:82:3)
+      at Object.<anonymous> (src/components/component-parts/error-popover.ts:2:1)
+      at Object.<anonymous> (src/components/component-parts/index.ts:1:1)
+      at Object.<anonymous> (src/components/text-field/text-field.ts:4:1)
+      at Object.<anonymous> (src/components/grid/columns/text-column.ts:4:1)
+      at Object.<anonymous> (src/components/grid/columns/columns-builder.ts:2:1)
+      at Object.<anonymous> (src/components/grid/grid-header.test.ts:4:1)
+
+  ● GridHeader › should render action header cell with correct width when actionCount > 0
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "80px"
+    Received: ""
+
+      82 |         const actionCell = header.getElement().querySelector(`.${GridStyles.actionHeaderCell.split(' ')[0]}`) as HTMLElement;
+      83 |         expect(actionCell).not.toBeNull();
+    > 84 |         expect(actionCell.style.width).toBe('80px');
+         |                                        ^
+      85 |     });
+      86 |
+      87 |     it('should not render action header cell when actionCount is 0', () => {
+
+      at Object.<anonymous> (src/components/grid/grid-header.test.ts:84:40)
+
+FAIL src/components/dialog/dialog.test.ts (17.964 s)
+  ● Console
+
+    console.warn
+      destroyable element observer started
+
+      2 |
+      3 | (function () {
+    > 4 |     console.warn('destroyable element observer started');
+        |             ^
+      5 |
+      6 |     /**
+      7 |      * Internal storage of destroy callbacks.
+
+      at src/core/destroyable-element.ts:4:13
+      at Object.<anonymous> (src/core/destroyable-element.ts:82:3)
+      at Object.<anonymous> (src/components/label/label.ts:5:1)
+      at Object.<anonymous> (src/components/dialog/dialog.ts:3:1)
+      at Object.<anonymous> (src/components/dialog/dialog.test.ts:1:1)
+
+  ● DialogBuilder › should be centered (no inline positioning styles) on reopen after drag
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: ""
+    Received: "none"
+
+      158 |
+      159 |         // Inline positioning styles should be cleared so native centering applies
+    > 160 |         expect(element.style.transform).toBe('');
+          |                                         ^
+      161 |         expect(element.style.margin).toBe('');
+      162 |         expect(element.style.left).toBe('');
+      163 |         expect(element.style.top).toBe('');
+
+      at Object.<anonymous> (src/components/dialog/dialog.test.ts:160:41)
+
+FAIL src/components/text-field/text-field.test.ts (18.757 s)
+  ● Console
+
+    console.warn
+      destroyable element observer started
+
+      2 |
+      3 | (function () {
+    > 4 |     console.warn('destroyable element observer started');
+        |             ^
+      5 |
+      6 |     /**
+      7 |      * Internal storage of destroy callbacks.
+
+      at src/core/destroyable-element.ts:4:13
+      at Object.<anonymous> (src/core/destroyable-element.ts:82:3)
+      at Object.<anonymous> (src/components/component-parts/error-popover.ts:2:1)
+      at Object.<anonymous> (src/components/component-parts/index.ts:1:1)
+      at Object.<anonymous> (src/components/text-field/text-field.ts:4:1)
+      at Object.<anonymous> (src/components/text-field/text-field.test.ts:2:1)
+
+  ● TextFieldBuilder › should support inline error with popover and red outline
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      169 |         const inputWrapper = container.querySelector('div.relative.flex.items-center.h-\\[48px\\]') as HTMLElement;
+      170 |         expect(inputWrapper.classList.contains('outline-error')).toBe(true);
+    > 171 |         expect(inputWrapper.classList.contains('outline-2')).toBe(true);
+          |                                                              ^
+      172 |
+      173 |         // Click to toggle popover
+      174 |         errorBtn.click();
+
+      at Object.<anonymous> (src/components/text-field/text-field.test.ts:171:62)
+
+FAIL src/components/number-field/number-field.test.ts (19.016 s)
   ● Console
 
     console.warn
@@ -291,44 +356,6 @@ FAIL src/components/number-field/number-field.test.ts
 
       at Object.<anonymous> (src/components/number-field/number-field.test.ts:317:38)
 
-FAIL src/components/text-field/text-field.test.ts
-  ● Console
-
-    console.warn
-      destroyable element observer started
-
-      2 |
-      3 | (function () {
-    > 4 |     console.warn('destroyable element observer started');
-        |             ^
-      5 |
-      6 |     /**
-      7 |      * Internal storage of destroy callbacks.
-
-      at src/core/destroyable-element.ts:4:13
-      at Object.<anonymous> (src/core/destroyable-element.ts:82:3)
-      at Object.<anonymous> (src/components/component-parts/error-popover.ts:2:1)
-      at Object.<anonymous> (src/components/component-parts/index.ts:1:1)
-      at Object.<anonymous> (src/components/text-field/text-field.ts:4:1)
-      at Object.<anonymous> (src/components/text-field/text-field.test.ts:2:1)
-
-  ● TextFieldBuilder › should support inline error with popover and red outline
-
-    expect(received).toBe(expected) // Object.is equality
-
-    Expected: true
-    Received: false
-
-      169 |         const inputWrapper = container.querySelector('div.relative.flex.items-center.h-\\[48px\\]') as HTMLElement;
-      170 |         expect(inputWrapper.classList.contains('outline-error')).toBe(true);
-    > 171 |         expect(inputWrapper.classList.contains('outline-2')).toBe(true);
-          |                                                              ^
-      172 |
-      173 |         // Click to toggle popover
-      174 |         errorBtn.click();
-
-      at Object.<anonymous> (src/components/text-field/text-field.test.ts:171:62)
-
 PASS src/components/tabs/tabs.test.ts
   ● Console
 
@@ -348,111 +375,7 @@ PASS src/components/tabs/tabs.test.ts
       at Object.<anonymous> (src/components/tabs/tabs.ts:7:1)
       at Object.<anonymous> (src/components/tabs/tabs.test.ts:1:1)
 
-PASS src/router/router-builder.test.ts
-PASS src/components/grid/pivot-grouping.test.ts
-  ● Console
-
-    console.warn
-      destroyable element observer started
-
-      2 |
-      3 | (function () {
-    > 4 |     console.warn('destroyable element observer started');
-        |             ^
-      5 |
-      6 |     /**
-      7 |      * Internal storage of destroy callbacks.
-
-      at src/core/destroyable-element.ts:4:13
-      at Object.<anonymous> (src/core/destroyable-element.ts:82:3)
-      at Object.<anonymous> (src/components/component-parts/error-popover.ts:2:1)
-      at Object.<anonymous> (src/components/component-parts/index.ts:1:1)
-      at Object.<anonymous> (src/components/text-field/text-field.ts:4:1)
-      at Object.<anonymous> (src/components/grid/columns/text-column.ts:4:1)
-      at Object.<anonymous> (src/components/grid/columns/columns-builder.ts:2:1)
-      at Object.<anonymous> (src/components/grid/grid-builder.ts:3:1)
-      at Object.<anonymous> (src/components/grid/pivot-grouping.test.ts:2:1)
-
-PASS src/components/grid/grid-inline-editing.test.ts
-  ● Console
-
-    console.warn
-      destroyable element observer started
-
-      2 |
-      3 | (function () {
-    > 4 |     console.warn('destroyable element observer started');
-        |             ^
-      5 |
-      6 |     /**
-      7 |      * Internal storage of destroy callbacks.
-
-      at src/core/destroyable-element.ts:4:13
-      at Object.<anonymous> (src/core/destroyable-element.ts:82:3)
-      at Object.<anonymous> (src/components/component-parts/error-popover.ts:2:1)
-      at Object.<anonymous> (src/components/component-parts/index.ts:1:1)
-      at Object.<anonymous> (src/components/text-field/text-field.ts:4:1)
-      at Object.<anonymous> (src/components/grid/columns/text-column.ts:4:1)
-      at Object.<anonymous> (src/components/grid/grid-inline-editing.test.ts:18:1)
-
-PASS src/components/button/button.test.ts
-  ● Console
-
-    console.warn
-      destroyable element observer started
-
-      2 |
-      3 | (function () {
-    > 4 |     console.warn('destroyable element observer started');
-        |             ^
-      5 |
-      6 |     /**
-      7 |      * Internal storage of destroy callbacks.
-
-      at src/core/destroyable-element.ts:4:13
-      at Object.<anonymous> (src/core/destroyable-element.ts:82:3)
-      at Object.<anonymous> (src/components/button/button.ts:5:1)
-      at Object.<anonymous> (src/components/button/button.test.ts:1:1)
-
-PASS src/components/checkbox/checkbox.test.ts
-  ● Console
-
-    console.warn
-      destroyable element observer started
-
-      2 |
-      3 | (function () {
-    > 4 |     console.warn('destroyable element observer started');
-        |             ^
-      5 |
-      6 |     /**
-      7 |      * Internal storage of destroy callbacks.
-
-      at src/core/destroyable-element.ts:4:13
-      at Object.<anonymous> (src/core/destroyable-element.ts:82:3)
-      at Object.<anonymous> (src/components/checkbox/checkbox.ts:5:1)
-      at Object.<anonymous> (src/components/checkbox/checkbox.test.ts:1:1)
-
-PASS src/components/panel/panel.test.ts
-  ● Console
-
-    console.warn
-      destroyable element observer started
-
-      2 |
-      3 | (function () {
-    > 4 |     console.warn('destroyable element observer started');
-        |             ^
-      5 |
-      6 |     /**
-      7 |      * Internal storage of destroy callbacks.
-
-      at src/core/destroyable-element.ts:4:13
-      at Object.<anonymous> (src/core/destroyable-element.ts:82:3)
-      at Object.<anonymous> (src/components/panel/panel.ts:5:1)
-      at Object.<anonymous> (src/components/panel/panel.test.ts:2:1)
-
-PASS src/components/grid/grid-builder.test.ts
+PASS src/components/grid/grid-builder.test.ts (5.959 s)
   ● Console
 
     console.warn
@@ -476,9 +399,7 @@ PASS src/components/grid/grid-builder.test.ts
       at Object.<anonymous> (src/components/grid/grid-builder.ts:3:1)
       at Object.<anonymous> (src/components/grid/grid-builder.test.ts:2:1)
 
-PASS src/components/grid/grid-logic.test.ts
-PASS src/router/link.test.ts
-PASS src/components/layout/layout.test.ts
+PASS src/components/grid/pivot-grouping.test.ts (6.995 s)
   ● Console
 
     console.warn
@@ -494,10 +415,121 @@ PASS src/components/layout/layout.test.ts
 
       at src/core/destroyable-element.ts:4:13
       at Object.<anonymous> (src/core/destroyable-element.ts:82:3)
-      at Object.<anonymous> (src/components/layout/layout.ts:4:1)
-      at Object.<anonymous> (src/components/layout/layout.test.ts:1:1)
+      at Object.<anonymous> (src/components/component-parts/error-popover.ts:2:1)
+      at Object.<anonymous> (src/components/component-parts/index.ts:1:1)
+      at Object.<anonymous> (src/components/text-field/text-field.ts:4:1)
+      at Object.<anonymous> (src/components/grid/columns/text-column.ts:4:1)
+      at Object.<anonymous> (src/components/grid/columns/columns-builder.ts:2:1)
+      at Object.<anonymous> (src/components/grid/grid-builder.ts:3:1)
+      at Object.<anonymous> (src/components/grid/pivot-grouping.test.ts:2:1)
 
-PASS src/components/combobox/combobox.test.ts
+PASS src/components/chart/chart.test.ts (7.271 s)
+  ● Console
+
+    console.warn
+      destroyable element observer started
+
+      2 |
+      3 | (function () {
+    > 4 |     console.warn('destroyable element observer started');
+        |             ^
+      5 |
+      6 |     /**
+      7 |      * Internal storage of destroy callbacks.
+
+      at src/core/destroyable-element.ts:4:13
+      at Object.<anonymous> (src/core/destroyable-element.ts:82:3)
+      at Object.<anonymous> (src/components/label/label.ts:5:1)
+      at Object.<anonymous> (src/components/label/index.ts:1:1)
+      at Object.<anonymous> (src/components/chart/chart-legend.ts:3:1)
+      at Object.<anonymous> (src/components/chart/chart-viewport.ts:7:1)
+      at Object.<anonymous> (src/components/chart/chart-builder.ts:13:1)
+      at Object.<anonymous> (src/components/chart/chart.test.ts:1:1)
+
+PASS src/components/grid/grid-inline-editing.test.ts (9.24 s)
+  ● Console
+
+    console.warn
+      destroyable element observer started
+
+      2 |
+      3 | (function () {
+    > 4 |     console.warn('destroyable element observer started');
+        |             ^
+      5 |
+      6 |     /**
+      7 |      * Internal storage of destroy callbacks.
+
+      at src/core/destroyable-element.ts:4:13
+      at Object.<anonymous> (src/core/destroyable-element.ts:82:3)
+      at Object.<anonymous> (src/components/component-parts/error-popover.ts:2:1)
+      at Object.<anonymous> (src/components/component-parts/index.ts:1:1)
+      at Object.<anonymous> (src/components/text-field/text-field.ts:4:1)
+      at Object.<anonymous> (src/components/grid/columns/text-column.ts:4:1)
+      at Object.<anonymous> (src/components/grid/grid-inline-editing.test.ts:18:1)
+
+PASS src/router/router-builder.test.ts
+PASS src/components/button/button.test.ts
+  ● Console
+
+    console.warn
+      destroyable element observer started
+
+      2 |
+      3 | (function () {
+    > 4 |     console.warn('destroyable element observer started');
+        |             ^
+      5 |
+      6 |     /**
+      7 |      * Internal storage of destroy callbacks.
+
+      at src/core/destroyable-element.ts:4:13
+      at Object.<anonymous> (src/core/destroyable-element.ts:82:3)
+      at Object.<anonymous> (src/components/button/button.ts:5:1)
+      at Object.<anonymous> (src/components/button/button.test.ts:1:1)
+
+PASS src/components/grid/columns/percentage-column.test.ts
+  ● Console
+
+    console.warn
+      destroyable element observer started
+
+      2 |
+      3 | (function () {
+    > 4 |     console.warn('destroyable element observer started');
+        |             ^
+      5 |
+      6 |     /**
+      7 |      * Internal storage of destroy callbacks.
+
+      at src/core/destroyable-element.ts:4:13
+      at Object.<anonymous> (src/core/destroyable-element.ts:82:3)
+      at Object.<anonymous> (src/components/component-parts/error-popover.ts:2:1)
+      at Object.<anonymous> (src/components/component-parts/index.ts:1:1)
+      at Object.<anonymous> (src/components/number-field/number-field.ts:4:1)
+      at Object.<anonymous> (src/components/grid/columns/percentage-column.ts:4:1)
+      at Object.<anonymous> (src/components/grid/columns/percentage-column.test.ts:1:1)
+
+PASS src/components/checkbox/checkbox.test.ts
+  ● Console
+
+    console.warn
+      destroyable element observer started
+
+      2 |
+      3 | (function () {
+    > 4 |     console.warn('destroyable element observer started');
+        |             ^
+      5 |
+      6 |     /**
+      7 |      * Internal storage of destroy callbacks.
+
+      at src/core/destroyable-element.ts:4:13
+      at Object.<anonymous> (src/core/destroyable-element.ts:82:3)
+      at Object.<anonymous> (src/components/checkbox/checkbox.ts:5:1)
+      at Object.<anonymous> (src/components/checkbox/checkbox.test.ts:1:1)
+
+PASS src/components/combobox/combobox.test.ts (14.216 s)
   ● Console
 
     console.warn
@@ -516,7 +548,8 @@ PASS src/components/combobox/combobox.test.ts
       at Object.<anonymous> (src/components/combobox/combobox-builder.ts:3:1)
       at Object.<anonymous> (src/components/combobox/combobox.test.ts:2:1)
 
-PASS src/components/date-picker/date-picker.test.ts
+PASS src/router/link.test.ts
+PASS src/components/date-picker/date-picker.test.ts (17.181 s)
   ● Console
 
     console.warn
@@ -535,26 +568,7 @@ PASS src/components/date-picker/date-picker.test.ts
       at Object.<anonymous> (src/components/date-picker/datepicker-builder.ts:3:1)
       at Object.<anonymous> (src/components/date-picker/date-picker.test.ts:2:1)
 
-PASS src/theme/theme-manager.test.ts
-PASS src/components/label/label.test.ts
-  ● Console
-
-    console.warn
-      destroyable element observer started
-
-      2 |
-      3 | (function () {
-    > 4 |     console.warn('destroyable element observer started');
-        |             ^
-      5 |
-      6 |     /**
-      7 |      * Internal storage of destroy callbacks.
-
-      at src/core/destroyable-element.ts:4:13
-      at Object.<anonymous> (src/core/destroyable-element.ts:82:3)
-      at Object.<anonymous> (src/components/label/label.ts:5:1)
-      at Object.<anonymous> (src/components/label/label.test.ts:2:1)
-
+PASS src/components/grid/grid-logic.test.ts
 PASS src/components/grid/columns/money-column.test.ts
   ● Console
 
@@ -577,70 +591,71 @@ PASS src/components/grid/columns/money-column.test.ts
       at Object.<anonymous> (src/components/grid/columns/money-column.ts:5:1)
       at Object.<anonymous> (src/components/grid/columns/money-column.test.ts:1:1)
 
+PASS src/components/layout/layout.test.ts
+  ● Console
+
+    console.warn
+      destroyable element observer started
+
+      2 |
+      3 | (function () {
+    > 4 |     console.warn('destroyable element observer started');
+        |             ^
+      5 |
+      6 |     /**
+      7 |      * Internal storage of destroy callbacks.
+
+      at src/core/destroyable-element.ts:4:13
+      at Object.<anonymous> (src/core/destroyable-element.ts:82:3)
+      at Object.<anonymous> (src/components/layout/layout.ts:4:1)
+      at Object.<anonymous> (src/components/layout/layout.test.ts:1:1)
+
 PASS src/components/grid/actions-builder.test.ts
-PASS src/components/grid/pivot-logic.test.ts
-PASS src/components/grid/cell-class.test.ts
+PASS src/components/label/label.test.ts
+  ● Console
+
+    console.warn
+      destroyable element observer started
+
+      2 |
+      3 | (function () {
+    > 4 |     console.warn('destroyable element observer started');
+        |             ^
+      5 |
+      6 |     /**
+      7 |      * Internal storage of destroy callbacks.
+
+      at src/core/destroyable-element.ts:4:13
+      at Object.<anonymous> (src/core/destroyable-element.ts:82:3)
+      at Object.<anonymous> (src/components/label/label.ts:5:1)
+      at Object.<anonymous> (src/components/label/label.test.ts:2:1)
+
+PASS src/components/panel/panel.test.ts
+  ● Console
+
+    console.warn
+      destroyable element observer started
+
+      2 |
+      3 | (function () {
+    > 4 |     console.warn('destroyable element observer started');
+        |             ^
+      5 |
+      6 |     /**
+      7 |      * Internal storage of destroy callbacks.
+
+      at src/core/destroyable-element.ts:4:13
+      at Object.<anonymous> (src/core/destroyable-element.ts:82:3)
+      at Object.<anonymous> (src/components/panel/panel.ts:5:1)
+      at Object.<anonymous> (src/components/panel/panel.test.ts:2:1)
+
 PASS src/utils/currency-registry.test.ts
+PASS src/components/grid/cell-class.test.ts
+PASS src/components/grid/pivot-logic.test.ts
 PASS src/router/route-matcher.test.ts
 
 Summary of all failing tests
-FAIL src/components/dialog/dialog.test.ts
-  ● DialogBuilder › should be centered (no inline positioning styles) on reopen after drag
-
-    expect(received).toBe(expected) // Object.is equality
-
-    Expected: ""
-    Received: "none"
-
-      158 |
-      159 |         // Inline positioning styles should be cleared so native centering applies
-    > 160 |         expect(element.style.transform).toBe('');
-          |                                         ^
-      161 |         expect(element.style.margin).toBe('');
-      162 |         expect(element.style.left).toBe('');
-      163 |         expect(element.style.top).toBe('');
-
-      at Object.<anonymous> (src/components/dialog/dialog.test.ts:160:41)
-
-FAIL src/components/chart/chart.test.ts
-  ● ChartBuilder › should apply glass style
-
-    expect(element).toHaveClass("backdrop-blur-md")
-
-    Expected the element to have class:
-      backdrop-blur-md
-    Received:
-      relative flex flex-col w-full h-full
-
-      222 |             .build();
-      223 |
-    > 224 |         expect(chart).toHaveClass('backdrop-blur-md');
-          |                       ^
-      225 |     });
-      226 |
-      227 |     it('should include animation elements when enabled', () => {
-
-      at Object.<anonymous> (src/components/chart/chart.test.ts:224:23)
-
-FAIL src/components/grid/grid-header.test.ts
-  ● GridHeader › should render action header cell with correct width when actionCount > 0
-
-    expect(received).toBe(expected) // Object.is equality
-
-    Expected: "80px"
-    Received: ""
-
-      82 |         const actionCell = header.getElement().querySelector(`.${GridStyles.actionHeaderCell.split(' ')[0]}`) as HTMLElement;
-      83 |         expect(actionCell).not.toBeNull();
-    > 84 |         expect(actionCell.style.width).toBe('80px');
-         |                                        ^
-      85 |     });
-      86 |
-      87 |     it('should not render action header cell when actionCount is 0', () => {
-
-      at Object.<anonymous> (src/components/grid/grid-header.test.ts:84:40)
-
-FAIL src/components/grid/grid-viewport.test.ts
+FAIL src/components/grid/grid-viewport.test.ts (12.858 s)
   ● GridViewport › should render visible rows
 
     expect(received).toBe(expected) // Object.is equality
@@ -692,7 +707,76 @@ FAIL src/components/grid/grid-viewport.test.ts
 
       at Object.<anonymous> (src/components/grid/grid-viewport.test.ts:110:25)
 
-FAIL src/components/form/form.test.ts
+FAIL src/theme/theme-manager.test.ts (14.498 s)
+  ● ThemeManager › should apply dark class when system preference is dark and theme is system
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      70 |     // It checks currentTheme ('system') and mediaQuery.matches (true).
+      71 |     expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
+    > 72 |     expect(document.documentElement.classList.contains('dark')).toBe(true);
+         |                                                                 ^
+      73 |   });
+      74 |
+      75 |   it('should not apply dark class when system preference is light and theme is system', () => {
+
+      at Object.<anonymous> (src/theme/theme-manager.test.ts:72:65)
+
+  ● ThemeManager › should explicitly set dark theme
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+       96 |     expect(manager.getTheme()).toBe('dark');
+       97 |     expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
+    >  98 |     expect(document.documentElement.classList.contains('dark')).toBe(true);
+          |                                                                 ^
+       99 |     expect(localStorage.getItem('theme')).toBe('dark');
+      100 |   });
+      101 |
+
+      at Object.<anonymous> (src/theme/theme-manager.test.ts:98:65)
+
+  ● ThemeManager › should explicitly set light theme
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      104 |     // First set to dark to ensure change happens
+      105 |     manager.setTheme('dark');
+    > 106 |     expect(document.documentElement.classList.contains('dark')).toBe(true);
+          |                                                                 ^
+      107 |     
+      108 |     manager.setTheme('light');
+      109 |     expect(manager.getTheme()).toBe('light');
+
+      at Object.<anonymous> (src/theme/theme-manager.test.ts:106:65)
+
+  ● ThemeManager › should load theme from localStorage on initialization
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      118 |     expect(manager.getTheme()).toBe('dark');
+      119 |     expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
+    > 120 |     expect(document.documentElement.classList.contains('dark')).toBe(true);
+          |                                                                 ^
+      121 |   });
+      122 |
+      123 |   it('should explicitly set green theme', () => {
+
+      at Object.<anonymous> (src/theme/theme-manager.test.ts:120:65)
+
+FAIL src/components/form/form.test.ts (17.23 s)
   ● FormBuilder › should propagate asGlass state to form, fields and buttons
 
     expect(element).toHaveClass("glass-effect")
@@ -729,7 +813,61 @@ FAIL src/components/form/form.test.ts
 
       at Object.<anonymous> (src/components/form/form.test.ts:175:39)
 
-FAIL src/components/number-field/number-field.test.ts
+FAIL src/components/grid/grid-header.test.ts (17.995 s)
+  ● GridHeader › should render action header cell with correct width when actionCount > 0
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: "80px"
+    Received: ""
+
+      82 |         const actionCell = header.getElement().querySelector(`.${GridStyles.actionHeaderCell.split(' ')[0]}`) as HTMLElement;
+      83 |         expect(actionCell).not.toBeNull();
+    > 84 |         expect(actionCell.style.width).toBe('80px');
+         |                                        ^
+      85 |     });
+      86 |
+      87 |     it('should not render action header cell when actionCount is 0', () => {
+
+      at Object.<anonymous> (src/components/grid/grid-header.test.ts:84:40)
+
+FAIL src/components/dialog/dialog.test.ts (17.964 s)
+  ● DialogBuilder › should be centered (no inline positioning styles) on reopen after drag
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: ""
+    Received: "none"
+
+      158 |
+      159 |         // Inline positioning styles should be cleared so native centering applies
+    > 160 |         expect(element.style.transform).toBe('');
+          |                                         ^
+      161 |         expect(element.style.margin).toBe('');
+      162 |         expect(element.style.left).toBe('');
+      163 |         expect(element.style.top).toBe('');
+
+      at Object.<anonymous> (src/components/dialog/dialog.test.ts:160:41)
+
+FAIL src/components/text-field/text-field.test.ts (18.757 s)
+  ● TextFieldBuilder › should support inline error with popover and red outline
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      169 |         const inputWrapper = container.querySelector('div.relative.flex.items-center.h-\\[48px\\]') as HTMLElement;
+      170 |         expect(inputWrapper.classList.contains('outline-error')).toBe(true);
+    > 171 |         expect(inputWrapper.classList.contains('outline-2')).toBe(true);
+          |                                                              ^
+      172 |
+      173 |         // Click to toggle popover
+      174 |         errorBtn.click();
+
+      at Object.<anonymous> (src/components/text-field/text-field.test.ts:171:62)
+
+FAIL src/components/number-field/number-field.test.ts (19.016 s)
   ● NumberFieldBuilder › 5. Accessibility › should have correct ARIA attributes and linkages
 
     expect(received).toBe(expected) // Object.is equality
@@ -764,29 +902,11 @@ FAIL src/components/number-field/number-field.test.ts
 
       at Object.<anonymous> (src/components/number-field/number-field.test.ts:317:38)
 
-FAIL src/components/text-field/text-field.test.ts
-  ● TextFieldBuilder › should support inline error with popover and red outline
 
-    expect(received).toBe(expected) // Object.is equality
-
-    Expected: true
-    Received: false
-
-      169 |         const inputWrapper = container.querySelector('div.relative.flex.items-center.h-\\[48px\\]') as HTMLElement;
-      170 |         expect(inputWrapper.classList.contains('outline-error')).toBe(true);
-    > 171 |         expect(inputWrapper.classList.contains('outline-2')).toBe(true);
-          |                                                              ^
-      172 |
-      173 |         // Click to toggle popover
-      174 |         errorBtn.click();
-
-      at Object.<anonymous> (src/components/text-field/text-field.test.ts:171:62)
-
-
-Test Suites: 7 failed, 21 passed, 28 total
-Tests:       11 failed, 327 passed, 338 total
+Test Suites: 7 failed, 22 passed, 29 total
+Tests:       14 failed, 356 passed, 370 total
 Snapshots:   0 total
-Time:        7.442 s, estimated 19 s
+Time:        49.175 s
 Ran all test suites.
 npm error Lifecycle script `test` failed with error:
 npm error Error: command failed
