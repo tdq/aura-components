@@ -65,7 +65,7 @@ export function createProblem(): HTMLElement {
 
     // Pain point cards
     const grid = document.createElement('div');
-    grid.className = 'grid grid-cols-1 md:grid-cols-3 gap-px-6';
+    grid.className = 'grid grid-cols-1 md:grid-cols-3 gap-px-24';
 
     PAIN_POINTS.forEach(point => {
         const card = document.createElement('div');
