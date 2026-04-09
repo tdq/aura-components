@@ -1,4 +1,4 @@
-import { appState, AppView } from '../state/app-state';
+import { router } from '../routes';
 
 const INSTALL_CODE = `npm install aura-components rxjs`;
 
@@ -242,7 +242,7 @@ function createBottomCTA(): HTMLElement {
             };
         }
         if (demoBtn) {
-            demoBtn.onclick = () => appState.setView(AppView.DASHBOARD);
+            demoBtn.onclick = () => router.navigate('/dashboard');
         }
     });
 

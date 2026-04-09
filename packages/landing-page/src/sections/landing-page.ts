@@ -4,7 +4,7 @@ import { createProblem } from './problem';
 import { createFeatures } from './features';
 import { createGetStarted } from './get-started';
 import { createPlayground } from './playground';
-import { appState, AppView } from '../state/app-state';
+import { router } from '../routes';
 
 export function createLandingPage(): HTMLElement {
     const container = document.createElement('div');
@@ -62,7 +62,7 @@ function createFooter(): HTMLElement {
         </p>
     `;
     brand.querySelector('#footer-logo')?.addEventListener('click', () => {
-        appState.setView(AppView.LANDING);
+        router.navigate('/');
     });
 
     // Links column

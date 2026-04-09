@@ -1,4 +1,4 @@
-import { appState, AppView } from '../state/app-state';
+import { router } from '../routes';
 import { ThemeManager } from 'aura-components';
 
 export function createHeader(): HTMLElement {
@@ -8,8 +8,15 @@ export function createHeader(): HTMLElement {
 
     // Update glass background when theme changes
     const updateGlass = () => {
-        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        header.style.cssText = `position: relative; background: ${isDark ? 'rgba(20, 18, 24, 0.75)' : 'rgba(254, 247, 255, 0.75)'}; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(121, 116, 126, 0.12);`;
+        const theme = document.documentElement.getAttribute('data-theme');
+        let bg = 'rgba(254, 247, 255, 0.75)'; // Default light
+        if (theme === 'dark') {
+            bg = 'rgba(20, 18, 24, 0.75)';
+        } else if (theme === 'pink') {
+            bg = 'rgba(255, 240, 245, 0.75)';
+        }
+        
+        header.style.cssText = `position: relative; background: ${bg}; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(121, 116, 126, 0.12);`;
     };
 
     // Logo
@@ -25,7 +32,7 @@ export function createHeader(): HTMLElement {
         </div>
         <span class="text-title-large text-on-surface font-semibold tracking-tight group-hover:text-primary transition-colors duration-200">Aura Components</span>
     `;
-    logo.onclick = () => appState.setView(AppView.LANDING);
+    logo.onclick = () => router.navigate('/');
 
     // Nav
     const nav = document.createElement('nav');
@@ -74,7 +81,7 @@ export function createHeader(): HTMLElement {
     ctaBtn.onmouseleave = () => {
         ctaBtn.style.cssText = 'background: linear-gradient(135deg, #6750A4, #7D5260); box-shadow: 0 2px 12px rgba(103, 80, 164, 0.3); transform: scale(1);';
     };
-    ctaBtn.onclick = () => appState.setView(AppView.DASHBOARD);
+    ctaBtn.onclick = () => router.navigate('/dashboard');
 
     // Hamburger button (mobile only)
     const hamburger = document.createElement('button');
@@ -112,7 +119,7 @@ export function createHeader(): HTMLElement {
     mobileDemoBtn.textContent = 'View Demo';
     mobileDemoBtn.onclick = () => {
         closeMobileMenu();
-        appState.setView(AppView.DASHBOARD);
+        router.navigate('/dashboard');
     };
     mobileDemoBtnWrap.appendChild(mobileDemoBtn);
     mobileNav.appendChild(mobileDemoBtnWrap);

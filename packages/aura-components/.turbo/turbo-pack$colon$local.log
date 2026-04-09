@@ -8,7 +8,7 @@
 > vite build && npm run build:css && npm run build:types && node scripts/reorganize-types.mjs && node scripts/generate-manifest.mjs
 
 [1G[0K[36mvite v5.4.21 [32mbuilding for production...[36m[39m
-[2K[1Gtransforming (1) [2msrc/index.ts[22m[2K[1Gtransforming (30) [2msrc/components/toolbar/toolbar-builder.ts[22m[2K[1Gtransforming (45) [2msrc/components/checkbox/checkbox.ts[22m[2K[1Gtransforming (173) [2msrc/components/date-picker/datepicker-builder.ts[22m[2K[1Gtransforming (253) [2msrc/components/number-field/number-field-logic.ts[22m[2K[1Gtransforming (301) [2msrc/utils/currency-registry.ts[22m[2K[1G[32m✓[39m 301 modules transformed.
+[2K[1Gtransforming (1) [2msrc/components/checkbox/index.ts[22m[2K[1Gtransforming (31) [2msrc/components/toolbar/styles.ts[22m[2K[1Gtransforming (148) [2msrc/components/grid/actions-builder.ts[22m[2K[1Gtransforming (222) [2msrc/components/form/fields-builder.ts[22m[2K[1Gtransforming (262) [2msrc/components/grid/grid-viewport.ts[22m[2K[1G[32m✓[39m 302 modules transformed.
 [2K[1Grendering chunks (1)...[2K[1Grendering chunks (2)...[2K[1Grendering chunks (3)...[2K[1Grendering chunks (4)...[2K[1Grendering chunks (5)...[2K[1Grendering chunks (6)...[2K[1Grendering chunks (7)...[2K[1Grendering chunks (8)...[2K[1Grendering chunks (9)...[2K[1Grendering chunks (10)...[2K[1Grendering chunks (11)...[2K[1Grendering chunks (12)...[2K[1Grendering chunks (13)...[2K[1Grendering chunks (14)...[2K[1Grendering chunks (15)...[2K[1Grendering chunks (16)...[2K[1Grendering chunks (17)...[2K[1Grendering chunks (18)...[2K[1Grendering chunks (19)...[2K[1Grendering chunks (20)...[2K[1Grendering chunks (21)...[2K[1Grendering chunks (22)...[2K[1Grendering chunks (23)...[2K[1Grendering chunks (24)...[2K[1Grendering chunks (25)...[2K[1Grendering chunks (26)...[2K[1Grendering chunks (27)...[2K[1Grendering chunks (28)...[2K[1Grendering chunks (29)...[2K[1Grendering chunks (30)...[2K[1Grendering chunks (31)...[2K[1Grendering chunks (32)...[2K[1Grendering chunks (33)...[2K[1Grendering chunks (34)...[2K[1Grendering chunks (35)...[2K[1Grendering chunks (36)...[2K[1Grendering chunks (37)...[2K[1Grendering chunks (38)...[2K[1G[2K[1Gcomputing gzip size (0)...[2K[1Gcomputing gzip size (1)...[2K[1Gcomputing gzip size (2)...[2K[1Gcomputing gzip size (3)...[2K[1Gcomputing gzip size (4)...[2K[1Gcomputing gzip size (5)...[2K[1Gcomputing gzip size (6)...[2K[1Gcomputing gzip size (7)...[2K[1Gcomputing gzip size (8)...[2K[1Gcomputing gzip size (9)...[2K[1Gcomputing gzip size (10)...[2K[1Gcomputing gzip size (11)...[2K[1Gcomputing gzip size (12)...[2K[1Gcomputing gzip size (13)...[2K[1Gcomputing gzip size (14)...[2K[1Gcomputing gzip size (15)...[2K[1Gcomputing gzip size (16)...[2K[1Gcomputing gzip size (17)...[2K[1Gcomputing gzip size (18)...[2K[1Gcomputing gzip size (19)...[2K[1Gcomputing gzip size (20)...[2K[1Gcomputing gzip size (21)...[2K[1Gcomputing gzip size (22)...[2K[1Gcomputing gzip size (23)...[2K[1Gcomputing gzip size (24)...[2K[1Gcomputing gzip size (25)...[2K[1Gcomputing gzip size (26)...[2K[1Gcomputing gzip size (27)...[2K[1Gcomputing gzip size (28)...[2K[1Gcomputing gzip size (29)...[2K[1Gcomputing gzip size (30)...[2K[1Gcomputing gzip size (31)...[2K[1Gcomputing gzip size (32)...[2K[1Gcomputing gzip size (33)...[2K[1Gcomputing gzip size (34)...[2K[1Gcomputing gzip size (35)...[2K[1Gcomputing gzip size (36)...[2K[1Gcomputing gzip size (37)...[2K[1Gcomputing gzip size (38)...[2K[1G[2mdist/[22m[36mcheckbox/index.js                [39m[1m[2m 0.09 kB[22m[1m[22m[2m │ gzip:  0.09 kB[22m
 [2mdist/[22m[36mbutton/index.js                  [39m[1m[2m 0.10 kB[22m[1m[22m[2m │ gzip:  0.10 kB[22m
 [2mdist/[22m[36mpanel/index.js                   [39m[1m[2m 0.10 kB[22m[1m[22m[2m │ gzip:  0.11 kB[22m
@@ -21,8 +21,8 @@
 [2mdist/[22m[36mlayout/index.js                  [39m[1m[2m 0.16 kB[22m[1m[22m[2m │ gzip:  0.14 kB[22m
 [2mdist/[22m[36mtextfield/index.js               [39m[1m[2m 0.16 kB[22m[1m[22m[2m │ gzip:  0.13 kB[22m
 [2mdist/[22m[36mnumberfield/index.js             [39m[1m[2m 0.17 kB[22m[1m[22m[2m │ gzip:  0.14 kB[22m
-[2mdist/[22m[36mchart/index.js                   [39m[1m[2m 0.29 kB[22m[1m[22m[2m │ gzip:  0.19 kB[22m
 [2mdist/[22m[36mdatepicker/index.js              [39m[1m[2m 0.30 kB[22m[1m[22m[2m │ gzip:  0.20 kB[22m
+[2mdist/[22m[36mchart/index.js                   [39m[1m[2m 0.36 kB[22m[1m[22m[2m │ gzip:  0.23 kB[22m
 [2mdist/[22m[36mgrid/index.js                    [39m[1m[2m 0.69 kB[22m[1m[22m[2m │ gzip:  0.32 kB[22m
 [2mdist/[22m[36mdestroyable-element-D51cI_tZ.js  [39m[1m[2m 0.85 kB[22m[1m[22m[2m │ gzip:  0.45 kB[22m
 [2mdist/[22m[36mpanel-WS02yeA7.js                [39m[1m[2m 1.53 kB[22m[1m[22m[2m │ gzip:  0.75 kB[22m
@@ -39,15 +39,15 @@
 [2mdist/[22m[36mlistbox-AgQCL32E.js              [39m[1m[2m 5.01 kB[22m[1m[22m[2m │ gzip:  1.73 kB[22m
 [2mdist/[22m[36mtext-field-BOFVfSzQ.js           [39m[1m[2m 9.25 kB[22m[1m[22m[2m │ gzip:  3.02 kB[22m
 [2mdist/[22m[36mstartWith-D7k5baRl.js            [39m[1m[2m10.09 kB[22m[1m[22m[2m │ gzip:  2.75 kB[22m
-[2mdist/[22m[36mindex.js                         [39m[1m[2m10.45 kB[22m[1m[22m[2m │ gzip:  3.50 kB[22m
+[2mdist/[22m[36mindex.js                         [39m[1m[2m10.53 kB[22m[1m[22m[2m │ gzip:  3.54 kB[22m
 [2mdist/[22m[36mnumber-field-CFwde23x.js         [39m[1m[2m12.38 kB[22m[1m[22m[2m │ gzip:  3.65 kB[22m
 [2mdist/[22m[36mcombobox-builder-UIIWv5cs.js     [39m[1m[2m12.67 kB[22m[1m[22m[2m │ gzip:  3.89 kB[22m
 [2mdist/[22m[36mmap-DqDc5iNP.js                  [39m[1m[2m13.06 kB[22m[1m[22m[2m │ gzip:  3.73 kB[22m
 [2mdist/[22m[36mdatepicker-builder-Dc4IfnaR.js   [39m[1m[2m15.58 kB[22m[1m[22m[2m │ gzip:  4.74 kB[22m
-[2mdist/[22m[36mchart-builder-DWAGsGZf.js        [39m[1m[2m29.72 kB[22m[1m[22m[2m │ gzip:  7.57 kB[22m
+[2mdist/[22m[36mchart-builder-DOVWIyiB.js        [39m[1m[2m30.24 kB[22m[1m[22m[2m │ gzip:  7.70 kB[22m
 [2mdist/[22m[36mgrid-builder-C9izlWac.js         [39m[1m[2m48.01 kB[22m[1m[22m[2m │ gzip: 11.52 kB[22m
 [2mdist/[22m[36mbundle-mjs-C-fAsw3z.js           [39m[1m[2m59.63 kB[22m[1m[22m[2m │ gzip: 10.67 kB[22m
-[32m✓ built in 1.72s[39m
+[32m✓ built in 1.61s[39m
 
 > aura-components@0.1.1 build:css
 > tailwindcss -i ./src/index.css -o ./dist/a1-components.css --minify
@@ -58,7 +58,7 @@
 
 Rebuilding...
 
-Done in 877ms.
+Done in 849ms.
 [1G[0K\[1G[0K
 > aura-components@0.1.1 build:types
 > tsc -p tsconfig.build.json
@@ -74,6 +74,7 @@ Done in 877ms.
   components/chart/chart-svg-area.d.ts → chart/chart-svg-area.d.ts
   components/chart/chart-tooltip.d.ts → chart/chart-tooltip.d.ts
   components/chart/chart-viewport.d.ts → chart/chart-viewport.d.ts
+  components/chart/constants.d.ts → chart/constants.d.ts
   components/chart/index.d.ts → chart/index.d.ts
   components/chart/series-renderer.d.ts → chart/series-renderer.d.ts
   components/chart/styles.d.ts → chart/styles.d.ts
@@ -162,29 +163,30 @@ Done in 877ms.
   rewrote imports in index.d.ts
 Generated manifest with 27 components
 [1G[0K\[1G[0K[1G[0K\[1G[0K|[1G[0K[1mnpm[22m [96mnotice[39m
-[1G[0K/[1G[0K[1mnpm[22m [96mnotice[39m package: aura-components@0.1.1
-[1G[0K/[1G[0K[1mnpm[22m [96mnotice[39m [94mTarball Contents[39m
-[1G[0K/[1G[0K[1mnpm[22m [96mnotice[39m 33.7kB dist/a1-components.css
+[1G[0K|[1G[0K[1mnpm[22m [96mnotice[39m package: aura-components@0.1.1
+[1G[0K|[1G[0K[1mnpm[22m [96mnotice[39m [94mTarball Contents[39m
+[1G[0K|[1G[0K[1mnpm[22m [96mnotice[39m 33.7kB dist/a1-components.css
 [1mnpm[22m [96mnotice[39m 59.6kB dist/bundle-mjs-C-fAsw3z.js
 [1mnpm[22m [96mnotice[39m 4.0kB dist/button-oCAfGPAy.js
 [1mnpm[22m [96mnotice[39m 981B dist/button/button.d.ts
 [1mnpm[22m [96mnotice[39m 26B dist/button/index.d.ts
 [1mnpm[22m [96mnotice[39m 99B dist/button/index.js
-[1mnpm[22m [96mnotice[39m 29.7kB dist/chart-builder-DWAGsGZf.js
+[1mnpm[22m [96mnotice[39m 30.2kB dist/chart-builder-DOVWIyiB.js
 [1mnpm[22m [96mnotice[39m 548B dist/chart/axis-renderer.d.ts
 [1mnpm[22m [96mnotice[39m 710B dist/chart/builders/axis-builder.d.ts
-[1mnpm[22m [96mnotice[39m 1.5kB dist/chart/builders/chart-type-builders.d.ts
+[1mnpm[22m [96mnotice[39m 1.6kB dist/chart/builders/chart-type-builders.d.ts
 [1mnpm[22m [96mnotice[39m 1.1kB dist/chart/chart-builder.d.ts
 [1mnpm[22m [96mnotice[39m 195B dist/chart/chart-legend.d.ts
-[1mnpm[22m [96mnotice[39m 1.3kB dist/chart/chart-logic.d.ts
+[1mnpm[22m [96mnotice[39m 1.4kB dist/chart/chart-logic.d.ts
 [1mnpm[22m [96mnotice[39m 665B dist/chart/chart-svg-area.d.ts
 [1mnpm[22m [96mnotice[39m 399B dist/chart/chart-tooltip.d.ts
 [1mnpm[22m [96mnotice[39m 587B dist/chart/chart-viewport.d.ts
-[1mnpm[22m [96mnotice[39m 290B dist/chart/index.d.ts
-[1mnpm[22m [96mnotice[39m 290B dist/chart/index.js
+[1mnpm[22m [96mnotice[39m 92B dist/chart/constants.d.ts
+[1mnpm[22m [96mnotice[39m 319B dist/chart/index.d.ts
+[1mnpm[22m [96mnotice[39m 358B dist/chart/index.js
 [1mnpm[22m [96mnotice[39m 343B dist/chart/series-renderer.d.ts
 [1mnpm[22m [96mnotice[39m 335B dist/chart/styles.d.ts
-[1mnpm[22m [96mnotice[39m 3.4kB dist/chart/types.d.ts
+[1mnpm[22m [96mnotice[39m 3.5kB dist/chart/types.d.ts
 [1mnpm[22m [96mnotice[39m 3.3kB dist/checkbox-Cpdp_3ZS.js
 [1mnpm[22m [96mnotice[39m 555B dist/checkbox/checkbox.d.ts
 [1mnpm[22m [96mnotice[39m 28B dist/checkbox/index.d.ts
@@ -316,15 +318,15 @@ Generated manifest with 27 components
 [1mnpm[22m [96mnotice[39m 574B dist/utils/number.d.ts
 [1mnpm[22m [96mnotice[39m 370B dist/utils/validators.d.ts
 [1mnpm[22m [96mnotice[39m 3.3kB package.json
-[1G[0K/[1G[0K[1mnpm[22m [96mnotice[39m [94mTarball Details[39m
-[1G[0K/[1G[0K[1mnpm[22m [96mnotice[39m name: aura-components
-[1G[0K/[1G[0K[1mnpm[22m [96mnotice[39m version: 0.1.1
-[1G[0K/[1G[0K[1mnpm[22m [96mnotice[39m filename: aura-components-0.1.1.tgz
-[1G[0K/[1G[0K[1mnpm[22m [96mnotice[39m package size: 90.9 kB
-[1G[0K/[1G[0K[1mnpm[22m [96mnotice[39m unpacked size: 433.6 kB
-[1G[0K/[1G[0K[1mnpm[22m [96mnotice[39m shasum: df72f0ae129919695500fb50fd15eb1836f0c6d9
-[1G[0K/[1G[0K[1mnpm[22m [96mnotice[39m integrity: sha512-+xPJNwQuVcSgQ[...]r+HUecIDvF01w==
-[1G[0K/[1G[0K[1mnpm[22m [96mnotice[39m total files: 152
-[1G[0K/[1G[0K[1mnpm[22m [96mnotice[39m
-[1G[0K/[1G[0Kaura-components-0.1.1.tgz
-[1G[0K/[1G[0K[1G[0K\[1G[0K
+[1G[0K|[1G[0K[1mnpm[22m [96mnotice[39m [94mTarball Details[39m
+[1G[0K|[1G[0K[1mnpm[22m [96mnotice[39m name: aura-components
+[1G[0K|[1G[0K[1mnpm[22m [96mnotice[39m version: 0.1.1
+[1G[0K|[1G[0K[1mnpm[22m [96mnotice[39m filename: aura-components-0.1.1.tgz
+[1G[0K|[1G[0K[1mnpm[22m [96mnotice[39m package size: 91.2 kB
+[1G[0K|[1G[0K[1mnpm[22m [96mnotice[39m unpacked size: 434.6 kB
+[1G[0K|[1G[0K[1mnpm[22m [96mnotice[39m shasum: ea0a3117e6994aa353d9fd4bec329e70f0b9c24a
+[1G[0K|[1G[0K[1mnpm[22m [96mnotice[39m integrity: sha512-E6mVb+CKYB05O[...]r1d7TC/fMPYdw==
+[1G[0K|[1G[0K[1mnpm[22m [96mnotice[39m total files: 153
+[1G[0K|[1G[0K[1mnpm[22m [96mnotice[39m
+[1G[0K|[1G[0Kaura-components-0.1.1.tgz
+[1G[0K|[1G[0K[1G[0K\[1G[0K

@@ -5,6 +5,7 @@ import { registerDestroy } from '@/core/destroyable-element';
 import { twMerge } from 'tailwind-merge';
 
 export enum LayoutGap {
+    NONE = 'NONE',
     SMALL = 'SMALL',
     MEDIUM = 'MEDIUM',
     LARGE = 'LARGE',
@@ -32,6 +33,7 @@ function cn(...inputs: ClassValue[]) {
 }
 
 const GAP_MAP: Record<LayoutGap, string> = {
+    [LayoutGap.NONE]: 'gap-0',
     [LayoutGap.SMALL]: 'gap-1', // 4px
     [LayoutGap.MEDIUM]: 'gap-2', // 8px
     [LayoutGap.LARGE]: 'gap-4', // 16px
