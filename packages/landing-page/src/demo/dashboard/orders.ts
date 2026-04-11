@@ -31,10 +31,21 @@ const ALL_ORDERS: Order[] = [
     { id: '#ORD-003', customer: 'Quinn Foster',     product: 'Starter Plan — Monthly', date: '2026-04-01', total:   49.00, status: 'Delivered'  },
     { id: '#ORD-002', customer: 'Samuel Torres',    product: 'Pro Plan — Annual',      date: '2026-03-31', total: 1190.00, status: 'Delivered'  },
     { id: '#ORD-001', customer: 'Nina Patel',       product: 'Enterprise Add-on',      date: '2026-03-31', total:  299.00, status: 'Cancelled'  },
+    { id: '#ORD-021', customer: 'Alex Turner',      product: 'Pro Plan — Annual',      date: '2026-03-30', total: 1190.00, status: 'Delivered'  },
+    { id: '#ORD-022', customer: 'Maya Rodriguez',   product: 'Starter Plan — Monthly', date: '2026-03-30', total:   49.00, status: 'Delivered'  },
+    { id: '#ORD-023', customer: 'James Wilson',     product: 'API Access Pack',        date: '2026-03-29', total:  199.00, status: 'Shipped'    },
+    { id: '#ORD-024', customer: 'Sophie Lee',       product: 'Pro Plan — Monthly',     date: '2026-03-29', total:   99.00, status: 'Processing'},
+    { id: '#ORD-025', customer: 'David Chen',       product: 'Enterprise Plan',        date: '2026-03-28', total: 2490.00, status: 'Delivered'  },
+    { id: '#ORD-026', customer: 'Emma Johnson',     product: 'Data Export Module',     date: '2026-03-28', total:  149.00, status: 'Cancelled'  },
+    { id: '#ORD-027', customer: 'Ryan Kim',         product: 'Starter Plan — Annual',  date: '2026-03-27', total:  490.00, status: 'Delivered'  },
+    { id: '#ORD-028', customer: 'Lisa Wang',        product: 'Pro Plan — Monthly',     date: '2026-03-27', total:   99.00, status: 'Processing'},
+    { id: '#ORD-029', customer: 'Tom Harris',       product: 'API Access Pack',        date: '2026-03-26', total:  199.00, status: 'Shipped'    },
+    { id: '#ORD-030', customer: 'Olivia Martinez',  product: 'Enterprise Add-on',      date: '2026-03-26', total:  299.00, status: 'Delivered'  },
 ];
 
 function buildOrdersGrid(orders: Order[]): GridBuilder<Order> {
-    const grid = new GridBuilder<Order>().withItems(of(orders));
+    // Set fixed height for the orders grid (400px)
+    const grid = new GridBuilder<Order>().withItems(of(orders)).withHeight(of(400));
     const columns = grid.withColumns();
     columns.addTextColumn('id').withHeader('Order ID').withWidth('110px');
     columns.addTextColumn('customer').withHeader('Customer').withWidth('160px');

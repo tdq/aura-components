@@ -92,16 +92,6 @@ export function createHeader(): HTMLElement {
     };
     ctaBtn.onclick = () => router.navigate('/dashboard');
 
-    // Hamburger button (mobile only)
-    const hamburger = document.createElement('button');
-    hamburger.className = 'md:hidden flex flex-col justify-center items-center w-9 h-9 gap-1.5 rounded-medium text-on-surface-variant hover:bg-surface-variant-alpha-40 transition-all duration-200';
-    hamburger.setAttribute('aria-label', 'Open menu');
-    hamburger.innerHTML = `
-        <span class="ham-line w-5 h-0.5 rounded-full bg-current transition-all duration-300"></span>
-        <span class="ham-line w-5 h-0.5 rounded-full bg-current transition-all duration-300"></span>
-        <span class="ham-line w-5 h-0.5 rounded-full bg-current transition-all duration-300"></span>
-    `;
-
     // Mobile menu drawer
     const mobileMenu = document.createElement('div');
     mobileMenu.className = 'absolute top-full left-0 right-0 md:hidden overflow-hidden';
@@ -115,7 +105,6 @@ export function createHeader(): HTMLElement {
         a.href = link.href;
         a.className = 'px-px-16 py-px-12 text-body-large text-on-surface-variant hover:text-on-surface hover:bg-surface-variant-alpha-40 rounded-large transition-colors duration-200';
         a.textContent = link.label;
-        a.onclick = () => closeMobileMenu();
         mobileNav.appendChild(a);
     });
 
@@ -126,48 +115,22 @@ export function createHeader(): HTMLElement {
     mobileDemoBtn.className = 'w-full py-px-12 text-label-large text-white rounded-large font-medium transition-all duration-200';
     mobileDemoBtn.style.cssText = 'background: linear-gradient(135deg, #4f46e5, #6366f1);';
     mobileDemoBtn.textContent = 'View Demo';
-    mobileDemoBtn.onclick = () => {
-        closeMobileMenu();
-        router.navigate('/dashboard');
-    };
+    mobileDemoBtn.onclick = () => router.navigate('/dashboard');
     mobileDemoBtnWrap.appendChild(mobileDemoBtn);
     mobileNav.appendChild(mobileDemoBtnWrap);
 
     mobileMenu.appendChild(mobileNav);
 
-    let menuOpen = false;
-
-    const openMobileMenu = () => {
-        menuOpen = true;
-        mobileMenu.style.maxHeight = '320px';
-        hamburger.setAttribute('aria-label', 'Close menu');
-        const lines = hamburger.querySelectorAll('.ham-line') as NodeListOf<HTMLElement>;
-        lines[0].style.cssText = 'transform: translateY(8px) rotate(45deg); width: 20px;';
-        lines[1].style.cssText = 'opacity: 0; transform: scaleX(0);';
-        lines[2].style.cssText = 'transform: translateY(-8px) rotate(-45deg); width: 20px;';
-    };
-
-    const closeMobileMenu = () => {
-        menuOpen = false;
-        mobileMenu.style.maxHeight = '0';
-        hamburger.setAttribute('aria-label', 'Open menu');
-        const lines = hamburger.querySelectorAll('.ham-line') as NodeListOf<HTMLElement>;
-        lines[0].style.cssText = '';
-        lines[1].style.cssText = '';
-        lines[2].style.cssText = '';
-    };
-
-    hamburger.onclick = () => menuOpen ? closeMobileMenu() : openMobileMenu();
-
     actions.appendChild(themeToggle);
     actions.appendChild(githubBtn);
     actions.appendChild(ctaBtn);
-    actions.appendChild(hamburger);
 
     header.appendChild(logo);
     header.appendChild(nav);
     header.appendChild(actions);
     header.appendChild(mobileMenu);
+
+    updateGlass();
 
     return header;
 }
@@ -184,9 +147,19 @@ function createThemeToggle(onThemeChange?: () => void): HTMLElement {
     ];
 
     const themeManager = ThemeManager.getInstance();
-    let activeTheme = 'light';
 
     const buttons: HTMLButtonElement[] = [];
+
+    const updateActive = () => {
+        const theme = document.documentElement.getAttribute('data-theme') || 'light';
+        const activeColor = theme === 'dark' ? '#D0BCFF' : theme === 'pink' ? '#FFB3D1' : '#4f46e5';
+        buttons.forEach((b, i) => {
+            const isActive = themes[i].name === theme;
+            b.style.cssText = isActive
+                ? `background: white; color: ${activeColor}; box-shadow: 0 1px 4px rgba(0,0,0,0.15);`
+                : '';
+        });
+    };
 
     themes.forEach(t => {
         const btn = document.createElement('button');
@@ -194,21 +167,8 @@ function createThemeToggle(onThemeChange?: () => void): HTMLElement {
         btn.innerHTML = t.icon;
         btn.title = t.label;
 
-        const updateActive = () => {
-            const theme = document.documentElement.getAttribute('data-theme');
-            const activeColor = theme === 'dark' ? '#D0BCFF' : theme === 'pink' ? '#FFB3D1' : '#4f46e5';
-            buttons.forEach((b, i) => {
-                const isActive = themes[i].name === activeTheme;
-                b.style.cssText = isActive
-                    ? `background: white; color: ${activeColor}; box-shadow: 0 1px 4px rgba(0,0,0,0.15);`
-                    : '';
-            });
-        };
-
         btn.onclick = () => {
-            activeTheme = t.name;
             themeManager.setTheme(t.name as any);
-            document.documentElement.setAttribute('data-theme', t.name);
             updateActive();
             if (onThemeChange) onThemeChange();
         };
@@ -218,7 +178,7 @@ function createThemeToggle(onThemeChange?: () => void): HTMLElement {
     });
 
     // Set initial state
-    buttons[0].style.cssText = 'background: white; color: #4f46e5; box-shadow: 0 1px 4px rgba(0,0,0,0.15);';
+    updateActive();
 
     return container;
 }
