@@ -12,7 +12,7 @@ tools:
   task: false
   todowrite: false
 mcp: aura-components
-color: #F59E0B
+color: "#F59E0B"
 ---
 
 ## Scope

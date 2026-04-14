@@ -4,6 +4,11 @@ import { ColumnType, GridColumn, CellEditor } from '../types';
 import { NumberFieldBuilder } from '../../number-field/number-field';
 
 export class PercentageColumnBuilder<ITEM> extends BaseColumnBuilder<ITEM> {
+    constructor(field: string) {
+        super(field);
+        this._align = 'right';
+    }
+
     override render(item: ITEM): string {
         const value = (item as any)[this._field];
         if (value === undefined || value === null) return '';
@@ -37,6 +42,9 @@ export class PercentageColumnBuilder<ITEM> extends BaseColumnBuilder<ITEM> {
     }
 
     override build(): GridColumn<ITEM> {
+        if (this._editable && !this._minWidth) {
+            this._minWidth = '120px';
+        }
         return this.createBaseColumn(ColumnType.PERCENTAGE);
     }
 }

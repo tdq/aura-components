@@ -1,6 +1,6 @@
 export enum ComboBoxStyle {
     TONAL = 'tonal',
-    OUTLINED = 'outlined'
+    OUTLINED = 'outlined',
 }
 
 export interface ComboBoxConfig<ITEM> {

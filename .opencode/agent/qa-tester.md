@@ -11,7 +11,7 @@ tools:
   webfetch: false
   task: false
   todowrite: false
-color: #8B5CF6
+color: "#8B5CF6"
 ---
 
 ## Role

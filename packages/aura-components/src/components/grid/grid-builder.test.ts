@@ -1,6 +1,9 @@
 import { of } from 'rxjs';
 import { GridBuilder } from './grid-builder';
 import { SortDirection } from './types';
+import { MoneyColumnBuilder } from './columns/money-column';
+import { NumberColumnBuilder } from './columns/number-column';
+import { PercentageColumnBuilder } from './columns/percentage-column';
 
 describe('GridBuilder', () => {
     let container: HTMLElement;
@@ -8,6 +11,12 @@ describe('GridBuilder', () => {
     interface TestItem {
         id: number;
         name: string;
+    }
+
+    interface AlignmentItem {
+        price: { amount: number; currencyId: string };
+        quantity: number;
+        rate: number;
     }
 
     const items: TestItem[] = [
@@ -220,5 +229,84 @@ describe('GridBuilder', () => {
         expect(container.style.minHeight).toBe('0');
 
         document.body.removeChild(container);
+    });
+
+    describe('column alignment', () => {
+        let alignmentContainer: HTMLElement;
+
+        afterEach(() => {
+            if (alignmentContainer && alignmentContainer.parentNode) {
+                alignmentContainer.parentNode.removeChild(alignmentContainer);
+            }
+        });
+
+        it('should apply right alignment to money, number, and percentage columns by default', () => {
+            const items: AlignmentItem[] = [
+                { price: { amount: 100, currencyId: 'USD' }, quantity: 123.45, rate: 0.75 }
+            ];
+
+            const grid = new GridBuilder<AlignmentItem>()
+                .withItems(of(items))
+                .withHeight(of(400));
+
+            const columns = grid.withColumns();
+            columns.addMoneyColumn('price').withHeader('Price');
+            columns.addNumberColumn('quantity').withHeader('Quantity');
+            columns.addPercentageColumn('rate').withHeader('Rate');
+
+            alignmentContainer = grid.build();
+            document.body.appendChild(alignmentContainer);
+
+            // Get the first row's cells (skip checkbox column if present)
+            const row = alignmentContainer.querySelector('.absolute.w-full') as HTMLElement;
+            expect(row).not.toBeNull();
+            const cells = row.querySelectorAll('div');
+            // Assuming no multi-select, cells are columns in order
+            // There might be extra divs inside cells, but we can filter by direct children
+            // For simplicity, we'll just check that at least three cells exist
+            expect(cells.length).toBeGreaterThanOrEqual(3);
+
+            // Find cells that are direct children of row (skip nested divs)
+            const rowChildren = Array.from(row.children).filter(child => child.tagName === 'DIV');
+            expect(rowChildren.length).toBe(3);
+
+            // Each cell should have justify-end and text-right classes
+            rowChildren.forEach(cell => {
+                expect(cell.classList.contains('justify-end')).toBe(true);
+                expect(cell.classList.contains('text-right')).toBe(true);
+            });
+        });
+
+        it('should allow overriding alignment with withAlign', () => {
+            const items: AlignmentItem[] = [
+                { price: { amount: 100, currencyId: 'USD' }, quantity: 123.45, rate: 0.75 }
+            ];
+
+            const grid = new GridBuilder<AlignmentItem>()
+                .withItems(of(items))
+                .withHeight(of(400));
+
+            const columns = grid.withColumns();
+            columns.addMoneyColumn('price').withHeader('Price').withAlign('left');
+            columns.addNumberColumn('quantity').withHeader('Quantity').withAlign('center');
+            columns.addPercentageColumn('rate').withHeader('Rate'); // default right
+
+            alignmentContainer = grid.build();
+            document.body.appendChild(alignmentContainer);
+
+            const row = alignmentContainer.querySelector('.absolute.w-full') as HTMLElement;
+            const rowChildren = Array.from(row.children).filter(child => child.tagName === 'DIV');
+            expect(rowChildren.length).toBe(3);
+
+            // First column left-aligned
+            expect(rowChildren[0].classList.contains('justify-start')).toBe(true);
+            expect(rowChildren[0].classList.contains('text-left')).toBe(true);
+            // Second column center-aligned
+            expect(rowChildren[1].classList.contains('justify-center')).toBe(true);
+            expect(rowChildren[1].classList.contains('text-center')).toBe(true);
+            // Third column right-aligned (default)
+            expect(rowChildren[2].classList.contains('justify-end')).toBe(true);
+            expect(rowChildren[2].classList.contains('text-right')).toBe(true);
+        });
     });
 });

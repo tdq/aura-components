@@ -1,6 +1,7 @@
 export * from './core/component-builder';
 export * from './core/destroyable-element';
 export * from './core/icons';
+export * from './types/money';
 export * from './components/button';
 export * from './components/combobox';
 export * from './components/checkbox';
@@ -9,6 +10,7 @@ export * from './components/layout';
 export * from './components/panel';
 export * from './components/text-field';
 export * from './components/number-field';
+export * from './components/money-field';
 export * from './components/form';
 export * from './components/toolbar';
 export * from './components/dialog';

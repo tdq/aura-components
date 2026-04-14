@@ -13,12 +13,13 @@ tools:
   task: false
   todowrite: false
 mcp: aura-components
-color: #0EA5E9
+color: "#0EA5E9"
 ---
 
 ## Scope
 
 You are responsible **only** for files under `./packages/landing-page/src/demo/`. Do not touch any other package.
+The task is to create demo version of accounting software by using aura-components. Define which pages should be included in the demo and what features should be demonstrated. You are responsible for creating all the demo pages and their content and architecture of the demo.
 
 ## Tech stack
 

@@ -1,6 +1,6 @@
 import { Observable, Subject, Subscription, combineLatest } from 'rxjs';
 import { FieldStyle } from '../../theme';
-import { clamp, roundToStep, formatNumber } from '@/utils/number';
+import { clamp, roundToStep, formatNumber, getPrecision } from '@/utils/number';
 import { createNumberFieldErrorIcon } from './number-field-error';
 
 export interface NumberFieldState {
@@ -196,7 +196,11 @@ export class NumberFieldLogic {
                 this.input.value = '';
                 return;
             }
-            const val = clamp(roundToStep(parsed, latestStep), latestMin, latestMax);
+            
+            const precision = latestPrecision !== undefined ? latestPrecision : getPrecision(latestStep);
+            const rounded = parseFloat(parsed.toFixed(precision));
+            const val = clamp(rounded, latestMin, latestMax);
+            
             this.syncInputValue(val, latestFormat, latestPrecision, latestStep, latestLocale);
             this.state.value$.next(val);
         };
@@ -223,7 +227,7 @@ export class NumberFieldLogic {
         const showErrorMessage = !!msg;
 
         if (this.state.isInlineError) {
-            this.errorText.textContent = '';
+            this.errorText.textContent = msg;
             this.errorText.classList.add('hidden');
 
             this.footer.classList.toggle('hidden', true);
@@ -233,13 +237,12 @@ export class NumberFieldLogic {
 
             const existingIcon = this.suffixContainer.querySelector('button[aria-label^="Error:"]');
             if (msg) {
-                if (!existingIcon) {
-                    const icon = createNumberFieldErrorIcon(msg);
-                    this.suffixContainer.classList.remove('hidden');
-                    this.suffixContainer.appendChild(icon);
-                } else {
-                    existingIcon.setAttribute('aria-label', `Error: ${msg}`);
+                if (existingIcon) {
+                    existingIcon.remove();
                 }
+                const icon = createNumberFieldErrorIcon(msg);
+                this.suffixContainer.classList.remove('hidden');
+                this.suffixContainer.appendChild(icon);
             } else if (existingIcon) {
                 existingIcon.remove();
                 if (this.suffixContainer.childNodes.length === 0) {
@@ -258,8 +261,7 @@ export class NumberFieldLogic {
         }
 
         this.input.setAttribute('aria-invalid', showErrorMessage ? 'true' : 'false');
-        if (showErrorMessage) this.input.setAttribute('aria-describedby', this.errorText.id);
-        else this.input.removeAttribute('aria-describedby');
+        this.input.setAttribute('aria-describedby', this.errorText.id);
     }
 
     private updateStyles(style: FieldStyle, extraClass: string, hasError: boolean) {
@@ -271,7 +273,7 @@ export class NumberFieldLogic {
 
         // Validation classes (same as text-field)
         const validationClasses = hasError
-            ? 'outline outline-2 -outline-offset-2 outline-error focus-within:outline-error text-error'
+            ? 'outline outline-1 -outline-offset-1 outline-error focus-within:outline-error text-error'
             : '';
 
         // Input Wrapper styles - 48px height, MD3

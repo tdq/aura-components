@@ -11,6 +11,7 @@ packages/
 │   │   │       └── *.ts            # Supporting files (types, styles, logic, …)
 │   │   ├── core/          # ComponentBuilder base, icons, destroyable-element
 │   │   ├── theme/         # ThemeManager and types
+│   │   ├── types/         # Shared domain types used across multiple components (e.g. Money for Grid and MoneyField)
 │   │   └── utils/         # Shared utilities
 │   ├── scripts/
 │   │   ├── reorganize-types.mjs   # Post-build: moves dist/components/* → dist/*

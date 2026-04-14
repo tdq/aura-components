@@ -48,7 +48,7 @@ export function createFinanceDemo(): HTMLElement {
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
                                         <div class="text-gray-400 text-sm">Total Volume</div>
-                                        <span class="font-bold text-2xl md:text-3xl text-white">$2,400,000</span>
+                                        <span class="font-bold text-2xl md:text-3xl text-white">€2,400,000</span>
                                     </div>
                                     <div>
                                         <div class="text-gray-400 text-sm">Active Users</div>

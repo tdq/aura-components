@@ -11,9 +11,9 @@ Inherits all methods from [BaseColumnBuilder](grid.md#basecolumnbuilder-shared-m
 - **Rendering**: Multiplies the value by 100 and adds the `%` suffix. Decimal percentages are supported (e.g., `0.285` → `28.5%`). Trailing zeros are stripped, so `0.75` renders as `75%` not `75.00%`.
 
 ## Styling
-- **Alignment**: Right or Center-aligned.
+- **Alignment**: Right-aligned by default (can be overridden via `withAlign()`).
 
 ## Editing
 Built-in editor is **NumberFieldBuilder** with `asInlineError()` modifier. It is not displaying any label.
 In case if grid has `asGlass()` modifier, the number field should be initialized with `asGlass()` modifier.
-It also should have `withSuffix(of('%'))`.
+It also should have `withSuffix(of('%'))` and enforces a precision of 2 decimal places.

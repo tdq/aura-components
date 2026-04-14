@@ -62,6 +62,7 @@ All column builders inherit these common methods:
 - `asSortable()`: Enables the sorting UI for the column.
 - `asResizable()`: Enables column resizing via a handle in the header.
 - `asEditable()`: Marks the column as inline-editable. When the parent grid has `asEditable()` called, cells for this column render as corresponding input fields. Each column defines its own editor component. It updates item on blur (commit). Press **Enter** to start editing and to commit, **Escape** to revert without firing the callback. Pressing **Tab** should move to the next editable column and enter edit mode.
+- `withAlign(align: 'left' | 'center' | 'right')`: Sets the text and flex alignment for the column header and cells. Default is `'left'`.
 - `withClass(classProvider: (item: ITEM) => string)`: Adds custom CSS classes to all cells in this column via a provider function. Useful for conditional styling based on item data.
 
 ## Implementation Requirements

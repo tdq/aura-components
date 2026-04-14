@@ -48,6 +48,72 @@ describe('PercentageColumnBuilder', () => {
         });
     });
 
+    describe('alignment', () => {
+        it('should be right-aligned by default', () => {
+            const builder = new PercentageColumnBuilder<any>('value');
+            const column = builder.build();
+            expect(column.align).toBe('right');
+        });
+
+        it('should allow overriding alignment with withAlign("left")', () => {
+            const builder = new PercentageColumnBuilder<any>('value').withAlign('left');
+            const column = builder.build();
+            expect(column.align).toBe('left');
+        });
+
+        it('should allow overriding alignment with withAlign("center")', () => {
+            const builder = new PercentageColumnBuilder<any>('value').withAlign('center');
+            const column = builder.build();
+            expect(column.align).toBe('center');
+        });
+
+        it('should allow overriding alignment with withAlign("right")', () => {
+            const builder = new PercentageColumnBuilder<any>('value').withAlign('right');
+            const column = builder.build();
+            expect(column.align).toBe('right');
+        });
+    });
+
+    describe('editor', () => {
+        it('should use NumberFieldBuilder for editor', () => {
+            const builder = new PercentageColumnBuilder<any>('value').asEditable();
+            const column = builder.build();
+            const item = { value: 0.75 };
+
+            const editor = column.renderEditor!(item, false);
+            const input = editor.element.querySelector('input');
+            expect(input?.id).toContain('number-field');
+        });
+    });
+
+    describe('minWidth', () => {
+        it('editable percentage column has minWidth = "120px"', () => {
+            const column = new PercentageColumnBuilder<any>('value').asEditable().build();
+            expect(column.minWidth).toBe('120px');
+        });
+
+        it('non-editable percentage column has no minWidth', () => {
+            const column = new PercentageColumnBuilder<any>('value').build();
+            expect(column.minWidth).toBeUndefined();
+        });
+
+        it('withMinWidth overrides the default for editable column', () => {
+            const column = new PercentageColumnBuilder<any>('value')
+                .withMinWidth('150px')
+                .asEditable()
+                .build();
+            expect(column.minWidth).toBe('150px');
+        });
+
+        it('withMinWidth overrides the default when called after asEditable', () => {
+            const column = new PercentageColumnBuilder<any>('value')
+                .asEditable()
+                .withMinWidth('150px')
+                .build();
+            expect(column.minWidth).toBe('150px');
+        });
+    });
+
     describe('createEditor', () => {
         it('should set editor displayValue to 28.5 when stored value is 0.285', () => {
             const builder = new PercentageColumnBuilder<any>('value');

@@ -121,32 +121,43 @@ export const WithToolbar = () => {
 
 export const Editable = () => {
     const log = document.createElement('div');
-    log.className = 'mt-4 p-3 bg-surface-container rounded text-xs font-mono max-h-32 overflow-y-auto text-on-surface-variant';
-    log.textContent = 'Edit a cell and commit with Enter to see changes here...';
+    log.className = 'mt-4 p-4 bg-surface-container rounded-lg border border-outline/10 text-xs font-mono max-h-40 overflow-y-auto text-on-surface-variant shadow-inner';
+    log.innerHTML = '<div class="opacity-50 italic mb-2 font-sans text-sm">Action Log: Edit a cell and commit with Enter to see changes here...</div>';
 
     const grid = new GridBuilder<User>()
         .withItems(of(users.slice(0, 15)))
         .withHeight(of(500))
         .asEditable((item: User) => {
             const entry = document.createElement('div');
-            entry.textContent = `✓ ${item.name} — id:${item.id} active:${item.active} progress:${item.progress}% balance:${item.balance.amount} ${item.balance.currencyId}`;
-            if (log.firstChild?.textContent?.startsWith('Edit')) {
-                log.innerHTML = '';
-            }
+            entry.className = 'py-1 border-b border-outline/5 last:border-0';
+            entry.innerHTML = `<span class="text-primary font-bold">✓</span> <span class="text-on-surface font-semibold">${item.name}</span> <span class="opacity-70">(id:${item.id})</span>: 
+                <span class="text-secondary">${item.balance.amount} ${item.balance.currencyId}</span>, 
+                <span class="text-tertiary">${Math.round(item.progress * 100)}%</span>, 
+                ${item.active ? '<span class="text-green-600">Active</span>' : '<span class="text-red-600">Inactive</span>'}`;
+
+            const actionMsg = log.querySelector('.italic');
+            if (actionMsg) actionMsg.remove();
+
             log.prepend(entry);
         });
 
     const columns = grid.withColumns();
     columns.addTextColumn('name').withHeader('Name').withWidth('150px').asEditable();
     columns.addTextColumn('email').withHeader('Email').withWidth('200px').asEditable();
-    columns.addNumberColumn('id').withHeader('ID').withWidth('60px');
+    columns.addNumberColumn('id').withHeader('ID').withWidth('60px').withAlign('center');
     columns.addDateColumn('lastLogin').withHeader('Last Login').withWidth('140px').asEditable();
-    columns.addBooleanColumn('active').withHeader('Active').withWidth('80px').asEditable();
+    columns.addBooleanColumn('active').withHeader('Active').withWidth('80px').asEditable().withAlign('center');
     columns.addPercentageColumn('progress').withHeader('Progress').withWidth('100px').asEditable();
-    columns.addMoneyColumn('balance').withHeader('Balance').withWidth('110px').asEditable();
+    columns.addMoneyColumn('balance')
+        .withHeader('Balance')
+        .withWidth('120px')
+        .asEditable()
+        .withPrecision(2)
+        .withCurrencies(['USD', 'EUR', 'GBP', 'JPY']);
     columns.addEnumColumn('role').withHeader('Role').withWidth('100px');
 
     const container = document.createElement('div');
+    container.className = 'flex flex-col gap-2 p-4';
     container.appendChild(grid.build());
     container.appendChild(log);
     return container;

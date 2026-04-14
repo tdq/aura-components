@@ -15,6 +15,7 @@
 import { BehaviorSubject, of } from 'rxjs';
 import { GridRow } from './grid-row';
 import { GridColumn, ColumnType, CellEditor } from './types';
+import { Money } from '../../types/money';
 import { TextColumnBuilder } from './columns/text-column';
 import { NumberColumnBuilder } from './columns/number-column';
 import { PercentageColumnBuilder } from './columns/percentage-column';
@@ -583,7 +584,7 @@ describe('PercentageColumnBuilder editor factory', () => {
 });
 
 describe('MoneyColumnBuilder editor factory', () => {
-    interface Item { price: { amount: number; currencyId: string } }
+    interface Item { price: Money }
 
     it('createEditor initial value matches money amount', () => {
         const item: Item = { price: { amount: 100, currencyId: 'USD' } };
@@ -1141,6 +1142,134 @@ describe('GridViewport — row eviction commits open editor', () => {
         expect(commitCallArg.value).toBe('evicted-value');
 
         document.body.removeChild(viewport.getElement());
+    });
+});
+
+// ─── enterEditMode: editor element fills cell (width/height 100%) ────────────
+
+describe('GridRow — enterEditMode sets editor element size to 100%', () => {
+    interface Item { value: string }
+
+    it('editor element has width 100% when cell enters edit mode', () => {
+        const item: Item = { value: 'hello' };
+        const { editor } = makeTextEditor('hello');
+        const col = makeEditableColumn<Item>('value', ColumnType.TEXT, () => editor);
+        const row = buildRow(item, [col]);
+        document.body.appendChild(row.getElement());
+
+        const cell = row.getElement().children[0] as HTMLElement;
+        cell.click();
+
+        expect(editor.element.style.width).toBe('100%');
+
+        row.destroy();
+        document.body.removeChild(row.getElement());
+    });
+
+    it('editor element has height 100% when cell enters edit mode', () => {
+        const item: Item = { value: 'hello' };
+        const { editor } = makeTextEditor('hello');
+        const col = makeEditableColumn<Item>('value', ColumnType.TEXT, () => editor);
+        const row = buildRow(item, [col]);
+        document.body.appendChild(row.getElement());
+
+        const cell = row.getElement().children[0] as HTMLElement;
+        cell.click();
+
+        expect(editor.element.style.height).toBe('100%');
+
+        row.destroy();
+        document.body.removeChild(row.getElement());
+    });
+});
+
+// ─── showCellDisplay restores cell class with alignment and cellClass ─────────
+
+describe('GridRow — showCellDisplay restores cell className', () => {
+    interface Item { value: string }
+
+    it('cell class includes alignment class after showCellDisplay (via Enter commit)', () => {
+        const item: Item = { value: 'hello' };
+        const { editor } = makeTextEditor('hello');
+        const col: GridColumn<Item> = {
+            id: 'value',
+            field: 'value',
+            type: ColumnType.TEXT,
+            header: 'Value',
+            editable: true,
+            align: 'right',
+            render: (i) => i.value,
+            renderEditor: () => editor,
+        };
+        const row = buildRow(item, [col]);
+        document.body.appendChild(row.getElement());
+
+        const cell = row.getElement().children[0] as HTMLElement;
+        cell.click();
+
+        // Commit via Enter
+        editor.element.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+
+        // The base cell class should be restored including right-alignment classes
+        expect(cell.className).toContain('justify-end');
+        expect(cell.className).toContain('text-right');
+
+        row.destroy();
+        document.body.removeChild(row.getElement());
+    });
+
+    it('cell class includes cellClass result after showCellDisplay (via Escape revert)', () => {
+        const item: Item = { value: 'hello' };
+        const { editor } = makeTextEditor('hello');
+        const col: GridColumn<Item> = {
+            id: 'value',
+            field: 'value',
+            type: ColumnType.TEXT,
+            header: 'Value',
+            editable: true,
+            align: 'left',
+            cellClass: () => 'my-custom-class',
+            render: (i) => i.value,
+            renderEditor: () => editor,
+        };
+        const row = buildRow(item, [col]);
+        document.body.appendChild(row.getElement());
+
+        const cell = row.getElement().children[0] as HTMLElement;
+        cell.click();
+
+        // Revert via Escape
+        editor.element.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+
+        expect(cell.className).toContain('my-custom-class');
+
+        row.destroy();
+        document.body.removeChild(row.getElement());
+    });
+
+    it('cell class does not contain overflow-hidden or p-0 after showCellDisplay', () => {
+        const item: Item = { value: 'hello' };
+        const { editor } = makeTextEditor('hello');
+        const col = makeEditableColumn<Item>('value', ColumnType.TEXT, () => editor);
+        const row = buildRow(item, [col]);
+        document.body.appendChild(row.getElement());
+
+        const cell = row.getElement().children[0] as HTMLElement;
+        cell.click();
+
+        // Verify edit-mode classes were applied
+        expect(cell.className).toContain('overflow-hidden');
+        expect(cell.className).toContain('p-0');
+
+        // Commit
+        editor.element.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+
+        // Edit-mode classes should be gone; the cell base class (px-4 truncate) restored
+        expect(cell.className).not.toContain('overflow-hidden');
+        expect(cell.className).not.toContain('p-0');
+
+        row.destroy();
+        document.body.removeChild(row.getElement());
     });
 });
 

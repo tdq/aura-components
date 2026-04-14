@@ -6,10 +6,18 @@ import {
     ButtonStyle,
     PanelBuilder,
     themeManager,
-    registerDestroy
+    registerDestroy,
+    Money
 } from 'aura-components';
 import { of } from 'rxjs';
 import { map } from 'rxjs/operators';
+
+interface TransactionItem {
+    id: number;
+    type: string;
+    amount: Money;
+    status: 'Completed' | 'Pending' | 'Failed';
+}
 
 export function createHero(): HTMLElement {
     const section = document.createElement('section');
@@ -163,18 +171,39 @@ export function createHero(): HTMLElement {
     visualGrid.appendChild(formCard.build());
 
     // 3. Interactive Grid (Transaction history)
-    const gridData$ = of([
-        { id: 1, type: 'Income', amount: 1200 },
-        { id: 2, type: 'Expense', amount: 450 },
-        { id: 3, type: 'Income', amount: 800 },
-        { id: 4, type: 'Expense', amount: 120 }
+    const gridData$ = of<TransactionItem[]>([
+        { id: 1, type: 'Income', amount: { amount: 1200, currencyId: 'EUR' }, status: 'Completed' },
+        { id: 2, type: 'Expense', amount: { amount: 450, currencyId: 'EUR' }, status: 'Pending' },
+        { id: 3, type: 'Income', amount: { amount: 800, currencyId: 'EUR' }, status: 'Completed' },
+        { id: 4, type: 'Expense', amount: { amount: 120, currencyId: 'EUR' }, status: 'Failed' }
     ]);
-    const grid = new GridBuilder()
+    const grid = new GridBuilder<TransactionItem>()
         .withItems(gridData$)
         .asGlass();
     const cols = grid.withColumns();
-    cols.addTextColumn('type').withHeader('Type').withWidth('flex');
-    cols.addNumberColumn('amount').withHeader('Amount');
+    cols.addTextColumn('type').withHeader('Type');
+    cols.addMoneyColumn('amount').withHeader('Amount');
+    cols.addCustomColumn()
+        .withHeader('Status')
+        .withRenderer((item: TransactionItem) => {
+            const chip = document.createElement('span');
+            chip.className = 'px-3 py-1 rounded-full text-xs font-medium transition-colors duration-200';
+            
+            // Apply theme-aware styling based on status (consistent with demo chip-utils)
+            if (item.status === 'Completed') {
+                chip.style.backgroundColor = 'var(--md-sys-color-primary-container)';
+                chip.style.color = 'var(--md-sys-color-on-primary-container)';
+            } else if (item.status === 'Pending') {
+                chip.style.backgroundColor = 'var(--md-sys-color-secondary-container)';
+                chip.style.color = 'var(--md-sys-color-on-secondary-container)';
+            } else if (item.status === 'Failed') {
+                chip.style.backgroundColor = 'var(--md-sys-color-error-container, rgba(242, 184, 181, 0.2))';
+                chip.style.color = 'var(--md-sys-color-on-error-container, #601410)';
+            }
+            
+            chip.textContent = item.status;
+            return chip;
+        });
 
     visualGrid.appendChild(grid.build());
 

@@ -10,7 +10,7 @@ permission:
   edit: deny
   bash: allow
   webfetch: allow
-color: #10B981
+color: "#10B981"
 ---
 
 ## Role

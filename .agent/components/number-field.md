@@ -33,16 +33,16 @@ It uses the builder pattern (implements ComponentBuilder) and follows Material D
 - Numbers are right-aligned but placeholder text is left-aligned.
 - All logic must be implemented in `number-field-logic.ts` using the `NumberFieldLogic` class.
 - "as\<Something\>" methods set corresponding boolean fields to true. Logic and styling react accordingly.
-- On blur: clamp value to min/max range, round to step, and format display.
+- On blur: clamp value to min/max range, round to the configured `precision` (or the precision of the `step` if precision is not explicitly set), and format display.
 - All Observable/Subject properties use `of()` defaults (e.g. `of('')`, `of(true)`, `of(FieldStyle.TONAL)`, `of(-Infinity)`, `of(Infinity)`, `of(1)`).
 - Uses `formatNumber()` from `@/utils/number` for display formatting.
 - Uses `clamp()` and `roundToStep()` from `@/utils/number` for value constraints.
 
 ## Keyboard navigation
-- ArrowUp: increment by step
-- ArrowDown: decrement by step
-- PageUp: increment by step × 10
-- PageDown: decrement by step × 10
+- ArrowUp: increment by step (rounds to the nearest step)
+- ArrowDown: decrement by step (rounds to the nearest step)
+- PageUp: increment by step × 10 (rounds to the nearest step)
+- PageDown: decrement by step × 10 (rounds to the nearest step)
 - Home: set to min value (if finite)
 - End: set to max value (if finite)
 

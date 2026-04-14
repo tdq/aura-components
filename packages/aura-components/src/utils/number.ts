@@ -36,11 +36,13 @@ export function formatNumber(
         precision?: number;
         step?: number;
         format?: string;
+        useGrouping?: boolean;
     } = {}
 ): string {
     if (value === null || isNaN(value)) return '';
 
     const { locale, precision, step, format } = options;
+    const useGrouping = options.useGrouping ?? false;
     
     let minDigits = 0;
     let maxDigits = 20; // Default max
@@ -61,6 +63,7 @@ export function formatNumber(
         return new Intl.NumberFormat(locale || undefined, {
             minimumFractionDigits: minDigits,
             maximumFractionDigits: maxDigits,
+            useGrouping,
         }).format(value);
     } catch (e) {
         return value.toString();

@@ -12,7 +12,7 @@ tools:
   webfetch: false
   task: false
   todowrite: false
-color: #10B981
+color: "#10B981"
 ---
 
 ## Scope

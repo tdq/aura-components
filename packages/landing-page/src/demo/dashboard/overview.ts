@@ -1,6 +1,7 @@
-import { PanelBuilder, ChartBuilder, GridBuilder, LabelBuilder, registerDestroy } from 'aura-components';
+import { PanelBuilder, ChartBuilder, GridBuilder, LabelBuilder, registerDestroy, Money } from 'aura-components';
 import { of, timer, Subject, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { renderStatusChip } from './chip-utils';
 
 export function createOverview(): HTMLElement {
     const container = document.createElement('div');
@@ -23,13 +24,13 @@ function createStatsGrid(): HTMLElement {
     grid.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px-16';
 
     const stats = [
-        { label: 'Total Revenue',  value: '$248,592', trend: '+14.2%', positive: true,  color: '#6750A4', colorLight: 'rgba(103,80,164,0.08)' },
+        { label: 'Total Revenue',  value: '€248,592', trend: '+14.2%', positive: true,  color: '#6750A4', colorLight: 'rgba(103,80,164,0.08)' },
         { label: 'Active Users',   value: '24,891',   trend: '+8.7%',  positive: true,  color: '#625B71', colorLight: 'rgba(98,91,113,0.08)'  },
         { label: 'Orders (Apr)',   value: '2,847',    trend: '-1.4%',  positive: false, color: '#7D5260', colorLight: 'rgba(125,82,96,0.08)'  },
         { label: 'Conversion',     value: '4.1%',     trend: '+0.6%',  positive: true,  color: '#6750A4', colorLight: 'rgba(103,80,164,0.08)' },
         { label: 'New Signups',     value: '1,284',    trend: '+22.3%', positive: true,  color: '#0EA5E9', colorLight: 'rgba(14,165,233,0.08)'  },
-        { label: 'MRR',             value: '$31,240',  trend: '+9.1%',  positive: true,  color: '#10B981', colorLight: 'rgba(16,185,129,0.08)'  },
-        { label: 'Avg Order Value', value: '$447.30',  trend: '+3.8%',  positive: true,  color: '#F59E0B', colorLight: 'rgba(245,158,11,0.08)'  },
+        { label: 'MRR',             value: '€31,240',  trend: '+9.1%',  positive: true,  color: '#10B981', colorLight: 'rgba(16,185,129,0.08)'  },
+        { label: 'Avg Order Value', value: '€447.30',  trend: '+3.8%',  positive: true,  color: '#F59E0B', colorLight: 'rgba(245,158,11,0.08)'  },
         { label: 'Churn Rate',      value: '2.4%',     trend: '-0.3%',  positive: true,  color: '#EC4899', colorLight: 'rgba(236,72,153,0.08)'  },
     ];
 
@@ -86,8 +87,10 @@ function createSalesChart(): HTMLElement {
         .withData(dataRelay$)
         .withCategoryField('x')
         .withLegend(true);
-    chart.addAreaChart('y').withLabel('Revenue ($)').withColor('#6750A4');
-    chart.addBarChart('orders').withLabel('Orders').withColor('#0EA5E9');
+    
+    chart.withSecondaryYAxis();  // Configure secondary Y axis
+    chart.addAreaChart('y').withLabel('Revenue (€)').withColor('#6750A4');
+    chart.addBarChart('orders').withLabel('Orders').withColor('#0EA5E9').asSecondaryAxis(); // Mark as secondary
 
     const chartEl = chart.build();
     chartEl.classList.add('flex-1', 'min-h-0');
@@ -108,22 +111,25 @@ function createTransactionsGrid(): HTMLElement {
     panel.classList.add('min-h-[400px]', 'flex', 'flex-col');
 
     const data$ = of([
-        { customer: 'TechNova Corp',    amount: 1190.00, status: 'Completed', date: '2026-04-09' },
-        { customer: 'Kevin Park',        amount:  299.00, status: 'Pending',   date: '2026-04-09' },
-        { customer: 'Rachel Kim',        amount:   49.00, status: 'Completed', date: '2026-04-08' },
-        { customer: 'Tara Nguyen',       amount:   99.00, status: 'Completed', date: '2026-04-08' },
-        { customer: 'Cascade Ventures',  amount: 2490.00, status: 'Completed', date: '2026-04-07' },
-        { customer: 'Laura Chen',        amount: 1190.00, status: 'Completed', date: '2026-04-07' },
-        { customer: 'Oscar Ruiz',        amount:  199.00, status: 'Completed', date: '2026-04-06' },
-        { customer: 'Diana Prince',      amount:   99.00, status: 'Cancelled', date: '2026-04-04' },
+        { customer: 'TechNova Corp',    amount: { amount: 1190.00, currencyId: 'EUR' }, status: 'Completed', date: '2026-04-09' },
+        { customer: 'Kevin Park',        amount: { amount:  299.00, currencyId: 'EUR' }, status: 'Pending',   date: '2026-04-09' },
+        { customer: 'Rachel Kim',        amount: { amount:   49.00, currencyId: 'EUR' }, status: 'Completed', date: '2026-04-08' },
+        { customer: 'Tara Nguyen',       amount: { amount:   99.00, currencyId: 'EUR' }, status: 'Completed', date: '2026-04-08' },
+        { customer: 'Cascade Ventures',  amount: { amount: 2490.00, currencyId: 'EUR' }, status: 'Completed', date: '2026-04-07' },
+        { customer: 'Laura Chen',        amount: { amount: 1190.00, currencyId: 'EUR' }, status: 'Completed', date: '2026-04-07' },
+        { customer: 'Oscar Ruiz',        amount: { amount:  199.00, currencyId: 'EUR' }, status: 'Completed', date: '2026-04-06' },
+        { customer: 'Diana Prince',      amount: { amount:   99.00, currencyId: 'EUR' }, status: 'Cancelled', date: '2026-04-04' },
     ]);
 
-    const grid = new GridBuilder<{ customer: string; amount: number; status: string; date: string }>()
+    const grid = new GridBuilder<{ customer: string; amount: Money; status: string; date: string }>()
         .withItems(data$);
     const columns = grid.withColumns();
     columns.addTextColumn('customer').withHeader('Customer').withWidth('1fr');
-    columns.addNumberColumn('amount').withHeader('Amount ($)').withWidth('110px');
-    columns.addTextColumn('status').withHeader('Status').withWidth('110px');
+    columns.addMoneyColumn('amount').withHeader('Amount (€)').withWidth('110px');
+    columns.addCustomColumn()
+        .withHeader('Status')
+        .withWidth('110px')
+        .withRenderer((item) => renderStatusChip(item.status));
     columns.addTextColumn('date').withHeader('Date').withWidth('110px');
 
     const gridEl = grid.build();

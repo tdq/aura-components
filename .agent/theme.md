@@ -126,6 +126,9 @@ Buttons:
 - Secondary: Soft Slate
 - Tertiary: Ghost/Text
 
+Form Fields (TextField, NumberField, MoneyField, ComboBox):
+- Standardized 1px borders for error states to maintain a refined, high-density look without thick borders.
+
 ## 8. Accessibility
 
 Minimum contrast: WCAG AA (Target AAA for financial data)

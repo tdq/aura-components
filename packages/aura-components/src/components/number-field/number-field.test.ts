@@ -162,7 +162,42 @@ describe('NumberFieldBuilder', () => {
             expect(value$.value).toBe(0);
         });
 
-        test('should round to step on blur', () => {
+        test('should round to precision on blur', () => {
+            const value$ = new BehaviorSubject<number | null>(10);
+            const precision$ = new BehaviorSubject(1);
+            const container = builder
+                .withValue(value$)
+                .withPrecision(precision$)
+                .build();
+            const input = container.querySelector('input') as HTMLInputElement;
+
+            input.value = '12.34';
+            input.dispatchEvent(new Event('blur'));
+            expect(input.value).toBe('12.3');
+            expect(value$.value).toBe(12.3);
+
+            input.value = '12.36';
+            input.dispatchEvent(new Event('blur'));
+            expect(input.value).toBe('12.4');
+            expect(value$.value).toBe(12.4);
+        });
+
+        test('should use step precision if precision not defined on blur', () => {
+            const value$ = new BehaviorSubject<number | null>(10);
+            const step$ = new BehaviorSubject(0.1);
+            const container = builder
+                .withValue(value$)
+                .withStep(step$)
+                .build();
+            const input = container.querySelector('input') as HTMLInputElement;
+
+            input.value = '12.34';
+            input.dispatchEvent(new Event('blur'));
+            expect(input.value).toBe('12.3');
+            expect(value$.value).toBe(12.3);
+        });
+
+        test('should still round to step on keyboard interaction', () => {
             const value$ = new BehaviorSubject<number | null>(10);
             const step$ = new BehaviorSubject(5);
             const container = builder
@@ -171,15 +206,14 @@ describe('NumberFieldBuilder', () => {
                 .build();
             const input = container.querySelector('input') as HTMLInputElement;
 
+            // Trigger input event to set internal value to 12
             input.value = '12';
-            input.dispatchEvent(new Event('blur'));
-            expect(input.value).toBe('10');
-            expect(value$.value).toBe(10);
+            input.dispatchEvent(new Event('input'));
 
-            input.value = '13';
-            input.dispatchEvent(new Event('blur'));
-            expect(input.value).toBe('15');
+            input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp' }));
+            // 12 + 5 = 17, then roundToStep(17, 5) = 15
             expect(value$.value).toBe(15);
+            expect(input.value).toBe('15');
         });
 
         test('should handle floating point precision in stepping', () => {
@@ -306,9 +340,10 @@ describe('NumberFieldBuilder', () => {
                 .build();
 
             const inputWrapper = container.querySelector('input')?.parentElement as HTMLElement;
+            const input = container.querySelector('input') as HTMLInputElement;
             // First child of wrapper is prefix, input, then suffix
             const prefixEl = inputWrapper.firstElementChild as HTMLElement;
-            const suffixEl = inputWrapper.lastElementChild as HTMLElement;
+            const suffixEl = input.nextElementSibling as HTMLElement;
 
             expect(prefixEl.tagName).toBe('SPAN');
             expect(prefixEl.textContent).toBe('Pre');
@@ -324,6 +359,183 @@ describe('NumberFieldBuilder', () => {
 
             suffix$.next('New Suffix');
             expect(suffixEl.textContent).toBe('New Suffix');
+        });
+    });
+
+    describe('9. Precision rounding edge cases', () => {
+        test('blur rounds to explicit precision ignoring step', () => {
+            const value$ = new BehaviorSubject<number | null>(10);
+            const precision$ = new BehaviorSubject(1);
+            const step$ = new BehaviorSubject(0.05);
+            const container = builder
+                .withValue(value$)
+                .withPrecision(precision$)
+                .withStep(step$)
+                .build();
+            const input = container.querySelector('input') as HTMLInputElement;
+
+            // Step 0.05 has precision 2, but explicit precision 1 should round to 1 decimal place
+            input.value = '1.234';
+            input.dispatchEvent(new Event('blur'));
+            expect(input.value).toBe('1.2');
+            expect(value$.value).toBe(1.2);
+        });
+
+        test('keyboard navigation rounds to step ignoring explicit precision', () => {
+            const value$ = new BehaviorSubject<number | null>(10);
+            const precision$ = new BehaviorSubject(1);
+            const step$ = new BehaviorSubject(0.05);
+            const container = builder
+                .withValue(value$)
+                .withPrecision(precision$)
+                .withStep(step$)
+                .build();
+            const input = container.querySelector('input') as HTMLInputElement;
+
+            // Set current value to something not aligned with step
+            input.value = '1.22';
+            input.dispatchEvent(new Event('input'));
+            expect(value$.value).toBe(1.22);
+
+            // ArrowUp should add step (0.05) and round to nearest step (0.05 increments)
+            input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp' }));
+            // 1.22 + 0.05 = 1.27, roundToStep(1.27, 0.05) = 1.25 (nearest 0.05)
+            expect(value$.value).toBe(1.25);
+        });
+
+        test('min clamping works after rounding', () => {
+            const value$ = new BehaviorSubject<number | null>(10);
+            const min$ = new BehaviorSubject(0);
+            const step$ = new BehaviorSubject(1);
+            const container = builder
+                .withValue(value$)
+                .withMinValue(min$)
+                .withStep(step$)
+                .build();
+            const input = container.querySelector('input') as HTMLInputElement;
+
+            // Value below min after rounding
+            input.value = '-5.9';
+            input.dispatchEvent(new Event('blur'));
+            // step=1, precision undefined, getPrecision(1)=0, so round to integer -6 then clamp to 0 => 0
+            expect(value$.value).toBe(0);
+            expect(input.value).toBe('0');
+        });
+
+        test('max clamping works after rounding', () => {
+            const value$ = new BehaviorSubject<number | null>(10);
+            const max$ = new BehaviorSubject(10);
+            const step$ = new BehaviorSubject(1);
+            const container = builder
+                .withValue(value$)
+                .withMaxValue(max$)
+                .withStep(step$)
+                .build();
+            const input = container.querySelector('input') as HTMLInputElement;
+
+            // Value above max after rounding
+            input.value = '10.4';
+            input.dispatchEvent(new Event('blur'));
+            // step precision 0, round to integer 10, clamp to max 10 => 10
+            expect(value$.value).toBe(10);
+            expect(input.value).toBe('10');
+        });
+
+        test('floating point step rounding in keyboard navigation', () => {
+            const value$ = new BehaviorSubject<number | null>(0);
+            const step$ = new BehaviorSubject(0.1);
+            const container = builder
+                .withValue(value$)
+                .withStep(step$)
+                .build();
+            const input = container.querySelector('input') as HTMLInputElement;
+
+            // Start at 0.2
+            input.value = '0.2';
+            input.dispatchEvent(new Event('input'));
+            expect(value$.value).toBe(0.2);
+
+            // ArrowUp should add 0.1 -> 0.3
+            input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp' }));
+            expect(value$.value).toBe(0.3);
+            expect(input.value).toBe('0.3');
+
+            // ArrowDown twice should go back to 0.1
+            input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' }));
+            input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' }));
+            expect(value$.value).toBe(0.1);
+        });
+
+        test('blur with locale decimal separator', () => {
+            const value$ = new BehaviorSubject<number | null>(10);
+            const locale$ = new BehaviorSubject('de-DE');
+            const precision$ = new BehaviorSubject(2);
+            const container = builder
+                .withValue(value$)
+                .withLocale(locale$)
+                .withPrecision(precision$)
+                .build();
+            const input = container.querySelector('input') as HTMLInputElement;
+
+            // German locale uses comma as decimal separator
+            // Input with comma should be parsed correctly
+            input.value = '1,234';
+            input.dispatchEvent(new Event('blur'));
+            // Round to 2 decimal places -> 1.23
+            expect(value$.value).toBe(1.23);
+            // Display should be formatted with comma? formatNumber uses locale.
+            // Since we set locale de-DE, formatting will use comma.
+            // Expect '1,23'
+            expect(input.value).toBe('1,23');
+        });
+
+        test('blur with 2 decimals should not round incorrectly (10.55)', () => {
+            const value$ = new BehaviorSubject<number | null>(10);
+            const precision$ = new BehaviorSubject(2);
+            const step$ = new BehaviorSubject(0.01);
+            const container = builder
+                .withValue(value$)
+                .withPrecision(precision$)
+                .withStep(step$)
+                .build();
+            const input = container.querySelector('input') as HTMLInputElement;
+
+            input.value = '10.55';
+            input.dispatchEvent(new Event('blur'));
+            // Should stay 10.55, not round to 11
+            expect(value$.value).toBeCloseTo(10.55, 2);
+            expect(input.value).toBe('10.55');
+        });
+
+        test('keyboard navigation uses correct step for 2 decimals', () => {
+            const value$ = new BehaviorSubject<number | null>(10);
+            const precision$ = new BehaviorSubject(2);
+            const step$ = new BehaviorSubject(0.01);
+            const container = builder
+                .withValue(value$)
+                .withPrecision(precision$)
+                .withStep(step$)
+                .build();
+            const input = container.querySelector('input') as HTMLInputElement;
+
+            // Verify step attribute
+            expect(input.getAttribute('aria-valuestep')).toBe('0.01');
+
+            // Start at 10.55
+            input.value = '10.55';
+            input.dispatchEvent(new Event('input'));
+            expect(value$.value).toBeCloseTo(10.55, 2);
+
+            // ArrowUp should increment by 0.01
+            input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp' }));
+            expect(value$.value).toBeCloseTo(10.56, 2);
+            expect(input.value).toBe('10.56');
+
+            // ArrowDown twice should go back to 10.54
+            input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' }));
+            input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' }));
+            expect(value$.value).toBeCloseTo(10.54, 2);
+            expect(input.value).toBe('10.54');
         });
     });
 

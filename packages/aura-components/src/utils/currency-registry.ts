@@ -1,4 +1,4 @@
-import { Money } from '../components/grid/types';
+import { Money } from '../types/money';
 
 export class CurrencyRegistry {
     private static symbols: Record<string, string> = {
@@ -26,23 +26,29 @@ export class CurrencyRegistry {
 
     /**
      * Formats a Money object into a localized string.
+     * @param precision Optional number of decimal places. When omitted, uses the currency's default (typically 2).
      */
-    static format(money: Money): string {
+    static format(money: Money, precision?: number): string {
         if (!money || typeof money.amount !== 'number') return '';
-        
+
+        const fractionOptions: Intl.NumberFormatOptions = precision !== undefined
+            ? { minimumFractionDigits: precision, maximumFractionDigits: precision }
+            : {};
+
         try {
             return new Intl.NumberFormat('en-US', {
                 style: 'currency',
                 currency: money.currencyId.toUpperCase(),
-                currencyDisplay: 'symbol'
+                currencyDisplay: 'symbol',
+                ...fractionOptions
             }).format(money.amount);
         } catch (e) {
             // Fallback for unknown currencies or invalid currency codes
             const symbol = this.getSymbol(money.currencyId);
-            return `${symbol}${money.amount.toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            })}`;
+            const fallbackFraction = precision !== undefined
+                ? { minimumFractionDigits: precision, maximumFractionDigits: precision }
+                : { minimumFractionDigits: 2, maximumFractionDigits: 2 };
+            return `${symbol}${money.amount.toLocaleString(undefined, fallbackFraction)}`;
         }
     }
 

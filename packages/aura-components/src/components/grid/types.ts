@@ -1,9 +1,4 @@
 
-export interface Money {
-    amount: number;
-    currencyId: string;
-}
-
 export enum ColumnType {
     TEXT = 'TEXT',
     NUMBER = 'NUMBER',
@@ -41,10 +36,12 @@ export interface GridColumn<ITEM> {
     type: ColumnType;
     header: string;
     width?: string;
+    minWidth?: string;
     sortable?: boolean;
     filterable?: boolean;
     resizable?: boolean;
     editable?: boolean;
+    align?: 'left' | 'center' | 'right';
     cellClass?: (item: ITEM) => string;
     render: (item: ITEM) => HTMLElement | string;
     renderEditor?: (item: ITEM, isGlass: boolean) => CellEditor | null;
@@ -87,9 +84,11 @@ export interface GridState<ITEM> {
 export interface ColumnBuilder<ITEM> {
     withHeader(header: string): this;
     withWidth(width: string): this;
+    withMinWidth(minWidth: string): this;
     asSortable(sortable?: boolean): this;
     asResizable(resizable?: boolean): this;
     asEditable(): this;
+    withAlign(align: 'left' | 'center' | 'right'): this;
     withClass(classProvider: (item: ITEM) => string): this;
     withSortValue(provider: (item: ITEM) => any): this;
     build(): GridColumn<ITEM>;

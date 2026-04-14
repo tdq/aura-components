@@ -11,7 +11,7 @@ tools:
   webfetch: false
   task: false
   todowrite: false
-color: #6366f1
+color: "#6366f1"
 ---
 
 ## Scope

@@ -1,6 +1,7 @@
 import { of, firstValueFrom } from 'rxjs';
 import { GridLogic } from './grid-logic';
 import { SortDirection } from './types';
+import { Money } from '../../types/money';
 
 describe('GridLogic', () => {
     interface TestItem {
@@ -44,7 +45,7 @@ describe('GridLogic', () => {
     it('should sort Money objects by amount', async () => {
         interface MoneyItem {
             id: number;
-            price: { amount: number; currencyId: string };
+            price: Money;
         }
         const moneyItems: MoneyItem[] = [
             { id: 1, price: { amount: 100, currencyId: 'USD' } },

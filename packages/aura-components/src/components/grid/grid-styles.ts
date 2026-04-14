@@ -53,3 +53,38 @@ export const GridStyles = {
     tooltipWrapper: 'relative',
     tooltip: 'fixed m-0 border-0 px-2 py-1 text-xs font-medium rounded bg-neutral-800/90 text-white dark:bg-neutral-100 dark:text-neutral-900 whitespace-nowrap pointer-events-none -translate-x-1/2 -translate-y-full z-[9999]'
 };
+
+export function getAlignClass(align?: 'left' | 'center' | 'right'): string {
+    switch (align) {
+        case 'right': return 'justify-end text-right';
+        case 'center': return 'justify-center text-center';
+        default: return 'justify-start text-left';
+    }
+}
+
+export function applyColumnWidth(element: HTMLElement, col: { width?: string; minWidth?: string }): void {
+    if (col.width) {
+        if (col.width.includes('px') || col.width.includes('rem')) {
+            element.style.width = col.width;
+            element.style.flex = 'none';
+            element.classList.add('flex-none');
+            element.classList.remove('flex-1');
+        } else if (col.width.includes('fr')) {
+            element.style.flex = col.width.replace('fr', '');
+            element.style.width = '';
+            element.classList.remove('flex-none');
+            element.classList.remove('flex-1');
+        } else {
+            element.style.width = col.width;
+            element.style.flex = 'none';
+            element.classList.add('flex-none');
+            element.classList.remove('flex-1');
+        }
+    } else {
+        element.style.width = '';
+        element.style.flex = '1';
+        element.classList.add('flex-1');
+        element.classList.remove('flex-none');
+    }
+    element.style.minWidth = col.minWidth ?? '';
+}

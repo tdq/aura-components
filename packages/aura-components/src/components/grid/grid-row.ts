@@ -1,6 +1,6 @@
 import { Subscription } from 'rxjs';
 import { GridColumn, GridAction, ColumnType } from './types';
-import { GridStyles } from './grid-styles';
+import { GridStyles, getAlignClass, applyColumnWidth } from './grid-styles';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -153,32 +153,6 @@ export class GridRow<ITEM> {
         }
     }
 
-    private applyColumnWidth(element: HTMLElement, col: GridColumn<ITEM>) {
-        if (col.width) {
-            if (col.width.includes('px') || col.width.includes('rem')) {
-                element.style.width = col.width;
-                element.style.flex = 'none';
-                element.classList.add('flex-none');
-                element.classList.remove('flex-1');
-            } else if (col.width.includes('fr')) {
-                element.style.flex = col.width.replace('fr', '');
-                element.style.width = '';
-                element.classList.remove('flex-none');
-                element.classList.remove('flex-1');
-            } else {
-                element.style.width = col.width;
-                element.style.flex = 'none';
-                element.classList.add('flex-none');
-                element.classList.remove('flex-1');
-            }
-        } else {
-            element.style.width = '';
-            element.style.flex = '1';
-            element.classList.add('flex-1');
-            element.classList.remove('flex-none');
-        }
-    }
-
     private showCellDisplay(cell: HTMLElement, col: GridColumn<ITEM>) {
         const abort: AbortController | undefined = (cell as any).__editorAbort;
         if (abort) {
@@ -187,6 +161,17 @@ export class GridRow<ITEM> {
         }
         delete (cell as any).__commitEdit;
         delete cell.dataset.editing;
+        // Fully restore cell className (including alignment and cellClass)
+        const alignClass = getAlignClass(col.align);
+        if (col.cellClass) {
+            const cls = col.cellClass(this.item);
+            cell.className = cn(GridStyles.cell, alignClass, cls);
+        } else {
+            cell.className = cn(GridStyles.cell, alignClass);
+        }
+        // Re-apply width
+        applyColumnWidth(cell, col);
+        // Clear editor content and render display value
         while (cell.firstChild) {
             cell.removeChild(cell.firstChild);
         }
@@ -204,7 +189,12 @@ export class GridRow<ITEM> {
         const editor = col.renderEditor(this.item, this.isGlass);
         if (!editor) return;
 
+        editor.element.style.width = '100%';
+        editor.element.style.height = '100%';
+
         cell.dataset.editing = '1';
+        cell.classList.remove('px-4', 'truncate');
+        cell.classList.add('overflow-hidden', 'p-0');
         while (cell.firstChild) {
             cell.removeChild(cell.firstChild);
         }
@@ -290,13 +280,15 @@ export class GridRow<ITEM> {
         while (cell.firstChild) {
             cell.removeChild(cell.firstChild);
         }
-        this.applyColumnWidth(cell, col);
+        applyColumnWidth(cell, col);
+
+        const alignClass = getAlignClass(col.align);
 
         if (col.cellClass) {
             const cls = col.cellClass(this.item);
-            cell.className = cn(GridStyles.cell, cls);
+            cell.className = cn(GridStyles.cell, alignClass, cls);
         } else {
-            cell.className = cn(GridStyles.cell);
+            cell.className = cn(GridStyles.cell, alignClass);
         }
 
         if (this.isEditable && col.editable && col.renderEditor) {

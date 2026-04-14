@@ -1,5 +1,6 @@
 import { GridBuilder, TabsBuilder } from 'aura-components';
 import { of } from 'rxjs';
+import { renderStatusChip } from './chip-utils';
 
 type Customer = {
     id: number;
@@ -41,7 +42,10 @@ function createCustomerGrid(data: Customer[]): GridBuilder<Customer> {
     columns.addTextColumn('company').withHeader('Company').withWidth('1fr');
     columns.addTextColumn('email').withHeader('Email').withWidth('1fr');
     columns.addTextColumn('role').withHeader('Role').withWidth('100px');
-    columns.addTextColumn('status').withHeader('Status').withWidth('100px');
+    columns.addCustomColumn()
+        .withHeader('Status')
+        .withWidth('100px')
+        .withRenderer((item) => renderStatusChip(item.status));
     columns.addTextColumn('lastLogin').withHeader('Last Login').withWidth('170px');
     return grid;
 }

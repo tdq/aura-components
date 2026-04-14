@@ -8,7 +8,7 @@ It has the following methods:
 - `withEnabled(enabled: Observable<boolean>): this` - sets enabled state of the dropdown.
 - `withClass(className: Observable<string>): this` - sets class css name of the dropdown.
 - `withItems(items: Observable<ITEM[]>): this` - sets items which are displayed in dropdown.
-- `withItemCaptionProvider(provider: (item: ITEM) => string): this` - sets item caption provider which is used for converting item into a string which will be displayed in the dropdown. Default caption provider just returns string presentation of item.
+- `withListWidth(width: Observable<'match-input' | 'auto' | string>): this` - sets the width of the dropdown list. Can match the input width, auto-size to content, or use a specific CSS width.
 - `withItemIdProvider(provider: (item: ITEM) => string | number): this` - sets item ID provider used for generating unique IDs for accessibility and for item comparison. Default is `String(item)`.
 - `withValue(value: Subject<ITEM | null>): this` - sets value for dropdown (which item is selected). It is also updated by dropdown itself on item selecting.
 - `withError(error: Observable<string>): this` - sets error of the dropdown.
@@ -47,12 +47,13 @@ ComboBox implements ARIA patterns for combobox:
 ## Styling
 Style according to Material Design 3 
 Popup with items should have background according to combobox style (tonal or outline).
-Popup with items should have limited height.
+Popup with items should have limited height and a max-width of 300px.
 Hovered item in popup should be highlighted with darker background.
 Currently selected item also should be highlighted in popup by using bold text style.
 Clicking the dropdown icon (uses `Icons.CHEVRON_DOWN`) should focus the input.
 Height is 48px.
 Reserve space for error text only if it is not "as inline error".
+Use standardized 1px borders for error states instead of thicker borders to maintain a refined, high-density look.
 
 ### Inline error state
 On error set red outline for text field. 

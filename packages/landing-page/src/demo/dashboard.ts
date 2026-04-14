@@ -7,6 +7,7 @@ import { createAnalytics } from './dashboard/analytics';
 import { createCustomers } from './dashboard/customers';
 import { createOrders } from './dashboard/orders';
 import { createSettings } from './dashboard/settings';
+import { createMoneyFieldDemo } from './dashboard/money-field';
 
 export function createDashboardDemo(): HTMLElement {
     const layout = new LayoutBuilder()
@@ -37,6 +38,7 @@ export function createDashboardDemo(): HTMLElement {
             case 'customers':  content = createCustomers();  break;
             case 'orders':     content = createOrders();     break;
             case 'settings':   content = createSettings();   break;
+            case 'money-field': content = createMoneyFieldDemo(); break;
             default:           content = createOverview();   break;
         }
         contentOutlet.appendChild(content);

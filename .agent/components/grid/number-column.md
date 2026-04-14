@@ -13,7 +13,7 @@ In addition to [BaseColumnBuilder](grid.md#basecolumnbuilder-shared-methods) met
 - **Rendering**: Uses `Number().toFixed()` for formatting. Handles `null` or `undefined` by returning an empty string.
 
 ## Styling
-- **Alignment**: Right-aligned is recommended for numeric data (though currently inherits default alignment).
+- **Alignment**: Right-aligned by default (can be overridden via `withAlign()`).
 
 ## Editing
 Built-in editor is **NumberFieldBuilder** with `asInlineError()` modifier. It is not displaying any label.

@@ -44,7 +44,7 @@ function createRevenueChart(): HTMLElement {
     const chart = new ChartBuilder<{ x: string; y: number }>()
         .withData(dataRelay$)
         .withCategoryField('x');
-    chart.addAreaChart('y').withLabel('Revenue ($)').withColor('#6750A4');
+    chart.addAreaChart('y').withLabel('Revenue (€)').withColor('#6750A4');
 
     const chartEl = chart.build();
     chartEl.classList.add('flex-1', 'min-h-0');
@@ -119,7 +119,7 @@ function createRegionalChart(): HTMLElement {
     const chart = new ChartBuilder<{ x: string; y: number }>()
         .withData(data$)
         .withCategoryField('x');
-    chart.addBarChart('y').withLabel('Revenue ($)').withColor('#F59E0B');
+    chart.addBarChart('y').withLabel('Revenue (€)').withColor('#F59E0B');
 
     const chartEl = chart.build();
     chartEl.classList.add('flex-1', 'min-h-0');

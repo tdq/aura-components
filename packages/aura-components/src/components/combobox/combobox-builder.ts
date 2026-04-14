@@ -1,4 +1,4 @@
-import { Observable, Subject, BehaviorSubject, combineLatest, map, distinctUntilChanged, Subscription } from 'rxjs';
+import { Observable, Subject, BehaviorSubject, combineLatest, map, distinctUntilChanged, Subscription, of } from 'rxjs';
 import { ComponentBuilder } from '../../core/component-builder';
 import { registerDestroy } from '@/core/destroyable-element';
 import { ComboBoxStyle } from './types';
@@ -21,10 +21,16 @@ export class ComboBoxBuilder<ITEM> implements ComponentBuilder {
     private style$?: Observable<ComboBoxStyle>;
     private className$?: Observable<string>;
     private visible$?: Observable<boolean>;
+    private listWidth$?: Observable<string>;
     private isGlass: boolean = false;
 
     withItems(items: Observable<ITEM[]>): ComboBoxBuilder<ITEM> {
         this.items$ = items;
+        return this;
+    }
+
+    withListWidth(width: Observable<string>): ComboBoxBuilder<ITEM> {
+        this.listWidth$ = width;
         return this;
     }
 
@@ -141,12 +147,14 @@ export class ComboBoxBuilder<ITEM> implements ComponentBuilder {
         }
 
         const style$ = this.style$ || new BehaviorSubject<ComboBoxStyle>(ComboBoxStyle.TONAL);
+        const listWidth$ = this.listWidth$ || of('match-input');
         const isGlass = this.isGlass;
 
         subs.add(combineLatest({
             style: style$,
-            expanded: isExpanded$
-        }).subscribe(({ style, expanded }) => {
+            expanded: isExpanded$,
+            listWidth: listWidth$
+        }).subscribe(({ style, expanded, listWidth }) => {
             // Update input container base style
             Object.values(STYLE_MAP).forEach(cls => {
                 cls.split(' ').forEach(c => inputContainer.classList.remove(c));
@@ -211,7 +219,16 @@ export class ComboBoxBuilder<ITEM> implements ComponentBuilder {
                 const rect = inputContainer.getBoundingClientRect();
                 listbox.style.top = `${rect.bottom + 4}px`;
                 listbox.style.left = `${rect.left}px`;
-                listbox.style.width = `${rect.width}px`;
+                
+                if (listWidth === 'match-input') {
+                    listbox.style.width = `${rect.width}px`;
+                } else if (listWidth === 'auto') {
+                    listbox.style.width = 'auto';
+                    listbox.style.minWidth = `${rect.width}px`;
+                } else {
+                    listbox.style.width = listWidth;
+                }
+                
                 (listbox as any).showPopover();
             } else {
                 (listbox as any).hidePopover();
@@ -223,10 +240,13 @@ export class ComboBoxBuilder<ITEM> implements ComponentBuilder {
                 error.textContent = text;
                 error.classList.toggle('hidden', !text);
                 const hasError = !!text;
-                inputContainer.classList.toggle('ring-error', hasError);
-                inputContainer.classList.toggle('focus-within:ring-error', hasError);
+                inputContainer.classList.toggle('outline', hasError);
+                inputContainer.classList.toggle('outline-1', hasError);
+                inputContainer.classList.toggle('-outline-offset-1', hasError);
+                inputContainer.classList.toggle('outline-error', hasError);
+                inputContainer.classList.toggle('focus-within:outline-error', hasError);
                 inputContainer.classList.toggle('shadow-[inset_0_-1px_0_0_var(--md-sys-color-error)]', hasError);
-                inputContainer.classList.toggle('focus-within:shadow-[inset_0_-2px_0_0_var(--md-sys-color-error)]', hasError);
+                inputContainer.classList.toggle('focus-within:shadow-[inset_0_-1px_0_0_var(--md-sys-color-error)]', hasError);
             }));
         }
 
@@ -444,8 +464,6 @@ export class ComboBoxBuilder<ITEM> implements ComponentBuilder {
                 document.removeEventListener('scroll', scrollHandler, true);
             }
         });
-
-
 
         return container;
     }

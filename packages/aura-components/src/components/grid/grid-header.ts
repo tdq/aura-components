@@ -1,5 +1,5 @@
 import { GridColumn, SortConfig, SortDirection } from './types';
-import { GridStyles } from './grid-styles';
+import { GridStyles, getAlignClass, applyColumnWidth } from './grid-styles';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { Icons } from '@/core/icons';
@@ -60,10 +60,13 @@ export class GridHeader<ITEM> {
 
         this.columns.forEach((col, index) => {
             const cell = document.createElement('div');
-            this.applyColumnWidth(cell, col);
+            applyColumnWidth(cell, col);
+
+            const alignClass = getAlignClass(col.align);
 
             cell.className = cn(
                 GridStyles.headerCell,
+                alignClass,
                 col.sortable && GridStyles.headerCellSortable,
                 col.resizable && 'resizable-column',
                 (index > 0 && this.columns[index - 1].resizable) && 'prev-resizable'
@@ -117,7 +120,7 @@ export class GridHeader<ITEM> {
                     const onMouseMove = (moveEvent: MouseEvent) => {
                         const newWidth = Math.max(50, startWidth + (moveEvent.pageX - startX));
                         col.width = `${newWidth}px`;
-                        this.applyColumnWidth(cell, col);
+                        applyColumnWidth(cell, col);
                         this.onColumnsResized(this.columns);
                     };
 
@@ -143,33 +146,8 @@ export class GridHeader<ITEM> {
                 GridStyles.actionHeaderCell,
                 this.isGlass && GridStyles.actionHeaderCellGlass
             );
+            actionCell.style.width = `${this.actionCount * 40}px`;
             this.element.appendChild(actionCell);
-        }
-    }
-
-    private applyColumnWidth(element: HTMLElement, col: GridColumn<ITEM>) {
-        if (col.width) {
-            if (col.width.includes('px') || col.width.includes('rem')) {
-                element.style.width = col.width;
-                element.style.flex = 'none';
-                element.classList.add('flex-none');
-                element.classList.remove('flex-1');
-            } else if (col.width.includes('fr')) {
-                element.style.flex = col.width.replace('fr', '');
-                element.style.width = '';
-                element.classList.remove('flex-none');
-                element.classList.remove('flex-1');
-            } else {
-                element.style.width = col.width;
-                element.style.flex = 'none';
-                element.classList.add('flex-none');
-                element.classList.remove('flex-1');
-            }
-        } else {
-            element.style.width = '';
-            element.style.flex = '1';
-            element.classList.add('flex-1');
-            element.classList.remove('flex-none');
         }
     }
 

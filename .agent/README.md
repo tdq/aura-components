@@ -17,10 +17,12 @@ Logic and state are managed by RxJS.
 ## Components
 
 - [Button](components/button.md)
+- [Chart](components/chart/chart.md)
 - [Layout](components/layout.md)
 - [Label](components/label.md)
 - [TextField](components/text-field.md)
 - [NumberField](components/number-field.md)
+- [MoneyField](components/money-field.md)
 - [Checkbox](components/checkbox.md)
 - [ComboBox](components/combobox.md)
 - [DatePicker](components/datepicker.md)
@@ -28,4 +30,6 @@ Logic and state are managed by RxJS.
 - [Panel](components/panel.md)
 - [Dialog](components/dialog.md)
 - [Toolbar](components/toolbar.md)
+- [Tabs](components/tabs.md)
+- [ListBox](components/listbox.md)
 - [Grid](components/grid/grid.md)
