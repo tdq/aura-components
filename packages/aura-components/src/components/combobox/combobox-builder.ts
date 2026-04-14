@@ -6,6 +6,7 @@ import { cn, STYLE_MAP } from './styles';
 import { renderComboBoxItem } from './combobox-item';
 import { renderComboBoxList, renderNoResults } from './combobox-list';
 import { renderComboBoxInput } from './combobox-input';
+import { PopoverBuilder } from '../component-parts/popover';
 
 export { ComboBoxStyle };
 
@@ -107,7 +108,6 @@ export class ComboBoxBuilder<ITEM> implements ComponentBuilder {
         container.appendChild(inputContainer);
 
         const listbox = renderComboBoxList(listboxId);
-        container.appendChild(listbox);
 
         const error = document.createElement('span');
         error.className = 'md-label-small text-error px-px-16 hidden';
@@ -150,11 +150,20 @@ export class ComboBoxBuilder<ITEM> implements ComponentBuilder {
         const listWidth$ = this.listWidth$ || of('match-input');
         const isGlass = this.isGlass;
 
-        subs.add(combineLatest({
-            style: style$,
-            expanded: isExpanded$,
-            listWidth: listWidth$
-        }).subscribe(({ style, expanded, listWidth }) => {
+        const mappedListWidth$ = listWidth$.pipe(
+            map((w: string) => w === 'match-input' ? 'match-anchor' : w)
+        );
+
+        const popover = new PopoverBuilder()
+            .withAnchor(inputContainer)
+            .withContent({ build: () => listbox })
+            .withWidth(mappedListWidth$)
+            .withOnClose(() => isExpanded$.next(false))
+            .withClass('max-w-[300px]');
+
+        if (isGlass) popover.asGlass();
+
+        subs.add(style$.subscribe(style => {
             // Update input container base style
             Object.values(STYLE_MAP).forEach(cls => {
                 cls.split(' ').forEach(c => inputContainer.classList.remove(c));
@@ -176,11 +185,11 @@ export class ComboBoxBuilder<ITEM> implements ComponentBuilder {
                 // Caption
                 captionElement.classList.remove(...standardCaptionClasses);
                 captionElement.classList.add(...glassLabelClasses);
-                
+
                 // Input
                 input.classList.remove(...standardInputClasses);
                 input.classList.add(...glassLabelClasses);
-                
+
                 // Icons (using Description color)
                 iconContainer.classList.remove(...standardIconClasses);
                 iconContainer.classList.add(...glassDescClasses);
@@ -190,7 +199,7 @@ export class ComboBoxBuilder<ITEM> implements ComponentBuilder {
                 // Revert text colors
                 const glassLabelClasses = ['text-gray-900', 'dark:text-white'];
                 const glassDescClasses = ['text-gray-600', 'dark:text-white/60'];
-                
+
                 captionElement.classList.add('text-on-surface-variant');
                 captionElement.classList.remove(...glassLabelClasses);
 
@@ -201,37 +210,18 @@ export class ComboBoxBuilder<ITEM> implements ComponentBuilder {
                 iconContainer.classList.remove(...glassDescClasses);
             }
 
+            // Manage listbox background classes (glass-effect is owned by the popover wrapper via asGlass())
             const dynamicClasses = [
-                'bg-white/10', 'bg-white/20', 'backdrop-blur-xl', 'border-white/20', 'border-white/30',
                 'bg-secondary-container', 'bg-surface', 'border-outline', 'border', 'border-transparent'
             ];
             listbox.classList.remove(...dynamicClasses);
 
-            if (isGlass) {
-                listbox.classList.add('glass-effect');
-            } else if (style === ComboBoxStyle.TONAL) {
-                listbox.classList.add('bg-secondary-container', 'border', 'border-transparent');
-            } else {
-                listbox.classList.add('bg-surface', 'border', 'border-outline');
-            }
-
-            if (expanded) {
-                const rect = inputContainer.getBoundingClientRect();
-                listbox.style.top = `${rect.bottom + 4}px`;
-                listbox.style.left = `${rect.left}px`;
-                
-                if (listWidth === 'match-input') {
-                    listbox.style.width = `${rect.width}px`;
-                } else if (listWidth === 'auto') {
-                    listbox.style.width = 'auto';
-                    listbox.style.minWidth = `${rect.width}px`;
+            if (!isGlass) {
+                if (style === ComboBoxStyle.TONAL) {
+                    listbox.classList.add('bg-secondary-container', 'border', 'border-transparent');
                 } else {
-                    listbox.style.width = listWidth;
+                    listbox.classList.add('bg-surface', 'border', 'border-outline');
                 }
-                
-                (listbox as any).showPopover();
-            } else {
-                (listbox as any).hidePopover();
             }
         }));
 
@@ -349,7 +339,7 @@ export class ComboBoxBuilder<ITEM> implements ComponentBuilder {
             }
         }));
 
-        subs.add(isExpanded$.subscribe(expanded => {
+        subs.add(isExpanded$.pipe(distinctUntilChanged()).subscribe(expanded => {
             input.setAttribute('aria-expanded', expanded.toString());
             if (expanded) {
                 input.focus();
@@ -443,26 +433,16 @@ export class ComboBoxBuilder<ITEM> implements ComponentBuilder {
             }
         };
 
-        const clickOutsideHandler = (e: MouseEvent) => {
-            if (!container.contains(e.target as Node)) {
-                isExpanded$.next(false);
+        subs.add(isExpanded$.pipe(distinctUntilChanged()).subscribe(expanded => {
+            if (expanded) {
+                popover.show();
+            } else {
+                popover.close();
             }
-        };
-        document.addEventListener('click', clickOutsideHandler);
-
-        const scrollHandler = (e: Event) => {
-            if (isExpanded$.value && !listbox.contains(e.target as Node)) {
-                 isExpanded$.next(false);
-            }
-        };
-        document.addEventListener('scroll', scrollHandler, true);
+        }));
 
         registerDestroy(container, () => {
             subs.unsubscribe();
-            if (typeof document !== 'undefined') {
-                document.removeEventListener('click', clickOutsideHandler);
-                document.removeEventListener('scroll', scrollHandler, true);
-            }
         });
 
         return container;

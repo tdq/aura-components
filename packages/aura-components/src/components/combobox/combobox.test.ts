@@ -23,9 +23,7 @@ describe('ComboBoxBuilder', () => {
 
         const input = screen.getByRole('combobox') as HTMLInputElement;
         expect(input.value).toBe('Banana');
-
-        const listbox = screen.getByRole('listbox', { hidden: true });
-        expect(listbox).not.toBeVisible();
+        expect(input).toHaveAttribute('aria-expanded', 'false');
     });
 
     test('should verify filtering: typing in the input should update the list of displayed options', async () => {
@@ -114,10 +112,10 @@ describe('ComboBoxBuilder', () => {
         document.body.appendChild(container);
 
         const input = screen.getByRole('combobox');
-        const listbox = screen.getByRole('listbox', { hidden: true });
 
         // Click to open
         fireEvent.click(input);
+        const listbox = screen.getByRole('listbox');
         expect(listbox).toBeVisible();
 
         // Escape to close
@@ -174,11 +172,10 @@ describe('ComboBoxBuilder', () => {
         expect(input).toHaveAttribute('aria-expanded', 'false');
         expect(input).toHaveAttribute('aria-haspopup', 'listbox');
 
-        const listbox = screen.getByRole('listbox', { hidden: true });
-        expect(listbox).toBeTruthy();
-
         fireEvent.click(input);
         expect(input).toHaveAttribute('aria-expanded', 'true');
+        const listbox = screen.getByRole('listbox');
+        expect(listbox).toBeTruthy();
         
         // When opened, the first item is already highlighted
         await waitFor(() => {
@@ -278,10 +275,14 @@ describe('ComboBoxBuilder', () => {
         document.body.appendChild(container);
 
         const input = screen.getByRole('combobox');
-        const listbox = screen.getByRole('listbox', { hidden: true });
 
+        // aria-controls is set upfront; open to verify it resolves to the actual listbox
+        const ariaControls = input.getAttribute('aria-controls');
+        expect(ariaControls).toMatch(/^cb-.*-listbox$/);
+
+        fireEvent.click(input);
+        const listbox = screen.getByRole('listbox');
         expect(input).toHaveAttribute('aria-controls', listbox.id);
-        expect(listbox.id).toMatch(/^cb-.*-listbox$/);
     });
 
     test('should update focusedIndex on mouse hover', async () => {

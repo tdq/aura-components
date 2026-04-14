@@ -4,8 +4,7 @@ export function renderComboBoxList(id?: string): HTMLUListElement {
     if (id) {
         listbox.id = id;
     }
-    listbox.className = 'fixed m-0 py-px-8 rounded-small shadow-level-2 max-h-px-256 max-w-[300px] overflow-y-auto';
-    listbox.setAttribute('popover', 'manual');
+    listbox.className = 'py-px-8 max-h-px-256 overflow-y-auto';
     return listbox;
 }
 

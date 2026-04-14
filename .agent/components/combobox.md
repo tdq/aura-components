@@ -8,13 +8,15 @@ It has the following methods:
 - `withEnabled(enabled: Observable<boolean>): this` - sets enabled state of the dropdown.
 - `withClass(className: Observable<string>): this` - sets class css name of the dropdown.
 - `withItems(items: Observable<ITEM[]>): this` - sets items which are displayed in dropdown.
-- `withListWidth(width: Observable<'match-input' | 'auto' | string>): this` - sets the width of the dropdown list. Can match the input width, auto-size to content, or use a specific CSS width.
+- `withListWidth(width: Observable<string>): this` - sets the width of the dropdown list. Accepted values: `'match-input'` (matches input width), `'auto'` (content-sized with min-width of input), or any CSS width string.
 - `withItemIdProvider(provider: (item: ITEM) => string | number): this` - sets item ID provider used for generating unique IDs for accessibility and for item comparison. Default is `String(item)`.
+- `withItemCaptionProvider(provider: (item: ITEM) => string): this` - sets caption provider for converting items to display text. Default is `String(item)`.
+- `withVisible(visible: Observable<boolean>): this` - controls visibility of the combobox container.
 - `withValue(value: Subject<ITEM | null>): this` - sets value for dropdown (which item is selected). It is also updated by dropdown itself on item selecting.
 - `withError(error: Observable<string>): this` - sets error of the dropdown.
 - `withStyle(style: Observable<ComboBoxStyle>): this` - sets style of the dropdown.
-- `asGlass(): this` - sets special styling option for combobox and its popup with items as transparent with blur background (glass effect).
-- `asInlineError(): this` - sets error state displaying as field style change.
+- `asGlass(isGlass: boolean = true): this` - sets special styling option for combobox and its popup with items as transparent with blur background (glass effect).
+- `asInlineError(): this` - *(not yet implemented)* sets error state displaying as field style change.
 
 ComboBox style is an enum with the following values:
 - tonal
@@ -33,8 +35,7 @@ When dropdown opens initially it is showing all items, and only when user starte
 When dropdown opens it highlights selected item (scrolls into it if it is not visible).
 
 ### Dropdown
-It should open by calling `showPopover()` method.
-It should close on any event outside of the dropdown.
+The dropdown is powered by `PopoverBuilder` (from `component-parts`). `PopoverBuilder` handles popover element creation, anchor-relative positioning, click-outside / scroll / resize close, and width management. `isExpanded$` controls open/close by calling `popover.show()` / `popover.close()`.
 
 ## Accessibility
 ComboBox implements ARIA patterns for combobox:
@@ -46,6 +47,7 @@ ComboBox implements ARIA patterns for combobox:
 
 ## Styling
 Style according to Material Design 3 
+When `asGlass()` is used, `glass-effect` is applied to the `PopoverBuilder` wrapper (the container div that holds the listbox), not to the listbox `<ul>` element itself.
 Popup with items should have background according to combobox style (tonal or outline).
 Popup with items should have limited height and a max-width of 300px.
 Hovered item in popup should be highlighted with darker background.
@@ -55,7 +57,7 @@ Height is 48px.
 Reserve space for error text only if it is not "as inline error".
 Use standardized 1px borders for error states instead of thicker borders to maintain a refined, high-density look.
 
-### Inline error state
+### Inline error state *(not yet implemented)*
 On error set red outline for text field. 
 Add error icon on the right inside of text field. 
 Clicking this icon shows tooltip with error text.
