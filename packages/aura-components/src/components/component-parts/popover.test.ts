@@ -217,6 +217,72 @@ describe('PopoverBuilder', () => {
             const popover = document.body.querySelector('[popover]') as HTMLElement;
             expect(popover.style.top).toBe('130px'); // 120 + 10
         });
+
+        // ── Smart direction: open upward when more space above than below ──
+
+        test('opens upward (sets bottom, sets top:auto) when anchor is near viewport bottom', () => {
+            // jsdom default innerHeight = 768; anchor near bottom → spaceAbove(600) > spaceBelow(148)
+            // top must be 'auto' (not '') to override UA [popover] inset:0 which would otherwise
+            // conflict with bottom and cause the over-constraint rule to drop bottom.
+            const anchor = makeAnchor({ top: 600, bottom: 620, left: 50, right: 200, width: 150 });
+            const builder = new PopoverBuilder()
+                .withAnchor(anchor)
+                .withContent(makeContent());
+            builder.show();
+
+            const popover = document.body.querySelector('[popover]') as HTMLElement;
+            expect(popover.style.top).toBe('auto');
+            // bottom = innerHeight - anchorTop + offset = 768 - 600 + 4 = 172
+            expect(popover.style.bottom).toBe('172px');
+        });
+
+        test('upward offset is applied correctly', () => {
+            const anchor = makeAnchor({ top: 600, bottom: 620, left: 50, right: 200, width: 150 });
+            const builder = new PopoverBuilder()
+                .withAnchor(anchor)
+                .withContent(makeContent())
+                .withOffset(10);
+            builder.show();
+
+            const popover = document.body.querySelector('[popover]') as HTMLElement;
+            // bottom = 768 - 600 + 10 = 178
+            expect(popover.style.bottom).toBe('178px');
+        });
+
+        test('opens downward (sets top, sets bottom:auto) when anchor is near viewport top', () => {
+            // anchor near top → spaceBelow(648) > spaceAbove(100) → open below
+            // bottom must be 'auto' to prevent UA inset:0 bottom:0 from conflicting with top.
+            const anchor = makeAnchor({ top: 100, bottom: 120, left: 50, width: 150 });
+            const builder = new PopoverBuilder()
+                .withAnchor(anchor)
+                .withContent(makeContent());
+            builder.show();
+
+            const popover = document.body.querySelector('[popover]') as HTMLElement;
+            expect(popover.style.bottom).toBe('auto');
+            expect(popover.style.top).toBe('124px'); // 120 + 4
+        });
+
+        test('switches direction on re-position when anchor moves to bottom', () => {
+            let currentRect = { top: 100, bottom: 120, left: 50, right: 200, width: 150, height: 20, x: 50, y: 100, toJSON: () => {} } as DOMRect;
+            const anchor = document.createElement('button');
+            anchor.getBoundingClientRect = () => currentRect;
+            document.body.appendChild(anchor);
+
+            const builder = new PopoverBuilder()
+                .withAnchor(anchor)
+                .withContent(makeContent());
+
+            builder.show(); // opens downward
+            const popover = document.body.querySelector('[popover]') as HTMLElement;
+            expect(popover.style.top).toBe('124px');
+
+            // Simulate anchor scrolling to near the bottom
+            currentRect = { top: 650, bottom: 670, left: 50, right: 200, width: 150, height: 20, x: 50, y: 650, toJSON: () => {} } as DOMRect;
+            builder.show(); // re-positions (already open, just calls _position again)
+            expect(popover.style.bottom).toBe(`${768 - 650 + 4}px`); // 122
+            expect(popover.style.top).toBe('auto');
+        });
     });
 
     // ────────────────────────────────────────────────
@@ -599,6 +665,49 @@ describe('PopoverBuilder', () => {
 
             expect(cb).not.toHaveBeenCalled();
         });
+
+        test('window resize does not close popover when focus is inside it', () => {
+            const cb = jest.fn();
+            const anchor = makeAnchor();
+            const content = makeContent();
+            const builder = new PopoverBuilder()
+                .withAnchor(anchor)
+                .withContent(content)
+                .withOnClose(cb);
+            builder.show();
+
+            // Simulate focus inside the popover
+            const focusedEl = document.createElement('input');
+            document.body.appendChild(focusedEl);
+            // Place the focused element inside the popover element
+            const popoverEl = document.body.querySelector('[popover]') as HTMLElement;
+            popoverEl.appendChild(focusedEl);
+            Object.defineProperty(document, 'activeElement', { value: focusedEl, configurable: true });
+
+            window.dispatchEvent(new Event('resize'));
+
+            expect(cb).not.toHaveBeenCalled();
+
+            // Restore
+            Object.defineProperty(document, 'activeElement', { value: document.body, configurable: true });
+        });
+
+        test('window resize closes popover when focus is outside it', () => {
+            const cb = jest.fn();
+            const anchor = makeAnchor();
+            const builder = new PopoverBuilder()
+                .withAnchor(anchor)
+                .withContent(makeContent())
+                .withOnClose(cb);
+            builder.show();
+
+            // activeElement is outside the popover (default: document.body)
+            Object.defineProperty(document, 'activeElement', { value: document.body, configurable: true });
+
+            window.dispatchEvent(new Event('resize'));
+
+            expect(cb).toHaveBeenCalledTimes(1);
+        });
     });
 
     // ────────────────────────────────────────────────
@@ -810,6 +919,366 @@ describe('PopoverBuilder', () => {
             // second opened cleanly
             builder2.close();
             expect(cb2).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    // ────────────────────────────────────────────────
+    // withAlignment
+    // ────────────────────────────────────────────────
+
+    describe('withAlignment', () => {
+        test('withAlignment returns this (fluent)', () => {
+            const builder = new PopoverBuilder();
+            expect(builder.withAlignment('end')).toBe(builder);
+        });
+
+        test('default alignment (start) sets left = rect.left and clears right', () => {
+            const anchor = makeAnchor({ bottom: 120, left: 50, right: 200, width: 150 });
+            const builder = new PopoverBuilder()
+                .withAnchor(anchor)
+                .withContent(makeContent());
+            builder.show();
+
+            const popover = document.body.querySelector('[popover]') as HTMLElement;
+            expect(popover.style.left).toBe('50px');
+            expect(popover.style.right).toBe('');
+        });
+
+        test('alignment "end" uses left (not right) after show()', () => {
+            const anchor = makeAnchor({ bottom: 120, left: 50, right: 200, width: 150 });
+            const builder = new PopoverBuilder()
+                .withAnchor(anchor)
+                .withContent(makeContent())
+                .withAlignment('end');
+            builder.show();
+
+            const popover = document.body.querySelector('[popover]') as HTMLElement;
+            // New behaviour: always uses CSS left, never right
+            expect(popover.style.right).toBe('');
+            expect(popover.style.left).not.toBe('');
+        });
+
+        test('alignment "end" pre-render pass (offsetWidth=0): left = posRect.right', () => {
+            // offsetWidth is 0 in jsdom before layout, so the pre-render branch fires on first
+            // _position() call. After showPopover() the 'end' path calls _position() a second time,
+            // but offsetWidth is still 0 in jsdom so left is posRect.right on both calls.
+            const anchor = makeAnchor({ bottom: 120, left: 50, right: 200, width: 150 });
+            const builder = new PopoverBuilder()
+                .withAnchor(anchor)
+                .withContent(makeContent())
+                .withAlignment('end');
+            builder.show();
+
+            const popover = document.body.querySelector('[popover]') as HTMLElement;
+            // offsetWidth = 0 in jsdom => pre-render branch: left = posRect.right = 200
+            expect(popover.style.left).toBe('200px');
+            expect(popover.style.right).toBe('');
+        });
+
+        test('alignment "end" post-render pass (offsetWidth>0): left = posRect.right - offsetWidth', () => {
+            const anchor = makeAnchor({ bottom: 120, left: 50, right: 200, width: 150 });
+            const builder = new PopoverBuilder()
+                .withAnchor(anchor)
+                .withContent(makeContent())
+                .withAlignment('end');
+            builder.build(); // build without show so we can set offsetWidth
+
+            // Patch offsetWidth on the popover element before show()
+            const popoverEl = document.body.querySelector('[popover]') as HTMLElement;
+            Object.defineProperty(popoverEl, 'offsetWidth', { value: 80, configurable: true });
+
+            builder.show();
+
+            // post-render: left = Math.max(0, posRect.right - offsetWidth) = Math.max(0, 200 - 80) = 120
+            expect(popoverEl.style.left).toBe('120px');
+            expect(popoverEl.style.right).toBe('');
+        });
+
+        test('alignment "end" post-render pass clamps left to 0 when popover wider than posRect.right', () => {
+            const anchor = makeAnchor({ bottom: 120, left: 50, right: 200, width: 150 });
+            const builder = new PopoverBuilder()
+                .withAnchor(anchor)
+                .withContent(makeContent())
+                .withAlignment('end');
+            builder.build();
+
+            const popoverEl = document.body.querySelector('[popover]') as HTMLElement;
+            // offsetWidth larger than posRect.right → would go negative → clamped to 0
+            Object.defineProperty(popoverEl, 'offsetWidth', { value: 300, configurable: true });
+
+            builder.show();
+
+            expect(popoverEl.style.left).toBe('0px');
+        });
+
+        test('alignment "end" post-render pass clamps left to window.innerWidth - popoverWidth when anchor extends past viewport right', () => {
+            // posRect.right (1100) > window.innerWidth (1024): naive left = 1100-80 = 1020 which
+            // would place the right edge at 1020+80 = 1100 → off screen.
+            // The upper clamp should cap left at window.innerWidth - popoverWidth = 1024-80 = 944.
+            const savedInnerWidth = window.innerWidth;
+            Object.defineProperty(window, 'innerWidth', { value: 1024, configurable: true });
+
+            const anchor = makeAnchor({ bottom: 120, left: 950, right: 1100, width: 150 });
+            const builder = new PopoverBuilder()
+                .withAnchor(anchor)
+                .withContent(makeContent())
+                .withAlignment('end');
+            builder.build();
+
+            const popoverEl = document.body.querySelector('[popover]') as HTMLElement;
+            Object.defineProperty(popoverEl, 'offsetWidth', { value: 80, configurable: true });
+
+            builder.show();
+
+            // Math.min(1024-80, Math.max(0, 1100-80)) = Math.min(944, 1020) = 944
+            expect(popoverEl.style.left).toBe('944px');
+            expect(popoverEl.style.right).toBe('');
+
+            Object.defineProperty(window, 'innerWidth', { value: savedInnerWidth, configurable: true });
+        });
+
+        test('show() calls _position() twice for "end" alignment (pre-render + post-render)', () => {
+            let rectCallCount = 0;
+            const anchor = document.createElement('button');
+            anchor.getBoundingClientRect = () => {
+                rectCallCount++;
+                return { top: 100, bottom: 120, left: 50, right: 200, width: 150, height: 20, x: 50, y: 100, toJSON: () => {} } as DOMRect;
+            };
+            document.body.appendChild(anchor);
+
+            const builder = new PopoverBuilder()
+                .withAnchor(anchor)
+                .withContent(makeContent())
+                .withAlignment('end');
+            builder.show();
+
+            // _position() is called twice for 'end' alignment: once before showPopover(),
+            // once after. Each call invokes getBoundingClientRect on the anchor.
+            expect(rectCallCount).toBeGreaterThanOrEqual(2);
+        });
+
+        test('show() does NOT call _position() a second time for "start" alignment', () => {
+            // For 'end', show() calls _position() twice (once before showPopover, once after).
+            // For 'start', show() calls _position() only once.
+            // We verify the 'end' count is strictly greater than the 'start' count.
+            let startRectCallCount = 0;
+            const startAnchor = document.createElement('button');
+            startAnchor.getBoundingClientRect = () => {
+                startRectCallCount++;
+                return { top: 100, bottom: 120, left: 50, right: 200, width: 150, height: 20, x: 50, y: 100, toJSON: () => {} } as DOMRect;
+            };
+            document.body.appendChild(startAnchor);
+
+            new PopoverBuilder()
+                .withAnchor(startAnchor)
+                .withContent(makeContent())
+                .withAlignment('start')
+                .show();
+
+            let endRectCallCount = 0;
+            const endAnchor = document.createElement('button');
+            endAnchor.getBoundingClientRect = () => {
+                endRectCallCount++;
+                return { top: 100, bottom: 120, left: 50, right: 200, width: 150, height: 20, x: 50, y: 100, toJSON: () => {} } as DOMRect;
+            };
+            document.body.appendChild(endAnchor);
+
+            new PopoverBuilder()
+                .withAnchor(endAnchor)
+                .withContent(makeContent())
+                .withAlignment('end')
+                .show();
+
+            // 'end' alignment makes 2× as many getBoundingClientRect calls as 'start'
+            // because it invokes _position() twice.
+            expect(endRectCallCount).toBeGreaterThan(startRectCallCount);
+        });
+
+        test('alignment "start" sets left and clears right', () => {
+            const anchor = makeAnchor({ bottom: 120, left: 75, right: 225, width: 150 });
+            const builder = new PopoverBuilder()
+                .withAnchor(anchor)
+                .withContent(makeContent())
+                .withAlignment('start');
+            builder.show();
+
+            const popover = document.body.querySelector('[popover]') as HTMLElement;
+            expect(popover.style.left).toBe('75px');
+            expect(popover.style.right).toBe('');
+        });
+    });
+
+    // ────────────────────────────────────────────────
+    // withPositionReference
+    // ────────────────────────────────────────────────
+
+    describe('withPositionReference', () => {
+        test('withPositionReference returns this (fluent)', () => {
+            const builder = new PopoverBuilder();
+            const ref = document.createElement('div');
+            expect(builder.withPositionReference(ref)).toBe(builder);
+        });
+
+        test('when positionReference is set, "end" alignment left uses positionReference.getBoundingClientRect().right', () => {
+            const anchor = makeAnchor({ bottom: 120, left: 50, right: 200, width: 150 });
+            const ref = document.createElement('div');
+            // positionReference has a different right than the anchor
+            ref.getBoundingClientRect = () => ({
+                top: 100, bottom: 120, left: 30, right: 350, width: 320, height: 20, x: 30, y: 100, toJSON: () => {}
+            } as DOMRect);
+            document.body.appendChild(ref);
+
+            const builder = new PopoverBuilder()
+                .withAnchor(anchor)
+                .withContent(makeContent())
+                .withAlignment('end')
+                .withPositionReference(ref);
+            builder.show();
+
+            const popover = document.body.querySelector('[popover]') as HTMLElement;
+            // offsetWidth = 0 in jsdom => pre-render branch: left = posRef.right = 350
+            expect(popover.style.left).toBe('350px');
+            expect(popover.style.right).toBe('');
+        });
+
+        test('when positionReference is set, "end" alignment left does NOT use anchor.getBoundingClientRect().right', () => {
+            const anchor = makeAnchor({ bottom: 120, left: 50, right: 200, width: 150 });
+            const ref = document.createElement('div');
+            ref.getBoundingClientRect = () => ({
+                top: 100, bottom: 120, left: 30, right: 350, width: 320, height: 20, x: 30, y: 100, toJSON: () => {}
+            } as DOMRect);
+            document.body.appendChild(ref);
+
+            const builder = new PopoverBuilder()
+                .withAnchor(anchor)
+                .withContent(makeContent())
+                .withAlignment('end')
+                .withPositionReference(ref);
+            builder.show();
+
+            const popover = document.body.querySelector('[popover]') as HTMLElement;
+            // anchor.right = 200 (left would be 200); posRef.right = 350 (left = 350)
+            // They differ, so left must NOT equal the anchor-based value
+            expect(popover.style.left).not.toBe('200px');
+        });
+
+        test('when positionReference is set, top still uses anchor.getBoundingClientRect().bottom (not positionReference)', () => {
+            // anchor bottom = 120, offset = 4 => top = 124
+            const anchor = makeAnchor({ bottom: 120, left: 50, right: 200, width: 150 });
+            const ref = document.createElement('div');
+            // positionReference has a very different bottom
+            ref.getBoundingClientRect = () => ({
+                top: 0, bottom: 999, left: 30, right: 350, width: 320, height: 999, x: 30, y: 0, toJSON: () => {}
+            } as DOMRect);
+            document.body.appendChild(ref);
+
+            const builder = new PopoverBuilder()
+                .withAnchor(anchor)
+                .withContent(makeContent())
+                .withPositionReference(ref);
+            builder.show();
+
+            const popover = document.body.querySelector('[popover]') as HTMLElement;
+            // top must come from anchor (120 + 4 = 124), not positionReference (999 + 4 = 1003)
+            expect(popover.style.top).toBe('124px');
+        });
+
+        test('when positionReference is set, "start" alignment left uses positionReference.getBoundingClientRect().left', () => {
+            const anchor = makeAnchor({ bottom: 120, left: 50, right: 200, width: 150 });
+            const ref = document.createElement('div');
+            ref.getBoundingClientRect = () => ({
+                top: 100, bottom: 120, left: 10, right: 330, width: 320, height: 20, x: 10, y: 100, toJSON: () => {}
+            } as DOMRect);
+            document.body.appendChild(ref);
+
+            const builder = new PopoverBuilder()
+                .withAnchor(anchor)
+                .withContent(makeContent())
+                .withAlignment('start')
+                .withPositionReference(ref);
+            builder.show();
+
+            const popover = document.body.querySelector('[popover]') as HTMLElement;
+            expect(popover.style.left).toBe('10px');
+        });
+
+        test('when positionReference is set, "match-anchor" width uses positionReference width', () => {
+            const anchor = makeAnchor({ bottom: 120, left: 50, right: 200, width: 150 });
+            const ref = document.createElement('div');
+            ref.getBoundingClientRect = () => ({
+                top: 100, bottom: 120, left: 30, right: 350, width: 320, height: 20, x: 30, y: 100, toJSON: () => {}
+            } as DOMRect);
+            document.body.appendChild(ref);
+
+            const builder = new PopoverBuilder()
+                .withAnchor(anchor)
+                .withContent(makeContent())
+                .withWidth('match-anchor')
+                .withPositionReference(ref);
+            builder.show();
+
+            const popover = document.body.querySelector('[popover]') as HTMLElement;
+            expect(popover.style.width).toBe('320px');
+        });
+
+        test('without positionReference, "end" alignment falls back to anchor.getBoundingClientRect().right for left', () => {
+            const anchor = makeAnchor({ bottom: 120, left: 50, right: 200, width: 150 });
+            const builder = new PopoverBuilder()
+                .withAnchor(anchor)
+                .withContent(makeContent())
+                .withAlignment('end');
+            builder.show();
+
+            const popover = document.body.querySelector('[popover]') as HTMLElement;
+            // offsetWidth = 0 in jsdom => pre-render: left = anchor.right = 200
+            expect(popover.style.left).toBe('200px');
+            expect(popover.style.right).toBe('');
+        });
+    });
+
+    // ────────────────────────────────────────────────
+    // withMaxWidth
+    // ────────────────────────────────────────────────
+
+    describe('withMaxWidth', () => {
+        test('withMaxWidth returns this (fluent)', () => {
+            const builder = new PopoverBuilder();
+            expect(builder.withMaxWidth('300px')).toBe(builder);
+        });
+
+        test('withMaxWidth sets maxWidth on the popover element', () => {
+            const anchor = makeAnchor();
+            const builder = new PopoverBuilder()
+                .withAnchor(anchor)
+                .withContent(makeContent())
+                .withMaxWidth('300px');
+            builder.show();
+
+            const popover = document.body.querySelector('[popover]') as HTMLElement;
+            expect(popover.style.maxWidth).toBe('300px');
+        });
+
+        test('withMaxWidth accepts arbitrary CSS values', () => {
+            const anchor = makeAnchor();
+            const builder = new PopoverBuilder()
+                .withAnchor(anchor)
+                .withContent(makeContent())
+                .withMaxWidth('50vw');
+            builder.show();
+
+            const popover = document.body.querySelector('[popover]') as HTMLElement;
+            expect(popover.style.maxWidth).toBe('50vw');
+        });
+
+        test('without withMaxWidth, maxWidth is not set on the popover element', () => {
+            const anchor = makeAnchor();
+            const builder = new PopoverBuilder()
+                .withAnchor(anchor)
+                .withContent(makeContent());
+            builder.show();
+
+            const popover = document.body.querySelector('[popover]') as HTMLElement;
+            expect(popover.style.maxWidth).toBe('');
         });
     });
 

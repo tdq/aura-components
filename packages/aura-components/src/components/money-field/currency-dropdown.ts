@@ -2,6 +2,7 @@ import { Observable, Subject, Subscription } from 'rxjs';
 import { CurrencyRegistry } from '@/utils/currency-registry';
 import { Icons } from '@/core/icons';
 import { registerDestroy } from '@/core/destroyable-element';
+import { PopoverBuilder } from '../component-parts/popover';
 
 let dropdownIdCounter = 0;
 
@@ -34,7 +35,8 @@ export function createCurrencyDropdown(
     currencies: string[],
     currencyValue$: Subject<string | null>,
     enabled$: Observable<boolean>,
-    isGlass: boolean
+    isGlass: boolean,
+    positionReference?: HTMLElement
 ): HTMLElement {
     const subscriptions = new Subscription();
 
@@ -44,8 +46,6 @@ export function createCurrencyDropdown(
     let currentCurrency: string | null = null;
     // Fix 4: Keep references to <li> elements to avoid full re-render on focus change
     let liElements: HTMLLIElement[] = [];
-    // Fix 5: Track whether listbox has been appended to DOM yet
-    let listboxAttached = false;
 
     // Root container
     const container = document.createElement('div');
@@ -77,17 +77,35 @@ export function createCurrencyDropdown(
     button.appendChild(chevron);
     container.appendChild(button);
 
-    // Dropdown list (popover) — not yet attached to DOM (Fix 5)
+    // Dropdown list — content element for PopoverBuilder
     const listbox = document.createElement('ul');
     listbox.id = listId;
     listbox.setAttribute('role', 'listbox');
-    listbox.setAttribute('popover', 'manual');
-    listbox.className = [
-        'fixed', 'm-0', 'py-2', 'rounded-small', 'shadow-level-2', 'overflow-y-auto', 'max-w-[300px]',
-        isGlass ? 'glass-effect' : 'bg-surface border border-outline'
-    ].join(' ');
-    listbox.style.minWidth = 'max-content';
-    listbox.style.width = 'auto';
+    listbox.className = 'py-2';
+
+    // PopoverBuilder manages DOM attachment, positioning, and all close events
+    const popover = new PopoverBuilder()
+        .withAnchor(button)
+        .withContent({ build: () => listbox })
+        .withWidth('auto')
+        .withAlignment('end')
+        .withMaxWidth('300px')
+        .withOnClose(() => {
+            isOpen = false;
+            focusedIndex = -1;
+            button.setAttribute('aria-expanded', 'false');
+            button.removeAttribute('aria-activedescendant');
+        });
+
+    if (positionReference) {
+        popover.withPositionReference(positionReference);
+    }
+
+    if (isGlass) {
+        popover.asGlass();
+    } else {
+        popover.withClass('bg-surface border border-outline');
+    }
 
     // Fix 4: Build list items and populate liElements; called on open and on selection change
     function renderItems() {
@@ -150,25 +168,13 @@ export function createCurrencyDropdown(
         }
     }
 
-    function positionListbox() {
-        const rect = button.getBoundingClientRect();
-        listbox.style.top = `${rect.bottom + 4}px`;
-        listbox.style.left = `${rect.left}px`;
-    }
-
     function openDropdown() {
         if (isOpen) return;
-        // Fix 5: Defer DOM attachment to first open
-        if (!listboxAttached) {
-            document.body.appendChild(listbox);
-            listboxAttached = true;
-        }
         isOpen = true;
         focusedIndex = currencies.indexOf(currentCurrency || '');
         if (focusedIndex < 0) focusedIndex = 0;
         renderItems();
-        positionListbox();
-        (listbox as any).showPopover();
+        popover.show();
         button.setAttribute('aria-expanded', 'true');
         // Fix 2: set initial aria-activedescendant
         if (focusedIndex >= 0 && focusedIndex < currencies.length) {
@@ -178,12 +184,8 @@ export function createCurrencyDropdown(
 
     function closeDropdown() {
         if (!isOpen) return;
-        isOpen = false;
-        focusedIndex = -1;
-        (listbox as any).hidePopover();
-        button.setAttribute('aria-expanded', 'false');
-        // Fix 2: remove aria-activedescendant
-        button.removeAttribute('aria-activedescendant');
+        popover.close();
+        // State reset happens in withOnClose callback
     }
 
     function toggleDropdown() {
@@ -244,28 +246,6 @@ export function createCurrencyDropdown(
         }
     };
 
-    // Click outside to close
-    const onDocumentClick = (e: MouseEvent) => {
-        if (isOpen && !container.contains(e.target as Node) && !listbox.contains(e.target as Node)) {
-            closeDropdown();
-        }
-    };
-    document.addEventListener('click', onDocumentClick);
-
-    // Scroll to close
-    const onScroll = (e: Event) => {
-        if (!isOpen) return;
-        const target = e.target as Node;
-        if (!listbox.contains(target)) {
-            closeDropdown();
-        }
-    };
-    document.addEventListener('scroll', onScroll, true);
-
-    // Fix 6: Close on window resize
-    const onResize = () => { if (isOpen) closeDropdown(); };
-    window.addEventListener('resize', onResize);
-
     // Subscribe to currency value changes to update the displayed symbol
     subscriptions.add(
         currencyValue$.subscribe(currencyId => {
@@ -295,18 +275,12 @@ export function createCurrencyDropdown(
         symbolSpan.textContent = CurrencyRegistry.getSymbol(currencies[0]);
     }
 
-    // Cleanup — removes all listeners and detaches listbox from DOM
+    // Cleanup — PopoverBuilder registers its own cleanup on the button element via registerDestroy,
+    // so click/scroll/resize listeners and popover DOM removal are handled automatically.
     registerDestroy(container, () => {
         subscriptions.unsubscribe();
-        document.removeEventListener('click', onDocumentClick);
-        document.removeEventListener('scroll', onScroll, true);
-        // Fix 6: remove resize listener
-        window.removeEventListener('resize', onResize);
         if (isOpen) {
-            try { (listbox as any).hidePopover(); } catch { /* ignore */ }
-        }
-        if (listbox.parentNode) {
-            listbox.parentNode.removeChild(listbox);
+            popover.close();
         }
     });
 

@@ -537,6 +537,83 @@ describe('MoneyFieldBuilder', () => {
         });
     });
 
+    describe('10. Currency dropdown position reference (container alignment)', () => {
+        beforeEach(() => {
+            document.body.innerHTML = '';
+        });
+
+        test('popover left aligns with container right edge (not inputWrapper, not currency button)', () => {
+            // Build a multi-currency money field so the currency dropdown is created
+            const moneyFieldContainer = builder.withCurrencies(['USD', 'EUR', 'GBP']).build();
+            document.body.appendChild(moneyFieldContainer);
+
+            // The position reference is now the outer container element (flex flex-col w-full),
+            // NOT the inputWrapper (flex items-center h-[48px]).
+            // The container is the top-level div returned by build().
+            const containerRight = 600;
+            moneyFieldContainer.getBoundingClientRect = () => ({
+                top: 50, bottom: 98, left: 100, right: containerRight,
+                width: 500, height: 48, x: 100, y: 50, toJSON: () => {}
+            } as DOMRect);
+
+            // Locate the currency dropdown button and give it a distinct right
+            const currencyButton = moneyFieldContainer.querySelector('.currency-dropdown button') as HTMLButtonElement;
+            expect(currencyButton).not.toBeNull();
+
+            currencyButton.getBoundingClientRect = () => ({
+                top: 50, bottom: 98, left: 555, right: 595,
+                width: 40, height: 48, x: 555, y: 50, toJSON: () => {}
+            } as DOMRect);
+
+            // Open the currency dropdown
+            currencyButton.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+            const allPopovers = Array.from(document.body.querySelectorAll('[popover]')) as HTMLElement[];
+            // The newly opened popover is the one with a left value set (end alignment uses left)
+            const openPopover = allPopovers.find(el => el.style.left !== '') as HTMLElement;
+            expect(openPopover).toBeDefined();
+
+            // offsetWidth = 0 in jsdom → pre-render branch: left = posRect.right = containerRight
+            expect(openPopover.style.left).toBe(`${containerRight}px`);
+            expect(openPopover.style.right).toBe('');
+
+            // Must NOT equal the currency-button-based left (595)
+            expect(openPopover.style.left).not.toBe('595px');
+        });
+
+        test('popover left does NOT use inputWrapper right edge (old behaviour)', () => {
+            // This test guards against regression to the old inputWrapper-based positioning.
+            const moneyFieldContainer = builder.withCurrencies(['USD', 'EUR', 'GBP']).build();
+            document.body.appendChild(moneyFieldContainer);
+
+            // Give container a distinct right
+            moneyFieldContainer.getBoundingClientRect = () => ({
+                top: 50, bottom: 98, left: 50, right: 700,
+                width: 650, height: 48, x: 50, y: 50, toJSON: () => {}
+            } as DOMRect);
+
+            // Give inputWrapper a different right
+            const input = moneyFieldContainer.querySelector('input') as HTMLInputElement;
+            const inputWrapper = input.parentElement as HTMLElement;
+            const inputWrapperRight = 650;
+            inputWrapper.getBoundingClientRect = () => ({
+                top: 50, bottom: 98, left: 50, right: inputWrapperRight,
+                width: 600, height: 48, x: 50, y: 50, toJSON: () => {}
+            } as DOMRect);
+
+            const currencyButton = moneyFieldContainer.querySelector('.currency-dropdown button') as HTMLButtonElement;
+            currencyButton.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+            const openPopover = Array.from(document.body.querySelectorAll('[popover]'))
+                .find(el => (el as HTMLElement).style.left !== '') as HTMLElement;
+            expect(openPopover).toBeDefined();
+
+            // left should be container.right (700), not inputWrapper.right (650)
+            expect(openPopover.style.left).toBe('700px');
+            expect(openPopover.style.left).not.toBe(`${inputWrapperRight}px`);
+        });
+    });
+
     test('should clean up subscriptions on destroy', async () => {
         const value$ = new BehaviorSubject<Money | null>({ amount: 10, currencyId: 'USD' });
         const container = builder.withValue(value$).withCurrencies(['USD']).build();

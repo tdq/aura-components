@@ -5,6 +5,7 @@ import { formatDate, parseDate, isValidDate } from './date-utils';
 import { renderCalendar } from './calendar';
 import { DatePickerStyle, DayOfWeek } from './types';
 import { Icons } from '@/core/icons';
+import { PopoverBuilder } from '../component-parts/popover';
 
 export class DatePickerBuilder implements ComponentBuilder {
     private value$?: Subject<Date | null>;
@@ -79,36 +80,21 @@ export class DatePickerBuilder implements ComponentBuilder {
         container.className = 'flex flex-col gap-px-4 w-full relative';
 
         // 1. Template Structure
-        const { captionElement, inputWrapper, input, iconButton, errorElement, popup } = this.createTemplate();
-        
+        const { captionElement, inputWrapper, input, iconButton, errorElement } = this.createTemplate();
+
         container.appendChild(captionElement);
         container.appendChild(inputWrapper);
         container.appendChild(errorElement);
-        container.appendChild(popup);
 
         // 2. Internal State
         const isExpanded$ = new BehaviorSubject<boolean>(false);
         const internalValue$ = new BehaviorSubject<Date | null>(null);
         const subs: any[] = [];
 
-        // 3. Logic & Subscriptions
-        this.setupLogic(
-            input, 
-            inputWrapper, 
-            captionElement, 
-            errorElement, 
-            popup, 
-            iconButton, 
-            container, 
-            isExpanded$, 
-            internalValue$, 
-            subs
-        );
+        // 3. Calendar wrapped in a padding div (replaces the p-px-16 that was on the old popup)
+        const calendarWrapper = document.createElement('div');
+        calendarWrapper.className = 'p-px-16';
 
-        // 4. Input Masking & Validation
-        this.setupMasking(input);
-
-        // 5. Calendar Initialization
         const calendar = renderCalendar({
             selectedDate$: internalValue$,
             isExpanded$: isExpanded$,
@@ -124,24 +110,48 @@ export class DatePickerBuilder implements ComponentBuilder {
             isGlass: this.isGlass,
             firstDayOfWeek: this.firstDayOfWeek
         });
-        popup.appendChild(calendar);
+        calendarWrapper.appendChild(calendar);
 
-        // 6. Event Handlers
+        // 4. PopoverBuilder replaces the manual popup div
+        const popover = new PopoverBuilder()
+            .withAnchor(inputWrapper)
+            .withContent({ build: () => calendarWrapper })
+            .withWidth('320px')
+            .withOnClose(() => {
+                input.focus();
+                isExpanded$.next(false);
+            });
+
+        if (this.isGlass) {
+            popover.asGlass();
+        } else {
+            popover.withClass('bg-surface border-outline');
+        }
+
+        // 5. Logic & Subscriptions
+        this.setupLogic(
+            input,
+            inputWrapper,
+            captionElement,
+            errorElement,
+            popover,
+            calendarWrapper,
+            iconButton,
+            container,
+            isExpanded$,
+            internalValue$,
+            subs
+        );
+
+        // 6. Input Masking & Validation
+        this.setupMasking(input);
+
+        // 7. Event Handlers
         this.setupEventHandlers(input, iconButton, isExpanded$);
 
-        const scrollHandler = (e: Event) => {
-            if (isExpanded$.value && !popup.contains(e.target as Node)) {
-                isExpanded$.next(false);
-            }
-        };
-        document.addEventListener('scroll', scrollHandler, true);
-
-        // 7. Cleanup
+        // 8. Cleanup
         registerDestroy(container, () => {
             subs.forEach(s => s?.unsubscribe());
-            if (typeof document !== 'undefined') {
-                document.removeEventListener('scroll', scrollHandler, true);
-            }
         });
 
         // Expose public API
@@ -181,12 +191,7 @@ export class DatePickerBuilder implements ComponentBuilder {
         const errorElement = document.createElement('span');
         errorElement.className = 'md-label-small text-error px-px-16 hidden';
 
-        // Calendar Popup
-        const popup = document.createElement('div');
-        popup.setAttribute('popover', 'auto');
-        popup.className = 'absolute mt-px-4 z-50 bg-surface border-outline rounded-small shadow-level-2 p-px-16 w-px-320 m-0';
-
-        return { captionElement, inputWrapper, input, iconButton, errorElement, popup };
+        return { captionElement, inputWrapper, input, iconButton, errorElement };
     }
 
     private setupLogic(
@@ -194,7 +199,8 @@ export class DatePickerBuilder implements ComponentBuilder {
         inputWrapper: HTMLElement,
         captionElement: HTMLElement,
         errorElement: HTMLElement,
-        popup: HTMLElement,
+        popover: PopoverBuilder,
+        calendarWrapper: HTMLElement,
         iconButton: HTMLButtonElement,
         container: HTMLElement,
         isExpanded$: BehaviorSubject<boolean>,
@@ -239,14 +245,11 @@ export class DatePickerBuilder implements ComponentBuilder {
         if (this.isGlass) {
             inputWrapper.classList.remove('bg-surface-variant', 'border-b', 'border-outline-variant', 'rounded-t-small');
             inputWrapper.classList.add('glass-effect', 'rounded-small');
-            
-            popup.classList.remove('bg-surface', 'border-outline');
-            popup.classList.add('glass-effect');
 
             // Apply glass text colors
             const glassLabelInputClasses = ['text-gray-900', 'dark:text-white'];
             const glassIconClasses = ['text-gray-600', 'dark:text-white/60'];
-            
+
             captionElement.classList.remove('text-on-surface-variant');
             captionElement.classList.add(...glassLabelInputClasses);
 
@@ -257,46 +260,17 @@ export class DatePickerBuilder implements ComponentBuilder {
             iconButton.classList.add(...glassIconClasses);
         }
 
-        subs.push(isExpanded$.subscribe(expanded => {
+        subs.push(isExpanded$.pipe(distinctUntilChanged()).subscribe(expanded => {
             input.setAttribute('aria-expanded', expanded.toString());
-            
+
             if (expanded) {
-                const rect = inputWrapper.getBoundingClientRect();
-                popup.style.top = `${rect.bottom + 4}px`;
-                popup.style.left = `${rect.left}px`;
-                
-                try {
-                    if ((popup as any).showPopover) {
-                        (popup as any).showPopover();
-                    }
-                } catch (e) {
-                    // Ignore if already shown or not supported
-                }
-                
-                const grid = popup.querySelector('[role="grid"]') as HTMLElement;
+                popover.show();
+                const grid = calendarWrapper.querySelector('[role="grid"]') as HTMLElement;
                 grid?.focus();
             } else {
-                try {
-                    if ((popup as any).hidePopover) {
-                        (popup as any).hidePopover();
-                    }
-                } catch (e) {
-                    // Ignore if already hidden or not supported
-                }
-                
-                // Return focus to input when closing IF the focus was inside the popup
-                if (popup.contains(document.activeElement)) {
-                    input.focus();
-                }
+                popover.close();
             }
         }));
-
-        popup.addEventListener('toggle', (event: any) => {
-            const isNowOpen = event.newState === 'open';
-            if (isExpanded$.value !== isNowOpen) {
-                isExpanded$.next(isNowOpen);
-            }
-        });
 
         subs.push(this.style$?.subscribe(style => {
             if (style.primaryColor) container.style.setProperty('--md-sys-color-primary', style.primaryColor);
@@ -314,13 +288,13 @@ export class DatePickerBuilder implements ComponentBuilder {
     private setupMasking(input: HTMLInputElement) {
         input.addEventListener('keypress', (e) => {
             if (e.ctrlKey || e.metaKey || e.altKey) return;
-            
+
             const char = e.key;
             // Only handle single character inputs
             if (char.length !== 1) return;
 
             const pos = input.selectionStart ?? 0;
-            
+
             // Prevent typing more than format length
             if (pos >= this.format.length && !this.isSelectionActive(input)) {
                 e.preventDefault();
@@ -342,14 +316,14 @@ export class DatePickerBuilder implements ComponentBuilder {
                 } else if (/\d/.test(char)) {
                     // Auto-insert separator and then this digit if it matches the NEXT placeholder
                     e.preventDefault();
-                    
+
                     const nextPos = pos + 1;
                     if (nextPos < this.format.length && /[YMD]/.test(this.format[nextPos])) {
                         const val = input.value;
                         const before = val.slice(0, pos);
                         const after = val.slice(input.selectionEnd ?? pos);
                         input.value = before + expected + char + after;
-                        
+
                         const cursorIdx = pos + 2;
                         input.setSelectionRange(cursorIdx, cursorIdx);
                         input.dispatchEvent(new Event('input'));

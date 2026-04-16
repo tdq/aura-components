@@ -14,6 +14,9 @@ export class PopoverBuilder implements PopupBuilder {
     private _className?: string;
     private _onCloseCb?: () => void;
     private _glass: boolean = false;
+    private _alignment: 'start' | 'end' = 'start';
+    private _maxWidth?: string;
+    private _positionReference?: HTMLElement;
 
     private _popoverEl?: HTMLElement;
     private _isOpen: boolean = false;
@@ -60,6 +63,21 @@ export class PopoverBuilder implements PopupBuilder {
         return this;
     }
 
+    withAlignment(alignment: 'start' | 'end'): this {
+        this._alignment = alignment;
+        return this;
+    }
+
+    withMaxWidth(maxWidth: string): this {
+        this._maxWidth = maxWidth;
+        return this;
+    }
+
+    withPositionReference(el: HTMLElement): this {
+        this._positionReference = el;
+        return this;
+    }
+
     build(): this {
         this._buildIfNeeded();
         return this;
@@ -76,6 +94,14 @@ export class PopoverBuilder implements PopupBuilder {
             (this._popoverEl as any).showPopover();
             this._isOpen = true;
             _activePopover = this;
+            // Two-pass positioning for 'end' alignment:
+            // 1st pass (above): sets top, min-width, max-width so the element has layout dimensions.
+            // 2nd pass (here): reads offsetWidth — now accurate because the element is visible with
+            //    correct width constraints — and computes left = posRect.right - offsetWidth.
+            // Both passes run in the same JS task so there is no visible flash.
+            if (this._alignment === 'end') {
+                this._position();
+            }
         }
     }
 
@@ -157,9 +183,11 @@ export class PopoverBuilder implements PopupBuilder {
         };
         document.addEventListener('scroll', this._scrollHandler, true);
 
-        // Close on window resize
+        // Close on window resize, but not when the mobile virtual keyboard fires a resize
+        // (e.g. when focus is inside the popover and the keyboard appears/dismisses).
         this._resizeHandler = () => {
             if (!this._isOpen) return;
+            if (this._popoverEl!.contains(document.activeElement)) return;
             this._onClose();
         };
         window.addEventListener('resize', this._resizeHandler);
@@ -173,23 +201,66 @@ export class PopoverBuilder implements PopupBuilder {
     private _position(): void {
         if (!this._popoverEl || !this._anchor) return;
 
-        const rect = this._anchor.getBoundingClientRect();
-        const top = rect.bottom + this._offset;
-        const left = rect.left;
+        // The popover element is appended to document.body (see _buildIfNeeded),
+        // so position:fixed is always relative to the viewport. getBoundingClientRect()
+        // also returns viewport-relative coordinates, so no coordinate transform is needed.
+        // Assumption: no CSS transform/filter/perspective on <body> or <html>.
+        const anchorRect = this._anchor.getBoundingClientRect();
+        const posRect = (this._positionReference ?? this._anchor).getBoundingClientRect();
 
-        this._popoverEl.style.top = `${top}px`;
-        this._popoverEl.style.left = `${left}px`;
+        // Smart vertical positioning: open upward when there is more space above the anchor
+        // than below it, preventing the popover from being clipped by the viewport bottom.
+        const spaceBelow = window.innerHeight - anchorRect.bottom;
+        const spaceAbove = anchorRect.top;
+        const openAbove = spaceAbove > spaceBelow;
+
+        if (openAbove) {
+            // Pin the popover's bottom edge just above the anchor.
+            // Must set top:'auto' explicitly — the [popover] UA stylesheet applies inset:0
+            // (top:0) which, combined with UA height:fit-content, would cause the CSS spec
+            // over-constraint rule to drop our `bottom` value, landing the popover at y=0.
+            // Explicit top:auto as an inline override lets `bottom` actually anchor the element.
+            this._popoverEl.style.top = 'auto';
+            this._popoverEl.style.bottom = `${window.innerHeight - anchorRect.top + this._offset}px`;
+        } else {
+            this._popoverEl.style.top = `${anchorRect.bottom + this._offset}px`;
+            this._popoverEl.style.bottom = 'auto';
+        }
+
+        this._popoverEl.style.right = '';   // always use left-based positioning
+        if (this._alignment === 'end') {
+            const popoverWidth = this._popoverEl.offsetWidth;
+            if (popoverWidth > 0) {
+                // Accurate: element is rendered, use measured width
+                const clampedLeft = Math.min(
+                    window.innerWidth - popoverWidth,
+                    Math.max(0, posRect.right - popoverWidth)
+                );
+                this._popoverEl.style.left = `${clampedLeft}px`;
+            } else {
+                // Pre-render pass: approximate using posRect.right (will be re-positioned in show())
+                this._popoverEl.style.left = `${posRect.right}px`;
+            }
+        } else {
+            this._popoverEl.style.left = `${posRect.left}px`;
+        }
 
         const w = this._currentWidth;
         if (w === 'match-anchor') {
-            this._popoverEl.style.width = `${rect.width}px`;
+            this._popoverEl.style.width = `${posRect.width}px`;
             this._popoverEl.style.minWidth = '';
         } else if (w === 'auto') {
             this._popoverEl.style.width = 'auto';
-            this._popoverEl.style.minWidth = `${rect.width}px`;
+            this._popoverEl.style.minWidth = `${posRect.width}px`;
         } else {
             this._popoverEl.style.width = w;
             this._popoverEl.style.minWidth = '';
+        }
+
+        if (this._maxWidth) {
+            this._popoverEl.style.maxWidth = this._maxWidth;
+        } else {
+            this._popoverEl.style.maxWidth = '';
         }
     }
 

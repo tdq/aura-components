@@ -7,7 +7,10 @@ import { createAnalytics } from './dashboard/analytics';
 import { createCustomers } from './dashboard/customers';
 import { createOrders } from './dashboard/orders';
 import { createSettings } from './dashboard/settings';
-import { createMoneyFieldDemo } from './dashboard/money-field';
+import { createLedger } from './dashboard/ledger';
+import { createPL } from './dashboard/pl';
+import { createBalanceSheet } from './dashboard/balance-sheet';
+import { createPayables } from './dashboard/payables';
 
 export function createDashboardDemo(): HTMLElement {
     const layout = new LayoutBuilder()
@@ -15,7 +18,7 @@ export function createDashboardDemo(): HTMLElement {
         .withGap(LayoutGap.NONE);
 
     // Sidebar
-    layout.addSlot().withSize(SlotSize.FIT).withContent({build: () => createSidebar()});
+    layout.addSlot().withSize(SlotSize.FIT).withContent({ build: () => createSidebar() });
 
     // Main Content Area
     const mainContent = document.createElement('div');
@@ -27,19 +30,22 @@ export function createDashboardDemo(): HTMLElement {
     // Dashboard Content Outlet
     const contentOutlet = document.createElement('div');
     contentOutlet.className = 'flex-1 overflow-hidden flex flex-col';
-    
+
     const routeSub = router.currentRoute$.subscribe(route => {
         contentOutlet.innerHTML = '';
         const page = route?.params?.page;
 
         let content: HTMLElement;
         switch (page) {
-            case 'analytics':  content = createAnalytics();  break;
-            case 'customers':  content = createCustomers();  break;
-            case 'orders':     content = createOrders();     break;
-            case 'settings':   content = createSettings();   break;
-            case 'money-field': content = createMoneyFieldDemo(); break;
-            default:           content = createOverview();   break;
+            case 'analytics':     content = createAnalytics(); break;
+            case 'customers':     content = createCustomers(); break;
+            case 'orders':        content = createOrders(); break;
+            case 'settings':      content = createSettings(); break;
+            case 'ledger':        content = createLedger(); break;
+            case 'pl':            content = createPL(); break;
+            case 'balance-sheet': content = createBalanceSheet(); break;
+            case 'payables':      content = createPayables(); break;
+            default:              content = createOverview(); break;
         }
         contentOutlet.appendChild(content);
     });
@@ -47,7 +53,7 @@ export function createDashboardDemo(): HTMLElement {
 
     mainContent.appendChild(contentOutlet);
 
-    layout.addSlot().withContent({build: () => mainContent});
+    layout.addSlot().withContent({ build: () => mainContent });
 
     const element = layout.build();
     element.classList.add('h-screen', 'w-full');

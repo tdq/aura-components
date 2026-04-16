@@ -155,7 +155,7 @@ export class MoneyFieldLogic {
 
     private updateCurrencyDisplay(currencies: string[]) {
         this.suffixContainer.innerHTML = '';
-        
+
         if (currencies.length === 0) {
             this.suffixContainer.classList.add('hidden');
             return;
@@ -170,7 +170,7 @@ export class MoneyFieldLogic {
             span.textContent = symbol;
             this.suffixContainer.appendChild(span);
             this.suffixContainer.classList.remove('hidden');
-            
+
             // If we have a value with a different currency or no currency, update it
             if (this.currentValue && this.currentValue.currencyId !== currencyId) {
                 this.state.value$.next({ ...this.currentValue, currencyId });
@@ -182,7 +182,8 @@ export class MoneyFieldLogic {
                 currencies,
                 this.currencyValue$,
                 this.state.enabled$,
-                this.state.isGlass
+                this.state.isGlass,
+                this.container
             );
             dropdown.classList.add('h-full');
             this.suffixContainer.appendChild(dropdown);
@@ -284,7 +285,7 @@ export class MoneyFieldLogic {
         this.input.onblur = () => {
             const parsed = this.parseValue(this.input.value, latestLocale);
             const currencyId = this.currentValue?.currencyId || this.currentCurrency || (this.state.currencies.length > 0 ? this.state.currencies[0] : 'USD');
-            
+
             if (parsed === null) {
                 this.state.value$.next(null);
                 this.input.value = '';

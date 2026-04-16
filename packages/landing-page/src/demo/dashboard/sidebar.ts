@@ -62,21 +62,39 @@ export function createSidebar(): HTMLElement {
             icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>`
         },
         {
-            label: 'Money Field',
-            path: '/dashboard/money-field',
-            icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`
-        },
-        {
             label: 'Settings',
             path: '/dashboard/settings',
             icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>`
         }
     ];
 
-    items.forEach(item => {
+    const accountingItems = [
+        {
+            label: 'Ledger',
+            path: '/dashboard/ledger',
+            icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`
+        },
+        {
+            label: 'P&L',
+            path: '/dashboard/pl',
+            icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>`
+        },
+        {
+            label: 'Balance Sheet',
+            path: '/dashboard/balance-sheet',
+            icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>`
+        },
+        {
+            label: 'Payables',
+            path: '/dashboard/payables',
+            icon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>`
+        }
+    ];
+
+    const makeNavButton = (item: { label: string; path: string; exact?: boolean; icon: string }) => {
         const btn = document.createElement('button');
         btn.className = 'w-full flex items-center gap-px-12 px-px-12 py-px-8 rounded-large text-label-large mb-1 relative transition-all duration-200';
-        
+
         const updateActive = (currentPath: string) => {
             const isActive = item.exact ? currentPath === item.path : currentPath.startsWith(item.path);
             if (isActive) {
@@ -99,8 +117,19 @@ export function createSidebar(): HTMLElement {
 
         btn.insertAdjacentHTML('beforeend', `${item.icon}<span>${item.label}</span>`);
         btn.onclick = () => router.navigate(item.path);
-        navSection.appendChild(btn);
-    });
+        return btn;
+    };
+
+    items.forEach(item => navSection.appendChild(makeNavButton(item)));
+
+    // Accounting section
+    const accountingLabel = document.createElement('div');
+    accountingLabel.className = 'px-px-12 mb-px-8 mt-px-16 text-label-small font-semibold text-on-surface-variant uppercase tracking-widest';
+    accountingLabel.style.cssText = 'opacity: 0.4; letter-spacing: 0.1em;';
+    accountingLabel.textContent = 'Accounting';
+    navSection.appendChild(accountingLabel);
+
+    accountingItems.forEach(item => navSection.appendChild(makeNavButton(item)));
 
     // Footer
     const sidebarFooter = document.createElement('div');
