@@ -35,23 +35,36 @@ When dropdown opens initially it is showing all items, and only when user starte
 When dropdown opens it highlights selected item (scrolls into it if it is not visible).
 
 ### Dropdown
-The dropdown is powered by `PopoverBuilder` (from `component-parts`). `PopoverBuilder` handles popover element creation, anchor-relative positioning, click-outside / scroll / resize close, and width management. `isExpanded$` controls open/close by calling `popover.show()` / `popover.close()`.
+The dropdown is powered by `PopoverBuilder` (from `component-parts`) with a `ListBoxBuilder` (BORDERLESS style) as its content. `PopoverBuilder` handles popover element creation, anchor-relative positioning, click-outside / scroll / resize close, and width management. `isExpanded$` controls open/close by calling `popover.show()` / `popover.close()`.
+
+`ListBoxBuilder` handles item rendering, selection highlighting, and focused-item highlighting. ComboBox drives the focused index externally via `withFocusedIndex(focusedIndex$)` — the input's `keydown` handler remains the sole writer of `focusedIndex$`. When the user clicks an item, ListBox emits via its `withValue` subject and ComboBox handles the selection (closes popup, updates input value).
+
+When the dropdown opens with an existing selected value, that item is shown with the selection highlight (bold, `bg-on-secondary-container/20`). A "No results" message is shown when the filter produces no matches; the `<ul role="listbox">` remains in the DOM at all times for accessibility.
+
+### Keyboard Navigation (input-driven)
+The input element captures all keyboard events:
+- `ArrowDown` — opens dropdown if closed; moves focus to the next item (wraps)
+- `ArrowUp` — opens dropdown if closed; moves focus to the previous item (wraps)
+- `Enter` — selects the focused item and closes the dropdown
+- `Escape` — closes the dropdown
+- **Space does NOT select** — falls through to allow typing multi-word search terms (e.g., "Ice Cream")
 
 ## Accessibility
 ComboBox implements ARIA patterns for combobox:
 - `role="combobox"` on the input element.
 - `aria-autocomplete="list"`, `aria-expanded`, `aria-haspopup="listbox"`.
-- `aria-controls` links the input to the listbox ID.
-- `aria-activedescendant` on the input points to the ID of the currently focused item in the listbox.
+- `aria-controls` links the input to the listbox `<ul>` id.
+- `aria-activedescendant` on the input points to the ID of the currently focused item in the listbox (set synchronously when `focusedIndex$` changes).
 - Listbox items have `role="option"` and `aria-selected`.
 
 ## Styling
-Style according to Material Design 3 
-When `asGlass()` is used, `glass-effect` is applied to the `PopoverBuilder` wrapper (the container div that holds the listbox), not to the listbox `<ul>` element itself.
-Popup with items should have background according to combobox style (tonal or outline).
-Popup with items should have limited height and a max-width of 300px.
-Hovered item in popup should be highlighted with darker background.
-Currently selected item also should be highlighted in popup by using bold text style.
+Style according to Material Design 3
+When `asGlass()` is used, `glass-effect` is applied to both the `PopoverBuilder` wrapper and the `ListBoxBuilder` (which uses BORDERLESS style — see ListBox glass+BORDERLESS behavior to avoid double-glass).
+Popup items have no top/bottom padding gap at the container level (`max-h-px-256 overflow-hidden` on the ListBox container). The `<ul>` inside handles scrolling.
+Popup with items has a max-width of 300px.
+Hovered item in popup is highlighted with `hover:bg-on-surface/8`.
+Focused item (keyboard navigation) is highlighted with `bg-on-surface/12` (not applied when item is also selected).
+Currently selected item is highlighted with bold text and `bg-on-secondary-container/20` (BORDERLESS/TONAL style).
 Clicking the dropdown icon (uses `Icons.CHEVRON_DOWN`) should focus the input.
 Height is 48px.
 Reserve space for error text only if it is not "as inline error".
