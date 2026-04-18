@@ -3,10 +3,10 @@ import { ComponentBuilder } from '../../core/component-builder';
 import { registerDestroy } from '@/core/destroyable-element';
 import { ComboBoxStyle } from './types';
 import { cn, STYLE_MAP } from './styles';
-import { renderComboBoxItem } from './combobox-item';
-import { renderComboBoxList, renderNoResults } from './combobox-list';
 import { renderComboBoxInput } from './combobox-input';
 import { PopoverBuilder } from '../component-parts/popover';
+import { ListBoxBuilder } from '../listbox/listbox';
+import { ListBoxStyle } from '../listbox/types';
 
 export { ComboBoxStyle };
 
@@ -107,8 +107,6 @@ export class ComboBoxBuilder<ITEM> implements ComponentBuilder {
         });
         container.appendChild(inputContainer);
 
-        const listbox = renderComboBoxList(listboxId);
-
         const error = document.createElement('span');
         error.className = 'md-label-small text-error px-px-16 hidden';
         container.appendChild(error);
@@ -120,11 +118,8 @@ export class ComboBoxBuilder<ITEM> implements ComponentBuilder {
         const focusedIndex$ = new BehaviorSubject<number>(-1);
         const items$ = this.items$ || new BehaviorSubject<ITEM[]>([]);
         const currentValue$ = new BehaviorSubject<ITEM | null>(null);
-
-        // Helper to get item ID
-        const getItemId = (item: ITEM) => {
-            return `${listboxId}-option-${this.itemIdProvider(item)}`;
-        };
+        const listBoxValue$ = new Subject<ITEM | null>();
+        let isSyncingExternalValue = false;
 
         const filteredItems$ = combineLatest([items$, searchTerm$, isFiltering$]).pipe(
             map(([items, term, isFiltering]) => {
@@ -150,13 +145,102 @@ export class ComboBoxBuilder<ITEM> implements ComponentBuilder {
         const listWidth$ = this.listWidth$ || of('match-input');
         const isGlass = this.isGlass;
 
+        // The popover provides the outer container; ListBox uses BORDERLESS to avoid double borders/backgrounds.
+        const mappedListBoxStyle$ = of(ListBoxStyle.BORDERLESS);
+
         const mappedListWidth$ = listWidth$.pipe(
             map((w: string) => w === 'match-input' ? 'match-anchor' : w)
         );
 
+        // Build ListBox
+        const listBoxBuilder = new ListBoxBuilder<ITEM>()
+            .withItems(filteredItems$)
+            .withValue(listBoxValue$)
+            .withFocusedIndex(focusedIndex$)
+            .withItemCaptionProvider(this.itemCaptionProvider)
+            .withItemIdProvider(this.itemIdProvider)
+            .withStyle(mappedListBoxStyle$)
+            .withClass(of('max-h-px-256 overflow-hidden'));
+
+        if (isGlass) listBoxBuilder.asGlass();
+
+        const listBoxEl = listBoxBuilder.build();
+        const ulEl = listBoxEl.querySelector('ul[role="listbox"]') as HTMLUListElement;
+        ulEl.id = listboxId;
+
+        // "No results" message shown when filteredItems$ is empty
+        const noResults = document.createElement('div');
+        noResults.className = 'px-px-16 py-px-8 text-on-surface-variant body-medium';
+        noResults.textContent = 'No results';
+        noResults.style.display = 'none';
+
+        const popoverContent = document.createElement('div');
+        popoverContent.appendChild(listBoxEl);
+        popoverContent.appendChild(noResults);
+
+        let currentItems: ITEM[] = [];
+
+        subs.add(filteredItems$.subscribe(items => {
+            currentItems = items;
+            // Keep the <ul role="listbox"> visible at all times (needed for aria-controls and
+            // accessibility queries). Only toggle the "No results" message.
+            noResults.style.display = items.length === 0 ? '' : 'none';
+
+            // Assign IDs to <li> elements so aria-activedescendant and tests work.
+            // ListBox re-renders synchronously via its own combineLatest subscription,
+            // but that subscription fires in the same microtask. Use Promise.resolve()
+            // to run after ListBox's itemsSub has completed.
+            Promise.resolve().then(() => {
+                Array.from(ulEl.children).forEach((li, index) => {
+                    if (!li.id) {
+                        const item = items[index];
+                        if (item !== undefined) {
+                            (li as HTMLElement).id = `${listboxId}-option-${this.itemIdProvider(item)}`;
+                        }
+                    }
+                });
+            });
+        }));
+
+        // When ListBox emits a selection (user clicked an item), handle it here
+        subs.add(listBoxValue$.subscribe(item => {
+            if (item !== null && !isSyncingExternalValue) {
+                this.value$?.next(item);
+                currentValue$.next(item);
+                isExpanded$.next(false);
+                const caption = this.itemCaptionProvider(item);
+                input.value = caption;
+                searchTerm$.next(caption);
+            }
+        }));
+
+        // Authoritative ID assigner for the focused <li>: runs synchronously so aria-activedescendant
+        // is correct at the same tick focusedIndex$ changes. The Promise.resolve() block in the
+        // filteredItems$ subscription covers IDs for non-focused items (deferred until after ListBox renders).
+        subs.add(focusedIndex$.subscribe(idx => {
+            if (idx >= 0) {
+                // Assign ID to the focused li if not already set
+                const li = ulEl.children[idx] as HTMLElement | undefined;
+                if (li) {
+                    if (!li.id) {
+                        const item = currentItems[idx];
+                        if (item !== undefined) {
+                            li.id = `${listboxId}-option-${this.itemIdProvider(item)}`;
+                        }
+                    }
+                    if (li.id) {
+                        input.setAttribute('aria-activedescendant', li.id);
+                    }
+                    li.scrollIntoView?.({ block: 'nearest' });
+                }
+            } else {
+                input.removeAttribute('aria-activedescendant');
+            }
+        }));
+
         const popover = new PopoverBuilder()
             .withAnchor(inputContainer)
-            .withContent({ build: () => listbox })
+            .withContent({ build: () => popoverContent })
             .withWidth(mappedListWidth$)
             .withOnClose(() => isExpanded$.next(false))
             .withClass('max-w-[300px]');
@@ -174,7 +258,6 @@ export class ComboBoxBuilder<ITEM> implements ComponentBuilder {
                 inputContainer.classList.add('glass-effect');
                 inputContainer.classList.remove('bg-secondary-container');
 
-                // Adjust text colors for glass mode
                 const glassLabelClasses = ['text-gray-900', 'dark:text-white'];
                 const glassDescClasses = ['text-gray-600', 'dark:text-white/60'];
 
@@ -182,21 +265,17 @@ export class ComboBoxBuilder<ITEM> implements ComponentBuilder {
                 const standardInputClasses = ['text-on-surface'];
                 const standardIconClasses = ['text-on-surface-variant'];
 
-                // Caption
                 captionElement.classList.remove(...standardCaptionClasses);
                 captionElement.classList.add(...glassLabelClasses);
 
-                // Input
                 input.classList.remove(...standardInputClasses);
                 input.classList.add(...glassLabelClasses);
 
-                // Icons (using Description color)
                 iconContainer.classList.remove(...standardIconClasses);
                 iconContainer.classList.add(...glassDescClasses);
             } else {
                 inputContainer.classList.remove('glass-effect');
 
-                // Revert text colors
                 const glassLabelClasses = ['text-gray-900', 'dark:text-white'];
                 const glassDescClasses = ['text-gray-600', 'dark:text-white/60'];
 
@@ -208,20 +287,6 @@ export class ComboBoxBuilder<ITEM> implements ComponentBuilder {
 
                 iconContainer.classList.add('text-on-surface-variant');
                 iconContainer.classList.remove(...glassDescClasses);
-            }
-
-            // Manage listbox background classes (glass-effect is owned by the popover wrapper via asGlass())
-            const dynamicClasses = [
-                'bg-secondary-container', 'bg-surface', 'border-outline', 'border', 'border-transparent'
-            ];
-            listbox.classList.remove(...dynamicClasses);
-
-            if (!isGlass) {
-                if (style === ComboBoxStyle.TONAL) {
-                    listbox.classList.add('bg-secondary-container', 'border', 'border-transparent');
-                } else {
-                    listbox.classList.add('bg-surface', 'border', 'border-outline');
-                }
             }
         }));
 
@@ -260,88 +325,10 @@ export class ComboBoxBuilder<ITEM> implements ComponentBuilder {
             }));
         }
 
-        let currentItems: ITEM[] = [];
-
-        subs.add(combineLatest({
-            items: filteredItems$,
-            style: style$,
-            selectedValue: currentValue$,
-            focusedIndex: focusedIndex$,
-            expanded: isExpanded$
-        }).subscribe(({ items, style, selectedValue, focusedIndex, expanded }) => {
-            currentItems = items;
-
-            let effectiveFocus = focusedIndex;
-            if (expanded && items.length > 0) {
-                if (effectiveFocus === -1) {
-                    const currentVal = currentValue$.value;
-                    const foundIndex = currentVal !== null 
-                        ? items.findIndex(it => this.itemIdProvider(it) === this.itemIdProvider(currentVal))
-                        : -1;
-                    effectiveFocus = foundIndex !== -1 ? foundIndex : 0;
-                } else if (effectiveFocus >= items.length) {
-                    effectiveFocus = items.length - 1;
-                }
-            }
-
-            const fragment = document.createDocumentFragment();
-            if (items.length === 0) {
-                fragment.appendChild(renderNoResults());
-            } else {
-                items.forEach((item, index) => {
-                    const isSelected = selectedValue !== null &&
-                        this.itemIdProvider(selectedValue) === this.itemIdProvider(item);
-                    const isFocused = index === effectiveFocus;
-                    const option = renderComboBoxItem({
-                        item,
-                        id: getItemId(item),
-                        isSelected,
-                        isFocused,
-                        style,
-                        isGlass,
-                        caption: this.itemCaptionProvider(item),
-                        onSelect: (selectedItem) => {
-                            this.value$?.next(selectedItem);
-                            currentValue$.next(selectedItem);
-                            isExpanded$.next(false);
-                            searchTerm$.next(this.itemCaptionProvider(selectedItem));
-                            input.value = this.itemCaptionProvider(selectedItem);
-                        },
-                        onHover: () => {
-                            if (focusedIndex$.value !== index) {
-                                focusedIndex$.next(index);
-                            }
-                        }
-                    });
-                    fragment.appendChild(option);
-
-                    if (isFocused) {
-                        input.setAttribute('aria-activedescendant', option.id);
-                        if (option.scrollIntoView) {
-                            option.scrollIntoView({ block: 'nearest' });
-                        }
-                    }
-                });
-            }
-            listbox.replaceChildren(fragment);
-
-            if (effectiveFocus === -1) {
-                input.removeAttribute('aria-activedescendant');
-            }
-
-            if (effectiveFocus !== focusedIndex) {
-                // Update focusedIndex$ to keep it in sync, but do it asynchronously to avoid circular emission
-                Promise.resolve().then(() => {
-                    if (focusedIndex$.value === focusedIndex) {
-                        focusedIndex$.next(effectiveFocus);
-                    }
-                });
-            }
-        }));
-
         subs.add(isExpanded$.pipe(distinctUntilChanged()).subscribe(expanded => {
             input.setAttribute('aria-expanded', expanded.toString());
             if (expanded) {
+                popover.show();
                 input.focus();
                 const currentVal = currentValue$.value;
                 if (currentVal !== null) {
@@ -352,6 +339,7 @@ export class ComboBoxBuilder<ITEM> implements ComponentBuilder {
                     focusedIndex$.next(0);
                 }
             } else {
+                popover.close();
                 isFiltering$.next(false);
                 focusedIndex$.next(-1);
             }
@@ -360,6 +348,10 @@ export class ComboBoxBuilder<ITEM> implements ComponentBuilder {
         if (this.value$) {
             subs.add(this.value$.pipe(distinctUntilChanged()).subscribe(val => {
                 currentValue$.next(val || null);
+                // Sync selection state to ListBox so the selected item renders highlighted
+                isSyncingExternalValue = true;
+                listBoxValue$.next(val || null);
+                isSyncingExternalValue = false;
                 if (val !== null && val !== undefined) {
                     const caption = this.itemCaptionProvider(val);
                     if (input.value !== caption) {
@@ -414,7 +406,7 @@ export class ComboBoxBuilder<ITEM> implements ComponentBuilder {
                     const nextIndex = (index - 1 + currentItems.length) % currentItems.length;
                     focusedIndex$.next(nextIndex);
                 }
-            } else if (e.key === 'Enter' || e.key === ' ') {
+            } else if (e.key === 'Enter') {
                 if (expanded && index >= 0 && index < currentItems.length) {
                     e.preventDefault();
                     const selectedItem = currentItems[index];
@@ -432,14 +424,6 @@ export class ComboBoxBuilder<ITEM> implements ComponentBuilder {
                 }
             }
         };
-
-        subs.add(isExpanded$.pipe(distinctUntilChanged()).subscribe(expanded => {
-            if (expanded) {
-                popover.show();
-            } else {
-                popover.close();
-            }
-        }));
 
         registerDestroy(container, () => {
             subs.unsubscribe();

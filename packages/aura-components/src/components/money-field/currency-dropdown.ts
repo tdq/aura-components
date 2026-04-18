@@ -1,8 +1,10 @@
-import { Observable, Subject, Subscription } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, Subscription, of } from 'rxjs';
 import { CurrencyRegistry } from '@/utils/currency-registry';
 import { Icons } from '@/core/icons';
 import { registerDestroy } from '@/core/destroyable-element';
 import { PopoverBuilder } from '../component-parts/popover';
+import { ListBoxBuilder } from '../listbox/listbox';
+import { ListBoxStyle } from '../listbox/types';
 
 let dropdownIdCounter = 0;
 
@@ -17,6 +19,11 @@ function getCurrencyDisplayName(currencyId: string): string {
     } catch {
         return currencyId;
     }
+}
+
+interface CurrencyItem {
+    id: string;
+    label: string;
 }
 
 function createChevronIcon(): HTMLElement {
@@ -42,10 +49,14 @@ export function createCurrencyDropdown(
 
     const listId = `currency-listbox-${++dropdownIdCounter}`;
     let isOpen = false;
-    let focusedIndex = -1;
     let currentCurrency: string | null = null;
-    // Fix 4: Keep references to <li> elements to avoid full re-render on focus change
-    let liElements: HTMLLIElement[] = [];
+    let isPreSelecting = false;
+
+    // Build currency items for ListBox
+    const currencyItems: CurrencyItem[] = currencies.map(id => ({
+        id,
+        label: `${CurrencyRegistry.getSymbol(id)} ${getCurrencyDisplayName(id)}`
+    }));
 
     // Root container
     const container = document.createElement('div');
@@ -77,22 +88,32 @@ export function createCurrencyDropdown(
     button.appendChild(chevron);
     container.appendChild(button);
 
-    // Dropdown list — content element for PopoverBuilder
-    const listbox = document.createElement('ul');
-    listbox.id = listId;
-    listbox.setAttribute('role', 'listbox');
-    listbox.className = 'py-2';
+    // ListBox setup
+    const listBoxValue$ = new BehaviorSubject<CurrencyItem | null>(null);
+
+    const listBox = new ListBoxBuilder<CurrencyItem>()
+        .withItems(of(currencyItems))
+        .withValue(listBoxValue$)
+        .withItemCaptionProvider(item => item.label)
+        .withItemIdProvider(item => item.id)
+        .withStyle(of(ListBoxStyle.BORDERLESS));
+
+    const listBoxEl = listBox.build();
+
+    // Assign the listId to the inner <ul> so aria-controls on the button points to it
+    const ul = listBoxEl.querySelector('ul[role="listbox"]') as HTMLUListElement | null;
+    if (!ul) throw new Error('ListBoxBuilder did not produce a <ul role="listbox"> element');
+    ul.id = listId;
 
     // PopoverBuilder manages DOM attachment, positioning, and all close events
     const popover = new PopoverBuilder()
         .withAnchor(button)
-        .withContent({ build: () => listbox })
+        .withContent({ build: () => listBoxEl })
         .withWidth('auto')
         .withAlignment('end')
         .withMaxWidth('300px')
         .withOnClose(() => {
             isOpen = false;
-            focusedIndex = -1;
             button.setAttribute('aria-expanded', 'false');
             button.removeAttribute('aria-activedescendant');
         });
@@ -107,79 +128,22 @@ export function createCurrencyDropdown(
         popover.withClass('bg-surface border border-outline');
     }
 
-    // Fix 4: Build list items and populate liElements; called on open and on selection change
-    function renderItems() {
-        listbox.innerHTML = '';
-        liElements = [];
-        currencies.forEach((currencyId, index) => {
-            const symbol = CurrencyRegistry.getSymbol(currencyId);
-            const name = getCurrencyDisplayName(currencyId);
-            const isSelected = currencyId === currentCurrency;
-            const isFocused = index === focusedIndex;
-
-            const li = document.createElement('li');
-            li.setAttribute('role', 'option');
-            li.setAttribute('aria-selected', isSelected.toString());
-            // Fix 2: id for aria-activedescendant
-            li.id = `${listId}-opt-${index}`;
-
-            const classes = [
-                'px-4', 'py-3', 'cursor-pointer', 'body-large', 'text-on-surface', 'whitespace-nowrap'
-            ];
-            if (isSelected) {
-                classes.push('bg-primary-container', 'text-on-primary-container', 'font-semibold');
-            } else if (isFocused) {
-                classes.push('bg-on-surface/12');
-            } else {
-                classes.push('hover:bg-on-surface/12');
-            }
-            li.className = classes.join(' ');
-            li.textContent = `${symbol} ${name}`;
-
-            li.onclick = () => {
-                currencyValue$.next(currencyId);
-                closeDropdown();
-            };
-
-            listbox.appendChild(li);
-            liElements.push(li);
-        });
-    }
-
-    // Fix 4: Incremental focus update — no DOM rebuild needed
-    function updateFocusedItem(oldIndex: number, newIndex: number) {
-        if (oldIndex >= 0 && oldIndex < liElements.length) {
-            const old = liElements[oldIndex];
-            const oldIsSelected = currencies[oldIndex] === currentCurrency;
-            if (!oldIsSelected) {
-                old.classList.remove('bg-on-surface/12');
-                old.classList.add('hover:bg-on-surface/12');
-            }
-        }
-        if (newIndex >= 0 && newIndex < liElements.length) {
-            const next = liElements[newIndex];
-            const newIsSelected = currencies[newIndex] === currentCurrency;
-            if (!newIsSelected) {
-                next.classList.remove('hover:bg-on-surface/12');
-                next.classList.add('bg-on-surface/12');
-            }
-            button.setAttribute('aria-activedescendant', `${listId}-opt-${newIndex}`);
-            next.scrollIntoView({ block: 'nearest' });
-        }
-    }
-
     function openDropdown() {
         if (isOpen) return;
         isOpen = true;
-        focusedIndex = currencies.indexOf(currentCurrency || '');
-        if (focusedIndex < 0) focusedIndex = 0;
-        renderItems();
+
+        // Pre-select the current currency for visual highlight — suppress the selection callback
+        const current = currencyItems.find(c => c.id === currentCurrency);
+        isPreSelecting = true;
+        listBoxValue$.next(current ?? null);
+        isPreSelecting = false;
+
         popover.show();
         button.setAttribute('aria-expanded', 'true');
-        // Fix 2: set initial aria-activedescendant
-        if (focusedIndex >= 0 && focusedIndex < currencies.length) {
-            button.setAttribute('aria-activedescendant', `${listId}-opt-${focusedIndex}`);
-        }
+
+        // Focus the list so keyboard nav works immediately
+        const listEl = listBoxEl.querySelector('ul[role="listbox"]') as HTMLElement;
+        listEl?.focus();
     }
 
     function closeDropdown() {
@@ -196,19 +160,15 @@ export function createCurrencyDropdown(
         }
     }
 
-    function moveFocus(delta: number) {
-        if (!isOpen) return;
-        const oldIndex = focusedIndex;
-        focusedIndex = Math.max(0, Math.min(currencies.length - 1, focusedIndex + delta));
-        // Fix 4: incremental update instead of full re-render
-        updateFocusedItem(oldIndex, focusedIndex);
-    }
-
-    function selectFocused() {
-        if (!isOpen || focusedIndex < 0 || focusedIndex >= currencies.length) return;
-        currencyValue$.next(currencies[focusedIndex]);
-        closeDropdown();
-    }
+    // Selection handling: ListBox emits via listBoxValue$ on click or Enter
+    subscriptions.add(
+        listBoxValue$.subscribe(item => {
+            if (item !== null && !isPreSelecting) {
+                currencyValue$.next(item.id);
+                closeDropdown();
+            }
+        })
+    );
 
     // Button click
     button.onclick = (e) => {
@@ -216,7 +176,8 @@ export function createCurrencyDropdown(
         toggleDropdown();
     };
 
-    // Fix 1: ArrowDown/Up/Space open the dropdown when closed; existing switch handles open state
+    // ArrowDown/Up/Space open the dropdown when closed; Escape closes when open.
+    // All navigation keys (ArrowDown/Up/Home/End/Enter) are handled by ListBox's <ul> keydown.
     button.onkeydown = (e) => {
         if (!isOpen) {
             if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === ' ') {
@@ -225,25 +186,11 @@ export function createCurrencyDropdown(
             }
             return;
         }
-        switch (e.key) {
-            case 'ArrowDown':
-                e.preventDefault();
-                moveFocus(1);
-                break;
-            case 'ArrowUp':
-                e.preventDefault();
-                moveFocus(-1);
-                break;
-            case 'Enter':
-            case ' ':
-                e.preventDefault();
-                selectFocused();
-                break;
-            case 'Escape':
-                e.preventDefault();
-                closeDropdown();
-                break;
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            closeDropdown();
         }
+        // Everything else (ArrowDown/Up/Enter etc.) is handled by ListBox's <ul> keydown
     };
 
     // Subscribe to currency value changes to update the displayed symbol

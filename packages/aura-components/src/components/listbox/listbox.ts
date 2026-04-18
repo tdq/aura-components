@@ -22,6 +22,7 @@ export class ListBoxBuilder<ITEM> implements ComponentBuilder {
     private height$?: Observable<number>;
     private error$?: Observable<string>;
     private isGlass: boolean = false;
+    private externalFocusedIndex$?: Observable<number>;
 
     withCaption(caption: Observable<string>): this {
         this.caption$ = caption;
@@ -78,7 +79,21 @@ export class ListBoxBuilder<ITEM> implements ComponentBuilder {
         return this;
     }
 
+    /**
+     * Provide an external observable that drives focused-index state.
+     * The external observable and internal keyboard navigation share the same
+     * focused-index subject, so it should only emit intentional resets
+     * (e.g. reset to 0 on items change), not continuous streams.
+     */
+    withFocusedIndex(index$: Observable<number>): this {
+        this.externalFocusedIndex$ = index$;
+        return this;
+    }
+
     build(): HTMLElement {
+        const focusedIndex$ = new BehaviorSubject<number>(-1);
+        let currentItems: ITEM[] = [];
+
         const container = document.createElement('div');
         
         // Container styles and state
@@ -120,13 +135,13 @@ export class ListBoxBuilder<ITEM> implements ComponentBuilder {
             this.style$,
             this.error$ ? this.error$.pipe(startWith(null)) : of(null)
         ]).subscribe(([style, error]) => {
-            const isBorderless = style === ListBoxStyle.BORDERLESS && !this.isGlass;
+            const isBorderless = style === ListBoxStyle.BORDERLESS;
             listContainer.className = cn(
                 'overflow-hidden transition-all flex-1 relative flex flex-col',
                 !this.isGlass && 'bg-surface text-on-surface',
                 !isBorderless && !this.isGlass && 'rounded-large border',
                 !isBorderless && !this.isGlass && !error && 'border-outline',
-                this.isGlass && 'glass-effect',
+                !isBorderless && this.isGlass && 'glass-effect',
                 !!error && !isBorderless && 'border-error',
                 !!error && isBorderless && 'rounded-large border border-error',
             );
@@ -138,8 +153,48 @@ export class ListBoxBuilder<ITEM> implements ComponentBuilder {
         // List (UL)
         const list = document.createElement('ul');
         list.role = 'listbox';
-        list.className = 'w-full h-full overflow-y-auto py-0'; 
+        list.tabIndex = -1;
+        list.className = 'w-full h-full overflow-y-auto py-0';
         listContainer.appendChild(list);
+
+        if (this.externalFocusedIndex$) {
+            const externalSub = this.externalFocusedIndex$.subscribe(index => {
+                focusedIndex$.next(index);
+            });
+            registerDestroy(container, () => externalSub.unsubscribe());
+        }
+
+        list.addEventListener('keydown', (e: KeyboardEvent) => {
+            const keys = ['ArrowDown', 'ArrowUp', 'Home', 'End', 'Enter'];
+            if (!keys.includes(e.key)) return;
+            e.preventDefault();
+
+            const count = currentItems.length;
+            if (count === 0) return;
+
+            const current = focusedIndex$.getValue();
+
+            if (e.key === 'ArrowDown') {
+                focusedIndex$.next(current < count - 1 ? current + 1 : 0);
+            } else if (e.key === 'ArrowUp') {
+                focusedIndex$.next(current > 0 ? current - 1 : count - 1);
+            } else if (e.key === 'Home') {
+                focusedIndex$.next(0);
+            } else if (e.key === 'End') {
+                focusedIndex$.next(count - 1);
+            } else if (e.key === 'Enter') {
+                const idx = focusedIndex$.getValue();
+                if (idx >= 0 && idx < currentItems.length) {
+                    this.value$.next(currentItems[idx]);
+                }
+            }
+        });
+
+        list.addEventListener('focusout', (e: FocusEvent) => {
+            if (!list.contains(e.relatedTarget as Node)) {
+                focusedIndex$.next(-1);
+            }
+        });
 
         // Items Rendering
         const currentValue$ = this.value$ 
@@ -149,23 +204,28 @@ export class ListBoxBuilder<ITEM> implements ComponentBuilder {
         const itemsState$ = combineLatest([
             this.items$,
             currentValue$,
-            this.style$
+            this.style$,
+            focusedIndex$,
         ]);
 
-        const itemsSub = itemsState$.subscribe(([items, selectedItem, style]) => {
+        const itemsSub = itemsState$.subscribe(([items, selectedItem, style, focusedIndex]) => {
+            currentItems = items;
             list.innerHTML = '';
-            
+
             const selectedId = selectedItem ? this.itemIdProvider(selectedItem) : null;
 
-            items.forEach(item => {
+            let focusedEl: HTMLElement | null = null;
+
+            items.forEach((item, index) => {
                 const id = this.itemIdProvider(item);
                 const isSelected = selectedId === id;
+                const isFocused = focusedIndex === index;
                 const caption = this.itemCaptionProvider(item);
 
                 const li = document.createElement('li');
                 li.role = 'option';
                 li.setAttribute('aria-selected', String(isSelected));
-                
+
                 // Styling logic mirrored from ComboBox
                 const isTonal = (style === ListBoxStyle.TONAL || style === ListBoxStyle.BORDERLESS) && !this.isGlass;
                 const isOutlined = style === ListBoxStyle.OUTLINED && !this.isGlass;
@@ -191,7 +251,8 @@ export class ListBoxBuilder<ITEM> implements ComponentBuilder {
                     itemTextColor,
                     isSelected && 'font-bold',
                     isSelected && selectedBg,
-                    !isSelected && hoverBg
+                    !isSelected && hoverBg,
+                    isFocused && !isSelected && 'bg-on-surface/12'
                 );
 
                 // State Layer (for focus/hover/active visual consistency)
@@ -213,8 +274,13 @@ export class ListBoxBuilder<ITEM> implements ComponentBuilder {
                     }
                 };
 
+                if (isFocused) focusedEl = li;
                 list.appendChild(li);
             });
+
+            if (focusedIndex >= 0) {
+                focusedEl?.scrollIntoView({ block: 'nearest' });
+            }
         });
         registerDestroy(container, () => itemsSub.unsubscribe());
 

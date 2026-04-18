@@ -3,6 +3,9 @@ import { ComboBoxBuilder, ComboBoxStyle } from './combobox-builder';
 import { fireEvent, screen, waitFor } from '@testing-library/dom';
 import '@testing-library/jest-dom';
 
+// jsdom does not implement scrollIntoView — stub it globally
+HTMLElement.prototype.scrollIntoView = jest.fn();
+
 describe('ComboBoxBuilder', () => {
     let builder: ComboBoxBuilder<string>;
     const items = ['Apple', 'Banana', 'Cherry'];
@@ -209,7 +212,12 @@ describe('ComboBoxBuilder', () => {
 
         await waitFor(() => {
             const options = screen.getAllByRole('option');
-            expect(options[2]).toHaveClass('bg-on-surface/12');
+            // Cherry is both selected and focused — selected item rendering takes priority
+            // over the focus highlight (bg-on-surface/12 is only for focused-but-not-selected).
+            // The ListBox uses BORDERLESS style inside the popover, so the tonal selected
+            // background (bg-on-secondary-container/20) is applied.
+            expect(options[2]).toHaveClass('bg-on-secondary-container/20');
+            expect(options[2]).toHaveAttribute('aria-selected', 'true');
             expect(options[2].textContent).toBe('Cherry');
         });
     });
@@ -224,9 +232,11 @@ describe('ComboBoxBuilder', () => {
         const input = screen.getByRole('combobox');
         fireEvent.click(input); // Open dropdown
 
+        // bg-surface is applied by ListBox to the inner listContainer div, not the <ul> itself
         const listbox = screen.getByRole('listbox');
-        expect(listbox).toHaveClass('bg-surface');
-        expect(listbox).not.toHaveClass('bg-surface-container-low');
+        const listContainer = listbox.closest('div');
+        expect(listContainer).toHaveClass('bg-surface');
+        expect(listContainer).not.toHaveClass('bg-surface-container-low');
     });
 
     test('should render placeholder when provided', () => {
@@ -240,7 +250,7 @@ describe('ComboBoxBuilder', () => {
         expect(input.placeholder).toBe(placeholder);
     });
 
-    test('should use itemIdProvider for complex objects', () => {
+    test('should use itemIdProvider for complex objects', async () => {
         interface Item { id: number; name: string; }
         const complexItems: Item[] = [
             { id: 1, name: 'Option 1' },
@@ -261,10 +271,14 @@ describe('ComboBoxBuilder', () => {
         const input = screen.getByRole('combobox');
         fireEvent.click(input); // Open dropdown
 
-        const options = screen.getAllByRole('option');
-        expect(options[0].id).toContain('-option-1');
-        expect(options[1].id).toContain('-option-2');
+        // IDs are assigned asynchronously after ListBox renders
+        await waitFor(() => {
+            const options = screen.getAllByRole('option');
+            expect(options[0].id).toContain('-option-1');
+            expect(options[1].id).toContain('-option-2');
+        });
 
+        const options = screen.getAllByRole('option');
         fireEvent.click(options[1]);
         expect(value$.getValue()).toEqual(complexItems[1]);
         expect(input).toHaveValue('Option 2');
@@ -285,7 +299,7 @@ describe('ComboBoxBuilder', () => {
         expect(input).toHaveAttribute('aria-controls', listbox.id);
     });
 
-    test('should update focusedIndex on mouse hover', async () => {
+    test('should update focusedIndex on keyboard ArrowDown', async () => {
         const items$ = new BehaviorSubject(items);
         const container = builder
             .withItems(items$)
@@ -302,11 +316,9 @@ describe('ComboBoxBuilder', () => {
             expect(options[0]).toHaveClass('bg-on-surface/12');
         });
 
-        // Hover second item
-        const options = screen.getAllByRole('option');
-        fireEvent.mouseEnter(options[1]);
-        
-        // Check if second item is highlighted
+        // ArrowDown to focus second item
+        fireEvent.keyDown(input, { key: 'ArrowDown' });
+
         await waitFor(() => {
             const currentOptions = screen.getAllByRole('option');
             expect(currentOptions[1]).toHaveClass('bg-on-surface/12');
@@ -328,5 +340,160 @@ describe('ComboBoxBuilder', () => {
 
         visible$.next(true);
         expect(container).not.toHaveClass('hidden');
+    });
+
+    test('should show "No results" message and keep listbox in DOM when filtered items is empty', async () => {
+        const items$ = new BehaviorSubject(items);
+        const container = builder
+            .withItems(items$)
+            .build();
+        document.body.appendChild(container);
+
+        const input = screen.getByRole('combobox');
+
+        // Type a term that matches nothing
+        fireEvent.input(input, { target: { value: 'zzznomatch' } });
+
+        // The <ul role="listbox"> must remain in the DOM (spec point 5)
+        const listbox = screen.getByRole('listbox', { hidden: true });
+        expect(listbox).toBeTruthy();
+
+        // "No results" div must be visible — it lives inside the popover which is
+        // appended to document.body, not inside the main container div.
+        // The builder sets display to '' (empty string) to show; jsdom resolves
+        // that to 'block', so we check it is not 'none'.
+        await waitFor(() => {
+            const allDivs = Array.from(document.querySelectorAll('div'));
+            const noResultsDiv = allDivs.find(d => d.textContent === 'No results');
+            expect(noResultsDiv).toBeTruthy();
+            expect(noResultsDiv!.style.display).not.toBe('none');
+        });
+
+        // Type a term that does match — "No results" must hide again
+        fireEvent.input(input, { target: { value: 'Apple' } });
+
+        await waitFor(() => {
+            const allDivs = Array.from(document.querySelectorAll('div'));
+            const noResultsDiv = allDivs.find(d => d.textContent === 'No results');
+            expect(noResultsDiv).toBeTruthy();
+            expect(noResultsDiv!.style.display).toBe('none');
+        });
+    });
+
+    test('should NOT select focused item when Space key is pressed (allows multi-word typing)', async () => {
+        const items$ = new BehaviorSubject(items);
+        const value$ = new BehaviorSubject<string | null>(null);
+        const container = builder
+            .withItems(items$)
+            .withValue(value$)
+            .build();
+        document.body.appendChild(container);
+
+        const input = screen.getByRole('combobox');
+
+        // Open and focus first item via ArrowDown
+        fireEvent.keyDown(input, { key: 'ArrowDown' });
+        expect(screen.getByRole('listbox')).toBeVisible();
+
+        await waitFor(() => {
+            const options = screen.getAllByRole('option');
+            expect(options[0]).toHaveClass('bg-on-surface/12');
+        });
+
+        // Press Space — must NOT select the focused item
+        fireEvent.keyDown(input, { key: ' ' });
+
+        // Value remains unchanged
+        expect(value$.getValue()).toBeNull();
+        // Dropdown must remain open
+        expect(input).toHaveAttribute('aria-expanded', 'true');
+        expect(screen.getByRole('listbox')).toBeVisible();
+    });
+
+    // ── Spec 2: No gaps — ListBox outer container has no py-* padding ─────────
+
+    test('inner ListBox container has no py-* padding class (no gap above/below list)', () => {
+        const items$ = new BehaviorSubject(items);
+        const container = builder
+            .withItems(items$)
+            .build();
+        document.body.appendChild(container);
+
+        // Open the dropdown so the popover and listbox are mounted
+        const input = screen.getByRole('combobox');
+        fireEvent.click(input);
+
+        // The ListBox outer container is the div wrapping the <ul role="listbox">
+        const listbox = screen.getByRole('listbox');
+        const listContainer = listbox.closest('div') as HTMLElement;
+
+        // No py-* class should be present on the outer container
+        const classes = Array.from(listContainer.classList);
+        const pyClasses = classes.filter(c => /^py-/.test(c));
+        expect(pyClasses).toHaveLength(0);
+    });
+
+    test('max-h-px-256 constraint is applied on the ListBox root element inside the popover', () => {
+        const items$ = new BehaviorSubject(items);
+        const container = builder
+            .withItems(items$)
+            .build();
+        document.body.appendChild(container);
+
+        const input = screen.getByRole('combobox');
+        fireEvent.click(input);
+
+        // The ListBox root element is the grandparent of the <ul role="listbox">.
+        // Structure: listBoxRoot(max-h-px-256) > listContainer(panel) > ul[role=listbox]
+        const listbox = screen.getByRole('listbox');
+        const listBoxRoot = listbox.closest('div')?.parentElement as HTMLElement;
+        expect(listBoxRoot).toHaveClass('max-h-px-256');
+    });
+
+    // ── Spec 3: Initial value selection — dropdown stays open after value sync ─
+
+    test('opening dropdown with initial value shows that item selected and highlighted', async () => {
+        const items$ = new BehaviorSubject(items);
+        const value$ = new BehaviorSubject<string | null>('Cherry');
+        const container = builder
+            .withItems(items$)
+            .withValue(value$)
+            .build();
+        document.body.appendChild(container);
+
+        const input = screen.getByRole('combobox');
+        fireEvent.click(input); // Open dropdown
+
+        await waitFor(() => {
+            const options = screen.getAllByRole('option');
+            const cherry = options[2]; // Cherry is index 2
+            expect(cherry.textContent).toBe('Cherry');
+            expect(cherry).toHaveAttribute('aria-selected', 'true');
+            expect(cherry).toHaveClass('bg-on-secondary-container/20');
+            expect(cherry).toHaveClass('font-bold');
+        });
+    });
+
+    test('external value sync while dropdown is open does NOT close the dropdown (isSyncingExternalValue guard)', () => {
+        const items$ = new BehaviorSubject(items);
+        const value$ = new BehaviorSubject<string | null>(null);
+        const container = builder
+            .withItems(items$)
+            .withValue(value$)
+            .build();
+        document.body.appendChild(container);
+
+        const input = screen.getByRole('combobox');
+        // Open the dropdown
+        fireEvent.click(input);
+        expect(input).toHaveAttribute('aria-expanded', 'true');
+        expect(screen.getByRole('listbox')).toBeVisible();
+
+        // Simulate external value update while dropdown is open
+        value$.next('Cherry');
+
+        // Dropdown must remain open — isSyncingExternalValue guard prevents close
+        expect(input).toHaveAttribute('aria-expanded', 'true');
+        expect(screen.getByRole('listbox')).toBeVisible();
     });
 });
