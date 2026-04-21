@@ -1,10 +1,16 @@
 import { Observable, Subject, Subscription, combineLatest } from 'rxjs';
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 import { FieldStyle } from '../../theme';
 import { Money } from '../../types/money';
 import { clamp, roundToStep, formatNumber, getPrecision } from '@/utils/number';
 import { CurrencyRegistry } from '@/utils/currency-registry';
 import { createCurrencyDropdown } from './currency-dropdown';
 import { createMoneyFieldErrorIcon } from './money-field-error';
+
+function cn(...inputs: ClassValue[]) {
+    return twMerge(clsx(inputs));
+}
 
 export interface MoneyFieldState {
     value$: Subject<Money | null>;
@@ -166,7 +172,9 @@ export class MoneyFieldLogic {
             const currencyId = currencies[0];
             const symbol = CurrencyRegistry.getSymbol(currencyId);
             const span = document.createElement('span');
-            span.className = 'body-large text-on-surface-variant select-none';
+            span.className = this.state.isGlass
+                ? 'body-large text-gray-900 dark:text-white/80 select-none'
+                : 'body-large text-on-surface-variant select-none';
             span.textContent = symbol;
             this.suffixContainer.appendChild(span);
             this.suffixContainer.classList.remove('hidden');
@@ -371,7 +379,13 @@ export class MoneyFieldLogic {
             this.inputWrapper.classList.add('glass-effect', 'focus-within:bg-white/20');
             this.inputWrapper.classList.add(isOutlined ? 'rounded-small' : 'rounded-t-small');
             this.activeIndicator.classList.add('hidden');
+            
+            this.label.className = cn(this.label.className, 'text-gray-900 dark:text-white');
+            this.input.className = cn(this.input.className, 'text-gray-900 dark:text-white placeholder:text-gray-900/50 dark:placeholder:text-white/50');
         } else {
+            this.label.className = cn(this.label.className, 'text-on-surface-variant');
+            this.input.className = cn(this.input.className, 'text-on-surface placeholder:text-on-surface-variant');
+            
             if (isOutlined) {
                 this.inputWrapper.classList.add(
                     'bg-transparent', 'rounded-small',

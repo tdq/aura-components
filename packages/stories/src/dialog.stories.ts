@@ -1,5 +1,5 @@
-import { DialogBuilder, DialogSize } from 'aura-components';
-import { of, Subject } from 'rxjs';
+import { DialogBuilder, DialogSize, Money } from 'aura-components';
+import { of, Subject, BehaviorSubject } from 'rxjs';
 import { ButtonBuilder } from 'aura-components';
 import { TabsBuilder } from 'aura-components';
 import { FormBuilder } from 'aura-components';
@@ -238,6 +238,114 @@ export const DialogWithTabs = () => {
     return container;
 };
 
+export const DialogWithForm = () => {
+    const fullName$ = new BehaviorSubject('John Doe');
+    const email$ = new BehaviorSubject('john.doe@example.com');
+    const password$ = new BehaviorSubject('secret123');
+    const age$ = new BehaviorSubject<number | null>(30);
+    const salary$ = new BehaviorSubject<Money | null>({ amount: 5000, currencyId: 'USD' });
+    const country$ = new BehaviorSubject<string | null>('USA');
+    const dob$ = new BehaviorSubject<Date | null>(new Date(1994, 0, 1));
+    const agreement$ = new BehaviorSubject(true);
+
+    const showDialog = () => {
+        const form = new FormBuilder()
+            .withCaption(of('Comprehensive Form'))
+            .withDescription(of('This form includes all available field types.'));
+
+        const fields = form.withFields(2);
+
+        fields.addHeading(1, 2).withCaption(of('Personal Information'));
+        
+        fields.addTextField()
+            .withLabel(of('Full Name'))
+            .withPlaceholder(of('Enter your full name'))
+            .withValue(fullName$);
+
+        fields.addEmailField()
+            .withLabel(of('Email Address'))
+            .withPlaceholder(of('email@example.com'))
+            .withValue(email$);
+
+        fields.addPasswordField()
+            .withLabel(of('Password'))
+            .withPlaceholder(of('Enter password'))
+            .withValue(password$);
+
+        fields.addHeading(1, 2).withCaption(of('Financial & Dates'));
+
+        fields.addNumberField()
+            .withLabel(of('Age'))
+            .withPlaceholder(of('Enter age'))
+            .withValue(age$);
+
+        fields.addMoneyField()
+            .withLabel(of('Salary'))
+            .withPlaceholder(of('Enter salary'))
+            .withCurrencies(['USD', 'EUR', 'GBP'])
+            .withValue(salary$);
+
+        fields.addComboBoxField()
+            .withCaption(of('Country'))
+            .withItems(of(['USA', 'UK', 'Germany', 'France', 'Japan']))
+            .withPlaceholder('Select a country')
+            .withValue(country$);
+
+        fields.addDatePickerField()
+            .withCaption(of('Date of Birth'))
+            .withValue(dob$);
+
+        fields.addCheckBox(1, 2)
+            .withCaption(of('I agree to the terms and conditions'))
+            .withValue(agreement$);
+
+        const dialog = new DialogBuilder()
+            .withCaption(of('Form in Dialog'))
+            .withSize(DialogSize.LARGE)
+            .withContent(form);
+
+        const close$ = new Subject<void>();
+        close$.subscribe(() => dialog.close());
+
+        const toolbar = dialog.withToolbar();
+        toolbar.addSecondaryButton()
+            .withCaption(of('Cancel'))
+            .withClick(() => close$.next());
+
+        toolbar.withPrimaryButton()
+            .withCaption(of('Submit Form'))
+            .withClick(() => {
+                console.log('Form Submitted:', {
+                    fullName: fullName$.value,
+                    email: email$.value,
+                    password: password$.value,
+                    age: age$.value,
+                    salary: salary$.value,
+                    country: country$.value,
+                    dob: dob$.value,
+                    agreement: agreement$.value
+                });
+                close$.next();
+            });
+
+        dialog.show();
+    };
+
+    const container = document.createElement('div');
+    container.className = 'p-4';
+
+    const btnClick$ = new Subject<void>();
+    btnClick$.subscribe(showDialog);
+
+    const btn = new ButtonBuilder()
+        .withCaption(of('Open Form Dialog'))
+        .withClick(() => btnClick$.next())
+        .build();
+    
+    container.appendChild(btn);
+    return container;
+};
+
 export const GlassEffect = () => {
     const container = document.createElement('div');
     container.className = 'p-10 min-h-[600px] w-full relative overflow-hidden flex items-center justify-center rounded-xl';
@@ -310,4 +418,3 @@ export const GlassEffect = () => {
     container.appendChild(btn);
     return container;
 };
-

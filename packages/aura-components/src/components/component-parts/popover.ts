@@ -138,7 +138,15 @@ export class PopoverBuilder implements PopupBuilder {
         // show()/hidePopover() will clear/restore this as needed.
         el.style.display = 'none';
 
-        document.body.appendChild(el);
+        // If the anchor is inside a dialog, we must append the popover to that dialog
+        // (or a descendant) to prevent it from being made inert when the dialog is modal.
+        const dialog = this._anchor.closest('dialog');
+        if (dialog) {
+            dialog.appendChild(el);
+        } else {
+            document.body.appendChild(el);
+        }
+        
         this._popoverEl = el;
 
         // Handle Observable vs plain width

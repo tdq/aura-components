@@ -1,6 +1,6 @@
 import { BehaviorSubject, combineLatest, of, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { GridBuilder, Money } from 'aura-components';
+import { GridBuilder, Money, MoneyFieldStyle } from 'aura-components';
 import { FormBuilder } from 'aura-components';
 import { PanelBuilder, PanelGap } from 'aura-components';
 import { LayoutBuilder, LayoutGap, Alignment } from 'aura-components';
@@ -124,7 +124,7 @@ export const ProductManagement = () => {
             .withLabel(of('Price'))
             .withValue(price$)
             .withError(priceError$)
-            .withStyle(of(NumberFieldStyle.OUTLINED))
+            .withStyle(of(MoneyFieldStyle.TONAL))
             .withCurrencies(['USD', 'EUR', 'GBP']);
 
         fields.addNumberField(2, 1)

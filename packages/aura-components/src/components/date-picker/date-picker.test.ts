@@ -55,20 +55,18 @@ describe('DatePickerBuilder', () => {
         document.body.appendChild(container);
 
         const iconButton = container.querySelector('button');
-        const popup = container.querySelector('[popover]') as HTMLElement;
-        
-        expect(popup.style.display).toBe('none');
         
         fireEvent.click(iconButton!);
+        const popup = document.body.querySelector('[popover]') as HTMLElement;
         expect(popup.style.display).toBe('block');
     });
 
     test('should open via showPopover method', () => {
         const container = builder.build() as any;
         document.body.appendChild(container);
-        const popup = container.querySelector('[popover]') as HTMLElement;
         
         container.showPopover();
+        const popup = document.body.querySelector('[popover]') as HTMLElement;
         expect(popup.style.display).toBe('block');
     });
 
@@ -108,7 +106,7 @@ describe('DatePickerBuilder', () => {
         expect(value$.getValue()?.getDate()).toBe(15);
         
         // Popup should be hidden after selection
-        const popup = container.querySelector('[popover]') as HTMLElement;
+        const popup = document.body.querySelector('[popover]') as HTMLElement;
         expect(popup.style.display).toBe('none');
     });
 
@@ -188,7 +186,7 @@ describe('DatePickerBuilder', () => {
         expect(updatedDate?.getDate()).toBe(16);
         
         // Popup should be hidden
-        const popup = container.querySelector('[popover]') as HTMLElement;
+        const popup = document.body.querySelector('[popover]') as HTMLElement;
         expect(popup.style.display).toBe('none');
     });
 
@@ -297,10 +295,10 @@ describe('DatePickerBuilder', () => {
         const container = builder.withValue(value$).build();
         document.body.appendChild(container);
 
-        const iconButton = container.querySelector('button');
-        fireEvent.click(iconButton!);
+        const iconButton = container.querySelector('button')!;
+        fireEvent.click(iconButton);
 
-        const grid = container.querySelector('[role="grid"]') as HTMLElement;
+        const grid = document.body.querySelector('[role="grid"]') as HTMLElement;
         // The 7 header cells (Mo Tu We Th Fr Sa Su) are first children of grid.
         const headerCells = Array.from(grid.children).slice(0, 7).map(el => el.textContent);
         // With MONDAY default, first header must be 'Mo'

@@ -77,12 +77,12 @@ export function createCurrencyDropdown(
     // Currency symbol span
     const symbolSpan = document.createElement('span');
     symbolSpan.className = isGlass
-        ? 'body-large text-white/80 select-none'
+        ? 'body-large text-gray-900 dark:text-white/80 select-none'
         : 'body-large text-on-surface-variant select-none';
 
     // Chevron icon
     const chevron = createChevronIcon();
-    chevron.className = isGlass ? 'text-white/80' : 'text-on-surface-variant';
+    chevron.className = isGlass ? 'text-gray-900 dark:text-white/80' : 'text-on-surface-variant';
 
     button.appendChild(symbolSpan);
     button.appendChild(chevron);

@@ -21,7 +21,13 @@ export class ErrorPopoverBuilder implements ComponentBuilder {
         popover.setAttribute('popover', 'auto');
         popover.className = 'error-popover bg-error text-on-error md-label-small px-3 py-2 rounded-small elevation-2 max-w-xs transition-opacity duration-200';
         popover.textContent = this.errorText;
-        document.body.appendChild(popover);
+
+        const dialog = button.closest('dialog');
+        if (dialog) {
+            dialog.appendChild(popover);
+        } else {
+            document.body.appendChild(popover);
+        }
 
         let timeoutId: ReturnType<typeof setTimeout> | null = null;
         let isVisible = false;
