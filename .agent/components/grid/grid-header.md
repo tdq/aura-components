@@ -59,5 +59,6 @@ Resizing is handled via a `mousedown`, `mousemove`, and `mouseup` pattern on the
 - **Coordination**: Changes are propagated via `onColumnsResized` to sync the viewport's column widths.
 
 ## Styling
+- **Background**: In non-glass mode, the header uses a solid background (`bg-surface-container-low`) with no `backdrop-blur`. The glass-mode header (`headerGlass`) uses `glass-effect !bg-white/20` with blur.
 - **Borders**: Interactive resizable borders (grey on cell hover, primary blue on active/handle hover). Borders are 2px wide and 80% of header height.
 - **Text Selection**: Header cells have `select-none` — column header text is not user-selectable.

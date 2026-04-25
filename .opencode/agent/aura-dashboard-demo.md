@@ -6,7 +6,7 @@ description: >-
   ensuring memory-safe RxJS usage throughout the demo.
 
 mode: subagent
-model: google/gemini-3-flash-preview
+model: deepseek/deepseek-v4-flash
 tools:
   bash: false
   webfetch: false

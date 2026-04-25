@@ -312,3 +312,130 @@ export const ConditionalStyling = () => {
 
     return grid.build();
 };
+
+interface FullCoverageItem {
+    id: number;
+    name: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    phone: string;
+    department: string;
+    score: number;
+    rating: number;
+    clicks: number;
+    lastLogin: Date;
+    createdAt: Date;
+    lastModified: Date;
+    role: 'ADMIN' | 'USER' | 'MANAGER' | 'VIEWER';
+    status: 'ACTIVE' | 'INACTIVE' | 'PENDING' | 'SUSPENDED';
+    active: boolean;
+    verified: boolean;
+    progress: number;
+    balance: Money;
+    priority: 'low' | 'medium' | 'high';
+    buttonLabel: string;
+}
+
+const generateFullCoverageData = (count: number): FullCoverageItem[] => {
+    const roles: ('ADMIN' | 'USER' | 'MANAGER' | 'VIEWER')[] = ['ADMIN', 'USER', 'MANAGER', 'VIEWER'];
+    const statuses: ('ACTIVE' | 'INACTIVE' | 'PENDING' | 'SUSPENDED')[] = ['ACTIVE', 'INACTIVE', 'PENDING', 'SUSPENDED'];
+    const priorities: ('low' | 'medium' | 'high')[] = ['low', 'medium', 'high'];
+    const departments = ['Engineering', 'Marketing', 'Sales', 'Support', 'HR', 'Finance', 'Legal', 'Operations'];
+    const firstNames = ['James', 'Mary', 'Robert', 'Patricia', 'John', 'Jennifer', 'Michael', 'Linda'];
+    const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis'];
+    return Array.from({ length: count }).map((_, i) => ({
+        id: i + 1,
+        name: `Record ${i + 1}`,
+        email: `record${i + 1}@company.com`,
+        firstName: firstNames[i % firstNames.length],
+        lastName: lastNames[i % lastNames.length],
+        phone: `+1-555-${String(1000 + (i % 9000)).slice(0, 4)}`,
+        department: departments[i % departments.length],
+        score: Math.floor(Math.random() * 1000),
+        rating: Math.floor(Math.random() * 5) + 1,
+        clicks: Math.floor(Math.random() * 10000),
+        lastLogin: new Date(Date.now() - Math.random() * 10000000000),
+        createdAt: new Date(Date.now() - Math.random() * 100000000000),
+        lastModified: new Date(Date.now() - Math.random() * 5000000000),
+        role: roles[i % roles.length],
+        status: statuses[i % statuses.length],
+        active: i % 2 === 0,
+        verified: i % 3 === 0,
+        progress: Math.random(),
+        balance: {
+            amount: Math.floor(Math.random() * 10000) / 100,
+            currencyId: ['USD', 'EUR', 'GBP'][i % 3]
+        },
+        priority: priorities[i % priorities.length],
+        buttonLabel: `Btn${i + 1}`
+    }));
+};
+
+export const FullCoverage = () => {
+    const data = generateFullCoverageData(1000);
+    const grid = new GridBuilder<FullCoverageItem>()
+        .withItems(of(data))
+        .withHeight(of(700));
+
+    const columns = grid.withColumns();
+    columns.addNumberColumn('id').withHeader('ID').withWidth('60px');
+    columns.addTextColumn('name').withHeader('Name').withWidth('120px').asResizable();
+    columns.addTextColumn('email').withHeader('Email').withWidth('220px').asResizable();
+    columns.addTextColumn('firstName').withHeader('First Name').withWidth('100px').asResizable();
+    columns.addTextColumn('lastName').withHeader('Last Name').withWidth('100px').asResizable();
+    columns.addTextColumn('phone').withHeader('Phone').withWidth('130px').asResizable();
+    columns.addTextColumn('department').withHeader('Department').withWidth('130px').asResizable();
+    columns.addNumberColumn('score').withHeader('Score').withWidth('80px').asResizable();
+    columns.addNumberColumn('rating').withHeader('Rating').withWidth('70px');
+    columns.addNumberColumn('clicks').withHeader('Clicks').withWidth('80px').asResizable();
+    columns.addDateColumn('lastLogin').withHeader('Last Login').withWidth('120px').asResizable();
+    columns.addDateColumn('createdAt').withHeader('Created At').withWidth('120px').asResizable();
+    columns.addDateTimeColumn('lastModified').withHeader('Last Modified').withWidth('150px').asResizable();
+    columns.addEnumColumn('role').withHeader('Role').withWidth('100px');
+    columns.addEnumColumn('status').withHeader('Status').withWidth('100px');
+    columns.addBooleanColumn('active').withHeader('Active').withWidth('70px');
+    columns.addBooleanColumn('verified').withHeader('Verified').withWidth('70px');
+    columns.addPercentageColumn('progress').withHeader('Progress').withWidth('90px');
+    columns.addMoneyColumn('balance').withHeader('Balance').withWidth('100px').asResizable();
+    columns.addIconColumn('priority')
+        .withHeader('Priority')
+        .withIconProvider((item) => {
+            if (item.priority === 'high') return 'w-3 h-3 rounded-full inline-block bg-red-500';
+            if (item.priority === 'medium') return 'w-3 h-3 rounded-full inline-block bg-yellow-500';
+            return 'w-3 h-3 rounded-full inline-block bg-green-500';
+        })
+        .withTooltipProvider((item) => `Priority: ${item.priority}`)
+        .withWidth('70px');
+    columns.addButtonColumn('buttonLabel')
+        .withHeader('Action')
+        .withLabel('Click')
+        .withClick((item) => alert(`Clicked row ${item.id}`))
+        .withWidth('90px');
+    columns.addCustomColumn()
+        .withHeader('Status Badge')
+        .withWidth('150px')
+        .withRenderer((item) => {
+            const badge = document.createElement('span');
+            badge.className = 'px-2 py-1 rounded text-xs font-semibold';
+            if (item.active) {
+                badge.classList.add('bg-green-100', 'text-green-800');
+                badge.textContent = 'Active';
+            } else {
+                badge.classList.add('bg-red-100', 'text-red-800');
+                badge.textContent = 'Inactive';
+            }
+            return badge;
+        });
+
+    const editClick = (item: FullCoverageItem) => alert(`Editing ${item.name}`);
+    const deleteClick = (item: FullCoverageItem) => alert(`Deleting ${item.name}`);
+    const viewClick = (item: FullCoverageItem) => alert(`Viewing ${item.name}`);
+
+    const actions = grid.withActions();
+    actions.addAction(Icons.EDIT, 'Edit', editClick);
+    actions.addAction(Icons.DELETE, 'Delete', deleteClick);
+    actions.addAction(Icons.EYE_OPEN, 'View', viewClick);
+
+    return grid.build();
+};

@@ -6,7 +6,7 @@ description: >-
   .agent/ guide files in sync with the component library.
 
 mode: subagent
-model: google/gemini-3-flash-preview
+model: deepseek/deepseek-v4-flash
 tools:
   bash: false
   webfetch: false

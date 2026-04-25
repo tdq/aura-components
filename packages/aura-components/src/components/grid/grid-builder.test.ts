@@ -309,4 +309,226 @@ describe('GridBuilder', () => {
             expect(rowChildren[2].classList.contains('text-right')).toBe(true);
         });
     });
+
+    describe('FullCoverage — all 11 column types', () => {
+        interface FullCoverageItem {
+            id: number;
+            name: string;
+            email: string;
+            firstName: string;
+            lastName: string;
+            phone: string;
+            department: string;
+            score: number;
+            rating: number;
+            clicks: number;
+            lastLogin: Date;
+            createdAt: Date;
+            lastModified: Date;
+            role: 'ADMIN' | 'USER' | 'MANAGER' | 'VIEWER';
+            status: 'ACTIVE' | 'INACTIVE' | 'PENDING';
+            active: boolean;
+            verified: boolean;
+            progress: number;
+            balance: { amount: number; currencyId: string };
+            priority: 'low' | 'medium' | 'high';
+            buttonLabel: string;
+        }
+
+        const firstNames = ['James', 'Mary', 'Robert', 'Patricia'];
+        const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown'];
+        const departments = ['Engineering', 'Marketing', 'Sales', 'Support'];
+
+        const generateItem = (i: number): FullCoverageItem => ({
+            id: i,
+            name: `Item ${i}`,
+            email: `item${i}@test.com`,
+            firstName: firstNames[i % firstNames.length],
+            lastName: lastNames[i % lastNames.length],
+            phone: `+1-555-${String(1000 + (i % 9000)).slice(0, 4)}`,
+            department: departments[i % departments.length],
+            score: Math.floor(Math.random() * 100),
+            rating: Math.floor(Math.random() * 5) + 1,
+            clicks: Math.floor(Math.random() * 10000),
+            lastLogin: new Date(Date.now() - Math.random() * 1e10),
+            createdAt: new Date(Date.now() - Math.random() * 1e11),
+            lastModified: new Date(Date.now() - Math.random() * 5e9),
+            role: (['ADMIN', 'USER', 'MANAGER', 'VIEWER'] as const)[i % 4],
+            status: (['ACTIVE', 'INACTIVE', 'PENDING'] as const)[i % 3],
+            active: i % 2 === 0,
+            verified: i % 3 === 0,
+            progress: Math.random(),
+            balance: { amount: Math.floor(Math.random() * 10000) / 100, currencyId: ['USD', 'EUR', 'GBP'][i % 3] },
+            priority: (['low', 'medium', 'high'] as const)[i % 3],
+            buttonLabel: `Btn${i}`,
+        });
+
+        const items = Array.from({ length: 50 }, (_, i) => generateItem(i + 1));
+
+        it('should build a grid with all 22 columns, correct widths, and correct resizability', () => {
+            const grid = new GridBuilder<FullCoverageItem>()
+                .withItems(of(items))
+                .withHeight(of(700));
+
+            const columns = grid.withColumns();
+            // Number — id
+            columns.addNumberColumn('id').withHeader('ID').withWidth('60px');
+            // Text
+            columns.addTextColumn('name').withHeader('Name').withWidth('120px').asResizable();
+            columns.addTextColumn('email').withHeader('Email').withWidth('220px').asResizable();
+            columns.addTextColumn('firstName').withHeader('First Name').withWidth('100px').asResizable();
+            columns.addTextColumn('lastName').withHeader('Last Name').withWidth('100px').asResizable();
+            columns.addTextColumn('phone').withHeader('Phone').withWidth('130px').asResizable();
+            columns.addTextColumn('department').withHeader('Department').withWidth('130px').asResizable();
+            // Number
+            columns.addNumberColumn('score').withHeader('Score').withWidth('80px').asResizable();
+            columns.addNumberColumn('rating').withHeader('Rating').withWidth('70px');
+            columns.addNumberColumn('clicks').withHeader('Clicks').withWidth('80px').asResizable();
+            // Date
+            columns.addDateColumn('lastLogin').withHeader('Last Login').withWidth('120px').asResizable();
+            columns.addDateColumn('createdAt').withHeader('Created').withWidth('120px').asResizable();
+            // DateTime
+            columns.addDateTimeColumn('lastModified').withHeader('Modified').withWidth('150px').asResizable();
+            // Enum
+            columns.addEnumColumn('role').withHeader('Role').withWidth('100px');
+            columns.addEnumColumn('status').withHeader('Status').withWidth('100px');
+            // Boolean
+            columns.addBooleanColumn('active').withHeader('Active').withWidth('70px');
+            columns.addBooleanColumn('verified').withHeader('Verified').withWidth('70px');
+            // Percentage
+            columns.addPercentageColumn('progress').withHeader('Progress').withWidth('90px');
+            // Money
+            columns.addMoneyColumn('balance').withHeader('Balance').withWidth('100px').asResizable();
+            // Icon
+            columns.addIconColumn('priority')
+                .withHeader('Priority')
+                .withWidth('70px')
+                .withIconProvider((item) => {
+                    if (item.priority === 'high') return 'bg-red-500';
+                    if (item.priority === 'medium') return 'bg-yellow-500';
+                    return 'bg-green-500';
+                });
+            // Button
+            columns.addButtonColumn('buttonLabel')
+                .withHeader('Action')
+                .withWidth('90px')
+                .withLabel('Go')
+                .withClick((item) => { /* noop in test */ });
+            // Custom
+            columns.addCustomColumn()
+                .withHeader('Status Badge')
+                .withWidth('150px')
+                .withRenderer((item) => {
+                    const badge = document.createElement('span');
+                    badge.textContent = item.active ? 'Active' : 'Inactive';
+                    return badge;
+                });
+
+            const actions = grid.withActions();
+            actions.addAction(
+                `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z"/></svg>`,
+                'Edit',
+                () => {}
+            );
+            actions.addAction(
+                `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12z"/></svg>`,
+                'Delete',
+                () => {}
+            );
+            actions.addAction(
+                `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5z"/></svg>`,
+                'View',
+                () => {}
+            );
+
+            const container = grid.build();
+            document.body.appendChild(container);
+
+            expect(container).toBeInstanceOf(HTMLElement);
+            expect(container.style.height).toBe('700px');
+
+            // Verify headers exist for all columns
+            const header = container.querySelector('.sticky');
+            expect(header).toBeTruthy();
+            expect(header!.textContent).toContain('Name');
+            expect(header!.textContent).toContain('Email');
+            expect(header!.textContent).toContain('First Name');
+            expect(header!.textContent).toContain('Last Name');
+            expect(header!.textContent).toContain('Phone');
+            expect(header!.textContent).toContain('Department');
+            expect(header!.textContent).toContain('ID');
+            expect(header!.textContent).toContain('Score');
+            expect(header!.textContent).toContain('Rating');
+            expect(header!.textContent).toContain('Clicks');
+            expect(header!.textContent).toContain('Last Login');
+            expect(header!.textContent).toContain('Created');
+            expect(header!.textContent).toContain('Modified');
+            expect(header!.textContent).toContain('Role');
+            expect(header!.textContent).toContain('Status');
+            expect(header!.textContent).toContain('Active');
+            expect(header!.textContent).toContain('Verified');
+            expect(header!.textContent).toContain('Progress');
+            expect(header!.textContent).toContain('Balance');
+            expect(header!.textContent).toContain('Priority');
+            expect(header!.textContent).toContain('Action');
+
+            // Rows should be present
+            const rows = container.querySelectorAll('.absolute.w-full');
+            expect(rows.length).toBeGreaterThan(0);
+
+            // Verify header cells are present
+            const headerCells = header!.querySelectorAll(':scope > div');
+            expect(headerCells.length).toBeGreaterThanOrEqual(22);
+
+            // Check resizability — count all resize handles (12 resizable columns)
+            const resizeHandles = header!.querySelectorAll('.resize-handle');
+            expect(resizeHandles.length).toBe(12);
+
+            document.body.removeChild(container);
+        });
+
+        it('should render without glass, multi-select, editing, toolbar, or sorting', () => {
+            const grid = new GridBuilder<FullCoverageItem>()
+                .withItems(of(items))
+                .withHeight(of(700));
+
+            const columns = grid.withColumns();
+            columns.addTextColumn('name').withHeader('Name');
+
+            const container = grid.build();
+            document.body.appendChild(container);
+
+            // No sorting indicators
+            expect(container.querySelector('.cursor-pointer')).toBeFalsy();
+            // No multi-select checkboxes
+            expect(container.querySelector('input[type="checkbox"]')).toBeFalsy();
+
+            document.body.removeChild(container);
+        });
+
+        it('should render icon column with valid CSS classes', () => {
+            const grid = new GridBuilder<FullCoverageItem>()
+                .withItems(of(items.slice(0, 3)))
+                .withHeight(of(300));
+
+            const columns = grid.withColumns();
+            columns.addIconColumn('priority')
+                .withHeader('Priority')
+                .withIconProvider((item) => {
+                    if (item.priority === 'high') return 'bg-red-500 w-3 h-3';
+                    if (item.priority === 'medium') return 'bg-yellow-500 w-3 h-3';
+                    return 'bg-green-500 w-3 h-3';
+                });
+
+            const container = grid.build();
+            document.body.appendChild(container);
+
+            // Wait for rendering cycle
+            const icons = container.querySelectorAll('i');
+            expect(icons.length).toBeGreaterThan(0);
+            expect(icons[0].className).toMatch(/^bg-\w+-\d+ w-3 h-3$/);
+
+            document.body.removeChild(container);
+        });
+    });
 });

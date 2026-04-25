@@ -96,6 +96,7 @@ export class GridRow<ITEM> {
                 this.isSelected ? GridStyles.actionCellSelected : (this.isGlass ? GridStyles.actionCellGlass : (this.index % 2 === 1 ? GridStyles.actionCellOdd : GridStyles.actionCellEven)),
                 !this.isGlass && 'group-hover:bg-surface-variant/20 dark:group-hover:bg-slate-800/60'
             );
+            actionCell.style.width = `${this.actions.length * 40}px`;
 
             this.actions.forEach((action) => {
                 const wrapper = document.createElement('div');

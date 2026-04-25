@@ -5,7 +5,7 @@ description: >-
   architecture alignment, and best practices.
 
 mode: subagent
-model: deepseek/deepseek-reasoner
+model: deepseek/deepseek-v4-pro
 permission:
   edit: deny
   bash: allow

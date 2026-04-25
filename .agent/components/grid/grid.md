@@ -83,8 +83,8 @@ When `asMultiSelect()` is enabled:
 - **Rows**: `GridRow` renders a checkbox and handles selection toggling. To maintain performance, selection updates are optimized to avoid full row re-renders, using cached element references to toggle classes and attributes.
 
 ### Sticky Panels
-- **Sticky Header**: Managed by `GridHeader`, remains fixed at the top (`sticky top-0`) with a higher z-index (`z-20`). Includes a backdrop blur for high-end visual feedback.
-- **Sticky Actions**: Rendered in a dedicated column that is `sticky right-0`. To prevent scroll lag, this panel uses an opaque background (`bg-surface-container-low/80`) and **must not** use `backdrop-blur` or any backdrop filter — these create per-row composite layers that tank scroll performance.
+- **Sticky Header**: Managed by `GridHeader`, remains fixed at the top (`sticky top-0`) with a higher z-index (`z-20`). Uses a solid background in non-glass mode; backdrop blur is reserved for glass mode only.
+- **Sticky Actions**: Rendered in a dedicated column that is `sticky right-0`. To prevent scroll lag, this panel uses a solid background (`bg-surface-container-low`) and **must not** use `backdrop-blur` or any backdrop filter — these create per-row composite layers that tank scroll performance.
 
 ### Column Sorting
 - **State**: Managed in `GridLogic` (field and direction).
@@ -131,7 +131,7 @@ Grid rows do not have background in case of glass effect. Grid header has backgr
 - **Container**: `bg-background`, `border-outline/30`, `dark:border-stone-50/20`, `rounded-lg`.
 - **Header**:
     - **Height**: 52px.
-    - **Background**: `bg-surface-container-low/80 backdrop-blur`.
+    - **Background**: `bg-surface-container-low` (solid, no blur). Glass mode uses `headerGlass` with `glass-effect !bg-white/20` and backdrop blur.
     - **Borders**: Interactive resizable borders (grey on hover, primary blue on active/handle hover). Borders are 2px wide and 80% of header height.
     - **Typography**: `font-semibold`, `text-[11px]`, `text-on-surface-variant`, `uppercase`, `tracking-wider`.
 - **Rows**:
@@ -143,4 +143,4 @@ Grid rows do not have background in case of glass effect. Grid header has backgr
     - **Alignment**: `flex items-center`.
 - **Sticky Actions Column**:
     - **Position**: `sticky right-0 z-10`.
-    - **Styling**: `border-l border-outline/10 bg-surface-container-low/80`. No `backdrop-blur` — see Performance Mandates.
+    - **Styling**: `border-l border-outline/10 bg-surface-container-low` (solid). No `backdrop-blur` — see Performance Mandates.

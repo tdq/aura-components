@@ -7,7 +7,7 @@ description: >-
   documentation in sync with the codebase.
 
 mode: subagent
-model: google/gemini-3.1-pro-preview
+model: deepseek/deepseek-v4-pro
 permission:
   edit: allow
   bash: allow

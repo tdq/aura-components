@@ -5,7 +5,7 @@ description: >-
   fixes, or QA a complete module or component.
 
 mode: subagent
-model:  deepseek/deepseek-reasoner
+model:  deepseek/deepseek-v4-flash
 tools:
   bash: false
   webfetch: false

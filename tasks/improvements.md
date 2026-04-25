@@ -1,6 +1,6 @@
 # Improvements tasks
 [x] **GridBuilder** addMoneyColumn should accept Money object instead of nimber. Money object is instance of {amount: number, currencyId: string}. Represent currency sign according to the currency id. Provide currency register as a separate util.
-[ ] **GridBuilder** "editable" feature is not working
+[x] **GridBuilder** "editable" feature is not working
 [x] **GridBuilder** if `withHeight` is not set then height is full height of container
 [ ] Implement component which accepts observable and allows to define how to render observable value
 [x] Export `registerDestroy`

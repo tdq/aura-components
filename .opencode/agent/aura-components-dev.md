@@ -5,7 +5,7 @@ description: >-
   updating component logic, writing tests, and creating Storybook stories.
 
 mode: subagent
-model: google/gemini-3-flash-preview
+model: deepseek/deepseek-v4-flash
 tools:
   bash: false
   webfetch: false
