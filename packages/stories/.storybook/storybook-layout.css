@@ -12,3 +12,35 @@ body {
     display: block;
     place-items: initial;
 }
+
+/* MDX docs table styling */
+.sbdocs-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.sbdocs-content table th {
+    text-align: left;
+    padding: 10px 16px;
+    font-weight: 600;
+    border-bottom: 2px solid var(--md-sys-color-outline, #938F99);
+    color: var(--md-sys-color-on-surface, #1C1B1F);
+}
+
+.sbdocs-content table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--md-sys-color-outline, #938F99);
+    color: var(--md-sys-color-on-surface, #1C1B1F);
+    vertical-align: top;
+}
+
+.sbdocs-content table tr:last-child td {
+    border-bottom: none;
+}
+
+.sbdocs-content table tr:hover td {
+    background-color: color-mix(in srgb, var(--md-sys-color-on-surface, #1C1B1F) 5%, transparent);
+}

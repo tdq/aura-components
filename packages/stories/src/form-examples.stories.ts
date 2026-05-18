@@ -593,9 +593,6 @@ export const GlassRegistrationDialog = () => {
     wrapper.appendChild(container);
     wrapper.appendChild(actionLog);
 
-    // Auto-open for convenience
-    setTimeout(() => showDialog(), 500);
-
     return wrapper;
 };
 
