@@ -3,7 +3,7 @@ const PAIN_POINTS = [
         stat: 'Every project',
         pain: 'Reinventing state adapters',
         detail: 'Your observable holds the data. The component wants a string. So you write glue. Again.',
-        icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
             <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
         </svg>`,
@@ -13,7 +13,7 @@ const PAIN_POINTS = [
         stat: 'Every override',
         pain: 'Fighting Shadow DOM boundaries',
         detail: 'Your design tokens stop at the component edge. You reach for ::part() and pray it works in Safari.',
-        icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
             <line x1="3" y1="9" x2="21" y2="9"/>
             <line x1="9" y1="21" x2="9" y2="9"/>
@@ -24,7 +24,7 @@ const PAIN_POINTS = [
         stat: '150KB+',
         pain: 'Shipping a framework to use 3 components',
         detail: 'You needed a button, a dropdown, and a table. You got React, a virtual DOM, and a reconciler.',
-        icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="12" cy="12" r="10"/>
             <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
         </svg>`,
@@ -34,6 +34,8 @@ const PAIN_POINTS = [
 
 export function createProblem(): HTMLElement {
     const section = document.createElement('section');
+    section.id = 'problem';
+    section.setAttribute('aria-labelledby', 'problem-heading');
     section.className = 'py-px-96 px-px-24 relative overflow-hidden';
     section.style.cssText = 'background: var(--md-sys-color-surface-container-low);';
 
@@ -51,10 +53,10 @@ export function createProblem(): HTMLElement {
     header.className = 'mb-px-64';
     header.innerHTML = `
         <div class="inline-flex items-center gap-px-8 px-px-16 py-px-8 rounded-full text-label-medium mb-px-24 badge-accent opacity-80">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
             Sound familiar?
         </div>
-        <h2 class="text-[36px] md:text-[44px] font-bold text-on-surface leading-tight" style="letter-spacing: -0.025em;">
+        <h2 id="problem-heading" class="text-[36px] md:text-[44px] font-bold text-on-surface leading-tight" style="letter-spacing: -0.025em;">
             Building reactive UIs in vanilla TypeScript<br class="hidden md:block"> used to mean accepting trade-offs.
         </h2>
         <p class="mt-px-16 text-body-large text-on-surface-variant max-w-2xl" style="opacity: 0.75;">

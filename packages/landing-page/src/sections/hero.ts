@@ -14,6 +14,7 @@ import { map } from 'rxjs/operators';
 
 export function createHero(): HTMLElement {
     const section = document.createElement('section');
+    section.setAttribute('aria-labelledby', 'hero-heading');
 
     section.innerHTML = `
         <div id="hero-container" class="min-h-screen relative overflow-hidden transition-colors duration-500">
@@ -30,12 +31,12 @@ export function createHero(): HTMLElement {
                     <div class="space-y-8">
                         <div class="space-y-6">
                             <div id="hero-badge" class="inline-flex items-center gap-px-8 px-px-16 py-px-8 rounded-full text-label-medium mb-px-32 transition-all duration-500 badge-accent">
-                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                                     <path d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                                 </svg>
                                 <span>RxJS native · TypeScript · Material 3</span>
                             </div>
-                            <h1 class="text-5xl md:text-7xl font-bold leading-tight">
+                            <h1 id="hero-heading" class="text-5xl md:text-7xl font-bold leading-tight">
                                 <span id="hero-title-1"
                                     class="text-gradient-1 transition-all duration-500">Components for</span><br /><span id="hero-title-2"
                                     class="text-gradient-2 transition-all duration-500">Financial Applications</span>

@@ -4,7 +4,7 @@ const FEATURES = [
         description: 'Every component speaks RxJS natively. Declarative state streams, real-time updates, zero unnecessary re-renders.',
         color: '#4338ca',
         colorLight: 'rgba(67, 56, 202, 0.08)',
-        icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
         </svg>`
     },
@@ -13,7 +13,7 @@ const FEATURES = [
         description: 'Utility-first styling that scales with your project. Full Tailwind v3 support with custom Material 3 tokens baked in.',
         color: '#4f46e5',
         colorLight: 'rgba(79, 70, 229, 0.08)',
-        icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="13.5" cy="6.5" r="2.5"/>
             <circle cx="17.5" cy="10.5" r="2.5"/>
             <circle cx="8.5" cy="7.5" r="2.5"/>
@@ -26,7 +26,7 @@ const FEATURES = [
         description: 'Adheres to Google\'s latest design language. Dynamic color, expressive motion, and accessible typography built in.',
         color: '#6366f1',
         colorLight: 'rgba(99, 102, 241, 0.08)',
-        icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z"/>
         </svg>`
     },
@@ -35,7 +35,7 @@ const FEATURES = [
         description: 'Fully typed with strict TypeScript. Builder pattern APIs that are impossible to misuse. IDE autocomplete everywhere.',
         color: '#4338ca',
         colorLight: 'rgba(67, 56, 202, 0.08)',
-        icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
             <path d="m9 12 2 2 4-4"/>
         </svg>`
@@ -45,7 +45,7 @@ const FEATURES = [
         description: 'Tree-shakeable exports. Import only what you use. Each component is self-contained with minimal runtime overhead.',
         color: '#4f46e5',
         colorLight: 'rgba(79, 70, 229, 0.08)',
-        icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
         </svg>`
     }
@@ -65,14 +65,16 @@ export function createFeatures(): HTMLElement {
     section.appendChild(bgTexture);
 
     // Section header
+    section.setAttribute('aria-labelledby', 'features-heading');
+
     const header = document.createElement('div');
     header.className = 'max-w-7xl mx-auto mb-px-48';
     header.innerHTML = `
         <div class="inline-flex items-center gap-px-8 px-px-16 py-px-8 rounded-full text-label-medium mb-px-24 badge-accent">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
             What makes it different
         </div>
-        <h2 class="text-[36px] md:text-[44px] font-bold text-on-surface leading-tight" style="letter-spacing: -0.025em;">
+        <h2 id="features-heading" class="text-[36px] md:text-[44px] font-bold text-on-surface leading-tight" style="letter-spacing: -0.025em;">
             Not a framework wrapper.<br>
             <span class="text-gradient-2">Not a Web Component.</span>
         </h2>
