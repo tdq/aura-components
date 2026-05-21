@@ -1,5 +1,9 @@
 import { RouterBuilder } from '@tdq/ora-components';
 import { createLandingPage } from './sections/landing-page';
+import { applyHeadToDocument } from './seo/inject-head';
+import { ROUTE_METADATA } from './seo/route-metadata';
+
+const siteOrigin = typeof window !== 'undefined' ? window.location.origin : '';
 
 export const router = new RouterBuilder()
     .withBase('/')
@@ -7,20 +11,20 @@ export const router = new RouterBuilder()
 
 router.addRoute()
     .withPattern('/')
-    .withContent(() => ({ build: () => createLandingPage() }));
+    .withContent(() => ({ build: () => createLandingPage() }))
+    .withOnEnter(() => applyHeadToDocument(ROUTE_METADATA['/'], siteOrigin));
+
+const dashboardFactory = async () => {
+    const { createDashboardDemo } = await import('./demo/dashboard');
+    return { build: () => createDashboardDemo() };
+};
 
 router.addRoute()
     .withPattern('/dashboard')
-    .withContent(async () => {
-        const { createDashboardDemo } = await import('./demo/dashboard');
-
-        return { build: () => createDashboardDemo() }
-    });
+    .withContent(dashboardFactory)
+    .withOnEnter(() => applyHeadToDocument(ROUTE_METADATA['/dashboard'], siteOrigin));
 
 router.addRoute()
     .withPattern('/dashboard/{page}')
-    .withContent(async () => {
-        const { createDashboardDemo } = await import('./demo/dashboard');
-
-        return { build: () => createDashboardDemo() }
-    });
+    .withContent(dashboardFactory)
+    .withOnEnter(() => applyHeadToDocument(ROUTE_METADATA['/dashboard/{page}'], siteOrigin));

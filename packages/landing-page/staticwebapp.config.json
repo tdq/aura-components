@@ -11,10 +11,26 @@
       "headers": {
         "cache-control": "public, immutable, max-age=31536000"
       }
+    },
+    {
+      "route": "/sitemap.xml",
+      "headers": {
+        "cache-control": "public, max-age=86400",
+        "content-type": "application/xml"
+      }
+    },
+    {
+      "route": "/robots.txt",
+      "headers": {
+        "cache-control": "public, max-age=86400"
+      }
     }
   ],
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/assets/*"]
+    "exclude": ["/assets/*", "/sitemap.xml", "/robots.txt", "/og-default.png"]
+  },
+  "mimeTypes": {
+    ".xml": "application/xml"
   }
 }

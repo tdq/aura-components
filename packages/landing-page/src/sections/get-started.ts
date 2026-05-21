@@ -15,6 +15,7 @@ document.body.appendChild(btn);`;
 export function createGetStarted(): HTMLElement {
     const section = document.createElement('section');
     section.id = 'get-started';
+    section.setAttribute('aria-labelledby', 'get-started-heading');
     section.className = 'py-px-96 px-px-24 bg-surface relative overflow-hidden';
 
     // Subtle bg
@@ -30,10 +31,10 @@ export function createGetStarted(): HTMLElement {
     header.className = 'max-w-7xl mx-auto text-center mb-px-64';
     header.innerHTML = `
         <div class="inline-flex items-center gap-px-8 px-px-16 py-px-8 rounded-full text-label-medium mb-px-24 badge-accent">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4zm2 2H5V5h14v14zm0-16H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4zm2 2H5V5h14v14zm0-16H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
             Quick Start
         </div>
-        <h2 class="text-[40px] font-bold text-on-surface leading-tight tracking-tight" style="letter-spacing: -0.025em;">
+        <h2 id="get-started-heading" class="text-[40px] font-bold text-on-surface leading-tight tracking-tight" style="letter-spacing: -0.025em;">
             Try it in <span class="text-gradient-2">60 seconds</span>
         </h2>
         <p class="mt-px-16 text-body-large text-on-surface-variant max-w-2xl mx-auto" style="opacity: 0.75;">

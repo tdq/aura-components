@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard/
+
+Sitemap: https://ora-components.com/sitemap.xml

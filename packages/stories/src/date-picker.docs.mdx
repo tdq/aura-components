@@ -73,8 +73,8 @@ All builder methods return `this` for chaining. Pass RxJS observables into the r
 - **`withError`** — `(error: Observable<string>): this`
   Sets the validation error message shown below the input. An empty string clears the error state.
 
-- **`withStyle`** — `(style: Observable<DatePickerStyle>): this`
-  Applies a custom `DatePickerStyle` object to override theme colours, border radius, and font family.
+- **`withStyle`** — `(style: Observable<FieldStyle>): this`
+  Sets the visual style variant: `FieldStyle.TONAL` (default) or `FieldStyle.OUTLINED`.
 
 - **`withClass`** — `(className: Observable<string>): this`
   Appends additional CSS class names to the root container element.
@@ -90,84 +90,24 @@ All builder methods return `this` for chaining. Pass RxJS observables into the r
 
 ---
 
-## DayOfWeek Enum
+## Styling Variants
 
-| Value | Description |
-|-------|-------------|
-| `DayOfWeek.SUNDAY` | `0` — Week starts on Sunday. |
-| `DayOfWeek.MONDAY` | `1` — Week starts on Monday. Default. |
-| `DayOfWeek.TUESDAY` | `2` — Week starts on Tuesday. |
-| `DayOfWeek.WEDNESDAY` | `3` — Week starts on Wednesday. |
-| `DayOfWeek.THURSDAY` | `4` — Week starts on Thursday. |
-| `DayOfWeek.FRIDAY` | `5` — Week starts on Friday. |
-| `DayOfWeek.SATURDAY` | `6` — Week starts on Saturday. |
+The date picker supports the same styling variants as `TextField`:
+
+- **TONAL** (default) — Filled input with an active indicator at the bottom.
+- **OUTLINED** — Bordered input with rounded corners.
 
 ---
 
-## DatePickerStyle Interface
-
-| Property | Type | Description |
-|----------|------|-------------|
-| `primaryColor` | `string` | CSS colour value for the primary accent colour. |
-| `surfaceColor` | `string` | CSS colour value for the surface background. |
-| `onSurfaceColor` | `string` | CSS colour value for text on surface. |
-| `borderRadius` | `string` | CSS border-radius value for the small shape corner. |
-| `fontFamily` | `string` | CSS font-family applied to the container. |
-
----
-
-## Default
-
-The `Default` story shows the basic date picker with a caption and the default `DD-MM-YYYY` format, no initial value, and no constraints.
+## Stories
 
 <Canvas of={Stories.Default} />
-
----
-
-## Initial Value
-
-The `InitialValue` story shows how to pre-populate the date picker with a specific date (e.g. 25 December 2023) using `withValue` with a `BehaviorSubject`.
-
 <Canvas of={Stories.InitialValue} />
-
----
-
-## Range Constraints
-
-The `RangeConstraints` story demonstrates `withMinDate` and `withMaxDate` to restrict selection to the next 30 days. Dates outside this range are disabled in the calendar popup.
-
 <Canvas of={Stories.RangeConstraints} />
-
----
-
-## Custom Format
-
-The `CustomFormat` story shows the date picker with a non-default format string `DD/MM/YYYY` (slash delimiters instead of dashes). The input mask enforces the chosen format at the character level.
-
 <Canvas of={Stories.CustomFormat} />
-
----
-
-## States
-
-The `States` story demonstrates the disabled and error states side by side. The disabled picker has reduced opacity and no pointer events. The error picker shows a validation message with `border-error` styling on the input wrapper.
-
 <Canvas of={Stories.States} />
-
----
-
-## Glass Effect
-
-The `Glass` story renders the date picker with `asGlass()` applied on top of a gradient background, demonstrating the frosted-glass appearance on both the input and the calendar popup.
-
 <Canvas of={Stories.Glass} />
-
----
-
-## Interactive Example
-
-The `Interactive` story demonstrates two-way reactive state: selecting a date updates a `BehaviorSubject`, which in turn refreshes a status label below showing the formatted date in real time.
-
+<Canvas of={Stories.Styles} />
 <Canvas of={Stories.Interactive} />
 
 ---
@@ -197,9 +137,9 @@ All visual properties are driven by MD3 design tokens. Override them on `:root` 
 | `--md-sys-color-outline` | Input and popup border |
 | `--md-sys-shape-medium` | Calendar popup border radius |
 
-See the [Theming guide](../?path=/docs/system-theming--docs) for token reference and custom theme examples.
+---
 
-### Additional notes
+## Additional notes
 
 - **Input height** is 48px (`h-[48px]`) for consistency with other form fields.
 - **Calendar popup** is powered by `PopoverBuilder` and rendered at a fixed width of 320px.

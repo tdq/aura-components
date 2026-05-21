@@ -110,7 +110,26 @@ export class RouterBuilder implements ComponentBuilder {
     private swapView(match: RouteMatch, definition: RouteDefinition): void {
         // Increment navigation ID to track this navigation
         const navigationId = ++this.pendingNavigationId;
-        
+
+        // Same-view navigation: if the new route shares the content factory
+        // with the current one, treat the mounted element as a shell and let
+        // its own subscribers (e.g. nested outlets) react to the new match
+        // instead of tearing it down and rebuilding.
+        if (
+            this.currentElement &&
+            this.currentDefinition &&
+            this.currentDefinition.factory === definition.factory
+        ) {
+            this.currentDefinition = definition;
+            this.routeSubject.next(match);
+            try {
+                definition.onEnter?.(match);
+            } catch (hookError) {
+                console.error('Route onEnter hook failed:', hookError);
+            }
+            return;
+        }
+
         // onLeave for old route
         try {
             this.currentDefinition?.onLeave?.();
