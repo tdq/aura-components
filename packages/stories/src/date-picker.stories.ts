@@ -1,4 +1,4 @@
-import { DatePickerBuilder } from '@tdq/ora-components';
+import { DatePickerBuilder, FieldStyle } from '@tdq/ora-components';
 import { BehaviorSubject, of } from 'rxjs';
 import { LayoutBuilder, LayoutGap } from '@tdq/ora-components';
 import { LabelBuilder, LabelSize } from '@tdq/ora-components';
@@ -174,6 +174,37 @@ export const Glass = () => {
 
     const container = layout.build();
     container.classList.add('flex-1', 'p-12', 'bg-gradient-to-br', 'from-indigo-500', 'via-purple-500', 'to-pink-500');
+
+    return container;
+};
+
+export const Styles = () => {
+    const layout = new LayoutBuilder()
+        .asVertical()
+        .withGap(LayoutGap.EXTRA_LARGE);
+
+    layout.addSlot().withContent(
+        new LabelBuilder().withCaption(of('Tonal (Default)')).withSize(LabelSize.MEDIUM)
+    );
+
+    layout.addSlot().withContent(
+        new DatePickerBuilder()
+            .withStyle(of(FieldStyle.TONAL))
+            .withCaption(of('Tonal DatePicker'))
+    );
+
+    layout.addSlot().withContent(
+        new LabelBuilder().withCaption(of('Outlined')).withSize(LabelSize.MEDIUM)
+    );
+
+    layout.addSlot().withContent(
+        new DatePickerBuilder()
+            .withStyle(of(FieldStyle.OUTLINED))
+            .withCaption(of('Outlined DatePicker'))
+    );
+
+    const container = layout.build();
+    container.classList.add('p-4', 'max-w-md');
 
     return container;
 };

@@ -3,9 +3,11 @@ import { ComponentBuilder } from '../../core/component-builder';
 import { registerDestroy } from '@/core/destroyable-element';
 import { formatDate, parseDate, isValidDate } from './date-utils';
 import { renderCalendar } from './calendar';
-import { DatePickerStyle, DayOfWeek } from './types';
+import { FieldStyle } from '../../theme';
+import { DayOfWeek } from './types';
 import { Icons } from '@/core/icons';
 import { PopoverBuilder } from '../component-parts/popover';
+import { of } from 'rxjs';
 
 export class DatePickerBuilder implements ComponentBuilder {
     private value$?: Subject<Date | null>;
@@ -15,7 +17,7 @@ export class DatePickerBuilder implements ComponentBuilder {
     private format = 'DD-MM-YYYY';
     private enabled$?: Observable<boolean>;
     private error$?: Observable<string>;
-    private style$?: Observable<DatePickerStyle>;
+    private style$: Observable<FieldStyle> = of(FieldStyle.TONAL);
     private className$?: Observable<string>;
     private isGlass: boolean = false;
     private firstDayOfWeek: DayOfWeek = DayOfWeek.MONDAY;
@@ -55,7 +57,7 @@ export class DatePickerBuilder implements ComponentBuilder {
         return this;
     }
 
-    withStyle(style: Observable<DatePickerStyle>): this {
+    withStyle(style: Observable<FieldStyle>): this {
         this.style$ = style;
         return this;
     }
@@ -272,12 +274,15 @@ export class DatePickerBuilder implements ComponentBuilder {
             }
         }));
 
-        subs.push(this.style$?.subscribe(style => {
-            if (style.primaryColor) container.style.setProperty('--md-sys-color-primary', style.primaryColor);
-            if (style.surfaceColor) container.style.setProperty('--md-sys-color-surface', style.surfaceColor);
-            if (style.onSurfaceColor) container.style.setProperty('--md-sys-color-on-surface', style.onSurfaceColor);
-            if (style.borderRadius) container.style.setProperty('--md-sys-shape-corner-small', style.borderRadius);
-            if (style.fontFamily) container.style.fontFamily = style.fontFamily;
+        subs.push(this.style$.subscribe(style => {
+            // Reset base styles
+            inputWrapper.classList.remove('bg-surface-variant', 'border-b', 'border-outline-variant', 'rounded-t-small', 'border', 'rounded-small', 'bg-transparent');
+
+            if (style === FieldStyle.TONAL) {
+                inputWrapper.classList.add('bg-surface-variant', 'rounded-t-small');
+            } else if (style === FieldStyle.OUTLINED) {
+                inputWrapper.classList.add('border', 'border-outline', 'rounded-small', 'bg-transparent');
+            }
         }));
 
         subs.push(this.className$?.subscribe(name => {

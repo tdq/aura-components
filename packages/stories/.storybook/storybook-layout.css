@@ -37,10 +37,269 @@ body {
     vertical-align: top;
 }
 
+.sbdocs-content table tr {
+    background-color: transparent !important;
+}
+
 .sbdocs-content table tr:last-child td {
     border-bottom: none;
 }
 
 .sbdocs-content table tr:hover td {
     background-color: color-mix(in srgb, var(--md-sys-color-on-surface, #1C1B1F) 5%, transparent);
+}
+
+/* Docs page background */
+.sbdocs-wrapper,
+.sbdocs-content {
+    background-color: var(--md-sys-color-background) !important;
+    color: var(--md-sys-color-on-background) !important;
+}
+
+/* Prose typography */
+.sbdocs-content h1,
+.sbdocs-content h2,
+.sbdocs-content h3,
+.sbdocs-content h4,
+.sbdocs-content p,
+.sbdocs-content li,
+.sbdocs-content blockquote {
+    color: var(--md-sys-color-on-background);
+}
+
+.sbdocs-content a {
+    color: var(--md-sys-color-primary);
+}
+
+.sbdocs-content hr {
+    border-color: var(--md-sys-color-outline);
+}
+
+/* Inline code */
+.sbdocs-content code {
+    background-color: var(--md-sys-color-surface-variant) !important;
+    color: var(--md-sys-color-on-surface-variant) !important;
+}
+
+[data-theme="dark"] .sbdocs-content code {
+    border: none !important;
+}
+
+.sbdocs-content pre code {
+    background-color: transparent;
+    color: var(--md-sys-color-on-surface);
+}
+
+/* Canvas story source blocks — dark card */
+.docblock-source,
+.sbdocs-content pre.prismjs {
+    position: relative !important;
+    background: rgb(26, 22, 37) !important;
+    border: none !important;
+    overflow: hidden !important;
+}
+
+.sbdocs-content pre.prismjs {
+    margin: 0 !important;
+}
+
+/* Header (traffic lights + copy slot) + rounded card only for .docblock-source */
+.docblock-source {
+    padding-top: 52px !important;
+    border-radius: 24px !important;
+    margin: 1rem 0 !important;
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 20px 60px, rgba(255, 255, 255, 0.06) 0px 0px 0px 1px !important;
+}
+
+/* When a .prismjs lives inside .docblock-source, don't double-wrap */
+.docblock-source pre.prismjs {
+    background: transparent !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding-top: 0 !important;
+    margin: 0 !important;
+}
+
+.docblock-source::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 52px;
+    background-color: rgba(255, 255, 255, 0.03);
+    background-image:
+        radial-gradient(circle at 24px 50%, #ff5f57 5px, transparent 5px),
+        radial-gradient(circle at 44px 50%, #febc2e 5px, transparent 5px),
+        radial-gradient(circle at 64px 50%, #28c840 5px, transparent 5px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    z-index: 1;
+}
+
+.docblock-source pre,
+.docblock-source .prismjs,
+.sbdocs-content pre.prismjs > div {
+    background: transparent !important;
+    margin: 0 !important;
+    padding: 2rem !important;
+    border: none !important;
+}
+
+.docblock-source .language-typescript,
+.docblock-source .language-ts,
+.sbdocs-content pre.prismjs .language-typescript,
+.sbdocs-content pre.prismjs .language-ts {
+    font-family: "Fira Code", "Cascadia Code", "JetBrains Mono", monospace !important;
+    font-size: 13px !important;
+    line-height: 1.7 !important;
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* Position the Copy button inside the title bar (top-right) */
+.docblock-source > div:last-child {
+    position: absolute !important;
+    top: 10px !important;
+    right: 16px !important;
+    z-index: 2 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.sbdocs-content .docblock-source button,
+.docblock-source button {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: rgba(255, 255, 255, 0.7) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 6px !important;
+    padding: 6px 14px !important;
+    font-size: 12px !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    transition: background 0.2s ease, color 0.2s ease !important;
+}
+
+.sbdocs-content .docblock-source button:hover,
+.docblock-source button:hover {
+    background: rgba(255, 255, 255, 0.14) !important;
+    color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.docblock-source button::before {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffffb3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='9' y='9' width='13' height='13' rx='2' ry='2'/%3E%3Cpath d='M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+
+/* Dark-card token colors (always dark, theme-independent).
+   Scoped under .sbdocs-content to outrank the theme-aware
+   `.sbdocs-content pre [class*="language-"]` rules below. */
+.sbdocs-content .docblock-source [class*="language-"],
+.sbdocs-content .docblock-source pre [class*="language-"],
+.sbdocs-content pre.prismjs [class*="language-"] {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.sbdocs-content .docblock-source .token.keyword,
+.sbdocs-content .docblock-source .token.keyword.module,
+.sbdocs-content .docblock-source .token.control-flow,
+.sbdocs-content pre.prismjs .token.keyword,
+.sbdocs-content pre.prismjs .token.keyword.module,
+.sbdocs-content pre.prismjs .token.control-flow {
+    color: #a78bfa !important;
+}
+
+.sbdocs-content .docblock-source .token.string,
+.sbdocs-content .docblock-source .token.constant,
+.sbdocs-content pre.prismjs .token.string,
+.sbdocs-content pre.prismjs .token.constant,
+.sbdocs-content pre.prismjs .token.template-string {
+    color: #fbbf24 !important;
+}
+
+.sbdocs-content .docblock-source .token.class-name,
+.sbdocs-content .docblock-source .token.maybe-class-name,
+.sbdocs-content pre.prismjs .token.class-name,
+.sbdocs-content pre.prismjs .token.maybe-class-name,
+.sbdocs-content pre.prismjs .token.known-class-name {
+    color: #93c5fd !important;
+}
+
+.sbdocs-content .docblock-source .token.punctuation,
+.sbdocs-content .docblock-source .token.operator,
+.sbdocs-content .docblock-source .token.arrow.operator,
+.sbdocs-content pre.prismjs .token.punctuation,
+.sbdocs-content pre.prismjs .token.operator,
+.sbdocs-content pre.prismjs .token.arrow.operator {
+    color: #e2e8f0 !important;
+}
+
+.sbdocs-content .docblock-source .token.method,
+.sbdocs-content .docblock-source .token.function,
+.sbdocs-content .docblock-source .token.property-access,
+.sbdocs-content .docblock-source .token.dom.variable,
+.sbdocs-content pre.prismjs .token.method,
+.sbdocs-content pre.prismjs .token.function,
+.sbdocs-content pre.prismjs .token.function-variable,
+.sbdocs-content pre.prismjs .token.property-access,
+.sbdocs-content pre.prismjs .token.dom.variable {
+    color: #34d399 !important;
+}
+
+.sbdocs-content .docblock-source .token.comment,
+.sbdocs-content pre.prismjs .token.comment {
+    color: rgba(255, 255, 255, 0.4) !important;
+    font-style: italic;
+}
+
+/* MDX fenced code block token colors — MD3 theme-aware */
+.sbdocs-content pre [class*="language-"] {
+    color: var(--md-sys-color-on-surface);
+}
+
+.sbdocs-content pre .token.keyword,
+.sbdocs-content pre .token.keyword.module,
+.sbdocs-content pre .token.control-flow {
+    color: var(--md-sys-color-primary);
+}
+
+.sbdocs-content pre .token.string,
+.sbdocs-content pre .token.constant {
+    color: var(--md-sys-color-tertiary);
+}
+
+.sbdocs-content pre .token.class-name,
+.sbdocs-content pre .token.maybe-class-name {
+    color: var(--md-sys-color-secondary);
+}
+
+.sbdocs-content pre .token.punctuation,
+.sbdocs-content pre .token.operator,
+.sbdocs-content pre .token.arrow.operator {
+    color: var(--md-sys-color-on-surface-variant);
+}
+
+.sbdocs-content pre .token.method,
+.sbdocs-content pre .token.function,
+.sbdocs-content pre .token.property-access,
+.sbdocs-content pre .token.dom.variable {
+    color: var(--md-sys-color-on-primary-container);
+}
+
+.sbdocs-content pre .token.comment {
+    color: var(--md-sys-color-outline);
+    font-style: italic;
 }
