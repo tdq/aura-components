@@ -14,18 +14,17 @@ router.addRoute()
     .withContent(() => ({ build: () => createLandingPage() }))
     .withOnEnter(() => applyHeadToDocument(ROUTE_METADATA['/'], siteOrigin));
 
+const dashboardFactory = async () => {
+    const { createDashboardDemo } = await import('./demo/dashboard');
+    return { build: () => createDashboardDemo() };
+};
+
 router.addRoute()
     .withPattern('/dashboard')
-    .withContent(async () => {
-        const { createDashboardDemo } = await import('./demo/dashboard');
-        return { build: () => createDashboardDemo() };
-    })
+    .withContent(dashboardFactory)
     .withOnEnter(() => applyHeadToDocument(ROUTE_METADATA['/dashboard'], siteOrigin));
 
 router.addRoute()
     .withPattern('/dashboard/{page}')
-    .withContent(async () => {
-        const { createDashboardDemo } = await import('./demo/dashboard');
-        return { build: () => createDashboardDemo() };
-    })
+    .withContent(dashboardFactory)
     .withOnEnter(() => applyHeadToDocument(ROUTE_METADATA['/dashboard/{page}'], siteOrigin));
