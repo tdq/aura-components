@@ -5,13 +5,13 @@ import { createLogo, getThemeAccents } from './logo';
 export function createHeader(): HTMLElement {
     const header = document.createElement('header');
     header.className = 'sticky top-0 z-50 px-px-24 py-px-16 flex flex-wrap items-center justify-between';
-    header.style.cssText = 'position: relative; background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(121, 116, 126, 0.12);';
+    header.style.cssText = 'background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(121, 116, 126, 0.12);';
 
     // Update glass background + accent colors when theme changes
     const updateGlass = () => {
         const theme = document.documentElement.getAttribute('data-theme');
         const accents = getThemeAccents(theme);
-        header.style.cssText = `position: relative; background: ${accents.bg}; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(121, 116, 126, 0.12);`;
+        header.style.cssText = `background: ${accents.bg}; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(121, 116, 126, 0.12);`;
         ctaBtn.style.cssText = `background: ${accents.gradient}; box-shadow: 0 2px 12px ${accents.shadow};`;
         mobileDemoBtn.style.cssText = `background: ${accents.gradient};`;
     };

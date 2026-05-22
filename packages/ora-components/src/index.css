@@ -212,7 +212,6 @@
 
   .glass-effect {
     @apply backdrop-blur-xl;
-    -webkit-backdrop-filter: blur(24px);
     @apply bg-white/60 ring-1 ring-black/10 text-gray-900;
     @apply dark:bg-white/10 dark:ring-white/20 dark:text-white;
   }
