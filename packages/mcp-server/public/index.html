@@ -8,130 +8,275 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 <link rel="icon" type="image/x-icon" href="favicon.ico" />
 <link rel="stylesheet" href="styles.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
-<body>
-<div class="bg-grid"></div>
-<div class="bg-glow"></div>
+<body class="bg-background text-on-surface min-h-screen font-sans antialiased overflow-x-hidden">
 
-<header class="nav">
-  <a class="brand" href="#">
-    <span class="brand-mark"></span>
-    <span class="brand-name">Ora<span class="brand-sub">/mcp</span></span>
-  </a>
-  <nav class="nav-links">
-    <a href="#tools">Tools</a>
-    <a href="#connect">Connect</a>
-    <a href="#api">API</a>
-    <a class="ghost-btn" href="/api/mcp" target="_blank" rel="noopener">Try /api/mcp →</a>
-  </nav>
+<!-- Background Blobs -->
+<div class="fixed inset-0 pointer-events-none z-0">
+  <div class="absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-3xl opacity-20 bg-accent-blob-1"></div>
+  <div class="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full blur-3xl opacity-20 bg-accent-blob-2"></div>
+</div>
+
+<!-- Sticky Header -->
+<header class="sticky top-0 z-50 px-px-24 md:px-px-64 py-px-16 flex items-center justify-between transition-all duration-300 border-b border-outline/10 bg-surface/75 backdrop-blur-xl">
+  <div class="max-w-7xl mx-auto w-full flex items-center justify-between">
+    <a class="flex items-center gap-px-12 group" href="/">
+      <div class="w-9 h-9 rounded-large flex items-center justify-center flex-shrink-0 overflow-hidden" style="background: var(--logo-gradient);">
+        <img src="favicon.svg" alt="Ora Logo" class="w-1/2 h-1/2 opacity-90" />
+      </div>
+      <div class="flex flex-col">
+        <span class="text-title-small font-bold text-on-surface group-hover:text-primary transition-colors">Ora Components</span>
+        <span class="text-[10px] text-on-surface-variant/50 uppercase tracking-widest font-semibold">MCP Server</span>
+      </div>
+    </a>
+    <nav class="hidden md:flex items-center gap-px-8">
+      <a href="#tools" class="px-px-16 py-px-8 text-label-large text-on-surface-variant hover:text-on-surface hover:bg-surface-variant-alpha-40 rounded-medium transition-all">Tools</a>
+      <a href="#connect" class="px-px-16 py-px-8 text-label-large text-on-surface-variant hover:text-on-surface hover:bg-surface-variant-alpha-40 rounded-medium transition-all">Connect</a>
+      <a href="#api" class="px-px-16 py-px-8 text-label-large text-on-surface-variant hover:text-on-surface hover:bg-surface-variant-alpha-40 rounded-medium transition-all">API</a>
+      <a href="/api/mcp" target="_blank" rel="noopener" class="ml-px-12 px-px-16 py-px-8 text-label-large text-white rounded-large font-medium transition-all hover:shadow-level-3 hover:scale-105 active:scale-95" style="background: var(--logo-gradient);">
+        Try Endpoint →
+      </a>
+    </nav>
+  </div>
 </header>
 
-<main>
-  <section class="hero">
-    <div class="hero-eyebrow">
-      <span class="pulse" id="status-pulse"></span>
+<main class="relative z-10 max-w-7xl mx-auto px-px-24 pb-px-96">
+  
+  <!-- Hero Section -->
+  <section class="py-px-96 flex flex-col items-center text-center">
+    <div class="inline-flex items-center gap-px-10 px-px-16 py-px-8 rounded-full text-label-medium mb-px-32 badge-accent">
+      <span class="w-2 h-2 rounded-full bg-on-surface-variant/30 animate-pulse" id="status-pulse"></span>
       <span id="status-text">Remote MCP server · checking…</span>
     </div>
-    <h1>
-      Give your coding agent <span class="gradient-text">first‑class knowledge</span><br/>
-      of the Ora component library.
+    
+    <h1 class="text-[44px] md:text-[64px] font-extrabold leading-tight tracking-tight mb-px-24">
+      Give your coding agent <br/>
+      <span class="text-gradient-2">first‑class knowledge</span>
     </h1>
-    <p class="lede">
+    
+    <p class="text-body-large text-on-surface-variant max-w-2xl mx-auto mb-px-48 opacity-80 leading-relaxed">
       A hosted Model Context Protocol endpoint that exposes structured APIs, usage examples,
-      and architecture guides for every Ora component — over JSON‑RPC, ready to plug into
-      Claude, Cursor, Continue, OpenCode, or any MCP client.
+      and architecture guides for every Ora component — ready to plug into
+      Claude, Cursor, Continue, or any MCP client.
     </p>
-    <div class="cta-row">
-      <button class="primary-btn" data-copy="claude">
-        <span class="copy-label">Copy Claude Desktop config</span>
-        <span class="copy-icon">⧉</span>
+    
+    <div class="flex flex-wrap gap-px-16 justify-center mb-px-64">
+      <button class="px-px-32 py-px-16 text-label-large font-semibold text-white rounded-extra-large transition-all hover:scale-105 active:scale-95 shadow-level-3 group" style="background: var(--logo-gradient);" data-copy="claude">
+        Copy Claude Desktop config
+        <span class="ml-px-8 opacity-60 group-hover:opacity-100 transition-opacity">⧉</span>
       </button>
-      <a class="secondary-btn" href="#connect">Connect another client →</a>
+      <a href="#connect" class="px-px-32 py-px-16 text-label-large font-semibold text-on-surface-variant rounded-extra-large border border-outline/20 hover:bg-surface-variant-alpha-30 transition-all">
+        Connect another client →
+      </a>
     </div>
-    <div class="hero-stats">
-      <div><strong id="stat-tools">8</strong><span>tools</span></div>
-      <div><strong id="stat-components">30+</strong><span>components</span></div>
-      <div><strong>HTTP</strong><span>JSON‑RPC 2.0</span></div>
-      <div><strong>0ms</strong><span>cold-start coupling</span></div>
+    
+    <!-- Hero Stats -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-px-12 w-full max-w-3xl mx-auto">
+      <div class="p-px-24 rounded-extra-large border border-outline/10 bg-surface/40 backdrop-blur-md">
+        <strong class="block text-headline-medium text-on-surface mb-px-4" id="stat-tools">8</strong>
+        <span class="text-label-small text-on-surface-variant/60 uppercase tracking-widest font-bold">Tools</span>
+      </div>
+      <div class="p-px-24 rounded-extra-large border border-outline/10 bg-surface/40 backdrop-blur-md">
+        <strong class="block text-headline-medium text-on-surface mb-px-4" id="stat-components">30+</strong>
+        <span class="text-label-small text-on-surface-variant/60 uppercase tracking-widest font-bold">Components</span>
+      </div>
+      <div class="p-px-24 rounded-extra-large border border-outline/10 bg-surface/40 backdrop-blur-md">
+        <strong class="block text-headline-medium text-on-surface mb-px-4">HTTP</strong>
+        <span class="text-label-small text-on-surface-variant/60 uppercase tracking-widest font-bold">JSON‑RPC 2.0</span>
+      </div>
+      <div class="p-px-24 rounded-extra-large border border-outline/10 bg-surface/40 backdrop-blur-md">
+        <strong class="block text-headline-medium text-on-surface mb-px-4">0ms</strong>
+        <span class="text-label-small text-on-surface-variant/60 uppercase tracking-widest font-bold">Cold Start</span>
+      </div>
     </div>
   </section>
 
-  <section id="tools" class="section">
-    <div class="section-head">
-      <span class="kicker">Tools</span>
-      <h2>Eight tools, one endpoint.</h2>
-      <p>Each tool returns structured JSON the agent can reason over directly — no scraping, no guessing.</p>
+  <!-- Tools Section -->
+  <section id="tools" class="py-px-96">
+    <div class="mb-px-64 text-center">
+      <span class="text-label-small font-bold text-primary uppercase tracking-[0.2em] mb-px-16 block">Capabilities</span>
+      <h2 class="text-headline-large font-bold mb-px-16 tracking-tight">Eight tools, one endpoint.</h2>
+      <p class="text-body-large text-on-surface-variant max-w-xl mx-auto opacity-70">Each tool returns structured JSON the agent can reason over directly — no scraping, no guessing.</p>
     </div>
-    <div class="tool-grid" id="tool-grid">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px-16" id="tool-grid">
       <!-- populated by JS -->
     </div>
   </section>
 
-  <section id="connect" class="section">
-    <div class="section-head">
-      <span class="kicker">Connect</span>
-      <h2>Wire it up in 30 seconds.</h2>
-      <p>The server speaks plain HTTP JSON‑RPC — point any MCP client at <code id="endpoint-inline">/api/mcp</code>.</p>
+  <!-- Connect Section -->
+  <section id="connect" class="py-px-96">
+    <div class="mb-px-64 text-center">
+      <span class="text-label-small font-bold text-primary uppercase tracking-[0.2em] mb-px-16 block">Integration</span>
+      <h2 class="text-headline-large font-bold mb-px-16 tracking-tight">Wire it up in 30 seconds.</h2>
+      <p class="text-body-large text-on-surface-variant max-w-xl mx-auto opacity-70">The server speaks plain HTTP JSON‑RPC — point any MCP client at <code class="px-px-8 py-px-2 bg-surface-variant-alpha-30 rounded-medium text-on-surface border border-outline/10 font-mono text-sm" id="endpoint-inline">/api/mcp</code>.</p>
     </div>
 
-    <div class="connect-grid">
-      <article class="card">
-        <header><h3>Claude Desktop</h3><span class="badge">stdio bridge</span></header>
-        <pre><code id="code-claude"></code></pre>
-        <button class="copy-link" data-copy="claude">Copy</button>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-px-32 items-stretch">
+      <!-- Claude Desktop Card -->
+      <article class="p-px-32 rounded-extra-large border border-outline/10 bg-surface/30 backdrop-blur-xl flex flex-col relative overflow-hidden group hover:bg-surface-variant-alpha-30 transition-all">
+        <header class="flex items-center justify-between mb-px-32">
+          <div class="flex items-center gap-px-20">
+            <h3 class="text-title-large font-bold text-on-surface">Claude Desktop</h3>
+            <span class="px-px-10 py-px-4 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider border border-primary/20">stdio bridge</span>
+          </div>
+        </header>
+        
+        <!-- Terminal Window -->
+        <div class="flex-1 rounded-large overflow-hidden border border-white/5 bg-[#1a1625] shadow-level-4 flex flex-col">
+          <div class="flex items-center justify-between px-px-24 py-px-16 border-b border-white/5 bg-white/5 flex-shrink-0">
+            <div class="flex items-center gap-px-10">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#ff5f57]"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-[#febc2e]"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-[#28c840]"></span>
+            </div>
+            <button class="flex items-center gap-px-6 px-px-8 py-px-4 rounded-medium bg-white/5 border border-white/10 text-[11px] text-white/50 hover:text-white hover:bg-white/10 transition-all" data-copy="claude">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy
+            </button>
+          </div>
+          <div class="p-px-32 overflow-x-auto flex-1 flex flex-col min-h-[180px]">
+            <pre class="text-body-small font-mono leading-relaxed text-blue-200/90 h-full"><code id="code-claude"></code></pre>
+          </div>
+        </div>
       </article>
 
-      <article class="card">
-        <header><h3>Cursor / Continue</h3><span class="badge">HTTP</span></header>
-        <pre><code id="code-cursor"></code></pre>
-        <button class="copy-link" data-copy="cursor">Copy</button>
+      <!-- Cursor Card -->
+      <article class="p-px-32 rounded-extra-large border border-outline/10 bg-surface/30 backdrop-blur-xl flex flex-col relative overflow-hidden group hover:bg-surface-variant-alpha-30 transition-all">
+        <header class="flex items-center justify-between mb-px-32">
+          <div class="flex items-center gap-px-20">
+            <h3 class="text-title-large font-bold text-on-surface">Cursor / Continue</h3>
+            <span class="px-px-10 py-px-4 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider border border-primary/20">HTTP</span>
+          </div>
+        </header>
+        
+        <!-- Terminal Window -->
+        <div class="flex-1 rounded-large overflow-hidden border border-white/5 bg-[#1a1625] shadow-level-4 flex flex-col">
+          <div class="flex items-center justify-between px-px-24 py-px-16 border-b border-white/5 bg-white/5 flex-shrink-0">
+            <div class="flex items-center gap-px-10">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#ff5f57]"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-[#febc2e]"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-[#28c840]"></span>
+            </div>
+            <button class="flex items-center gap-px-6 px-px-8 py-px-4 rounded-medium bg-white/5 border border-white/10 text-[11px] text-white/50 hover:text-white hover:bg-white/10 transition-all" data-copy="cursor">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy
+            </button>
+          </div>
+          <div class="p-px-32 overflow-x-auto flex-1 flex flex-col min-h-[180px]">
+            <pre class="text-body-small font-mono leading-relaxed text-blue-200/90 h-full"><code id="code-cursor"></code></pre>
+          </div>
+        </div>
       </article>
 
-      <article class="card">
-        <header><h3>OpenCode</h3><span class="badge">HTTP</span></header>
-        <pre><code id="code-opencode"></code></pre>
-        <button class="copy-link" data-copy="opencode">Copy</button>
+      <!-- OpenCode Card -->
+      <article class="p-px-32 rounded-extra-large border border-outline/10 bg-surface/30 backdrop-blur-xl flex flex-col relative overflow-hidden group hover:bg-surface-variant-alpha-30 transition-all">
+        <header class="flex items-center justify-between mb-px-32">
+          <div class="flex items-center gap-px-20">
+            <h3 class="text-title-large font-bold text-on-surface">OpenCode</h3>
+            <span class="px-px-10 py-px-4 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider border border-primary/20">HTTP</span>
+          </div>
+        </header>
+        
+        <!-- Terminal Window -->
+        <div class="flex-1 rounded-large overflow-hidden border border-white/5 bg-[#1a1625] shadow-level-4 flex flex-col">
+          <div class="flex items-center justify-between px-px-24 py-px-16 border-b border-white/5 bg-white/5 flex-shrink-0">
+            <div class="flex items-center gap-px-10">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#ff5f57]"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-[#febc2e]"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-[#28c840]"></span>
+            </div>
+            <button class="flex items-center gap-px-6 px-px-8 py-px-4 rounded-medium bg-white/5 border border-white/10 text-[11px] text-white/50 hover:text-white hover:bg-white/10 transition-all" data-copy="opencode">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy
+            </button>
+          </div>
+          <div class="p-px-32 overflow-x-auto flex-1 flex flex-col min-h-[180px]">
+            <pre class="text-body-small font-mono leading-relaxed text-blue-200/90 h-full"><code id="code-opencode"></code></pre>
+          </div>
+        </div>
       </article>
 
-      <article class="card">
-        <header><h3>curl</h3><span class="badge">raw JSON-RPC</span></header>
-        <pre><code id="code-curl"></code></pre>
-        <button class="copy-link" data-copy="curl">Copy</button>
+      <!-- curl Card -->
+      <article class="p-px-32 rounded-extra-large border border-outline/10 bg-surface/30 backdrop-blur-xl flex flex-col relative overflow-hidden group hover:bg-surface-variant-alpha-30 transition-all">
+        <header class="flex items-center justify-between mb-px-32">
+          <div class="flex items-center gap-px-20">
+            <h3 class="text-title-large font-bold text-on-surface">curl</h3>
+            <span class="px-px-10 py-px-4 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider border border-primary/20">raw JSON-RPC</span>
+          </div>
+        </header>
+        
+        <!-- Terminal Window -->
+        <div class="flex-1 rounded-large overflow-hidden border border-white/5 bg-[#1a1625] shadow-level-4 flex flex-col">
+          <div class="flex items-center justify-between px-px-24 py-px-16 border-b border-white/5 bg-white/5 flex-shrink-0">
+            <div class="flex items-center gap-px-10">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#ff5f57]"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-[#febc2e]"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-[#28c840]"></span>
+            </div>
+            <button class="flex items-center gap-px-6 px-px-8 py-px-4 rounded-medium bg-white/5 border border-white/10 text-[11px] text-white/50 hover:text-white hover:bg-white/10 transition-all" data-copy="curl">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copy
+            </button>
+          </div>
+          <div class="p-px-32 overflow-x-auto flex-1 flex flex-col min-h-[180px]">
+            <pre class="text-body-small font-mono leading-relaxed text-blue-200/90 h-full"><code id="code-curl"></code></pre>
+          </div>
+        </div>
       </article>
     </div>
   </section>
 
-  <section id="api" class="section">
-    <div class="section-head">
-      <span class="kicker">API</span>
-      <h2>One endpoint. Three methods.</h2>
+  <!-- API Section -->
+  <section id="api" class="py-px-96">
+    <div class="mb-px-48 text-center">
+      <span class="text-label-small font-bold text-primary uppercase tracking-[0.2em] mb-px-16 block">Endpoint</span>
+      <h2 class="text-headline-large font-bold mb-px-16 tracking-tight">One endpoint. Three methods.</h2>
     </div>
-    <div class="api-rows">
-      <div class="api-row">
-        <code class="api-method">initialize</code>
-        <span>Returns protocol version, capabilities, server info.</span>
+    <div class="max-w-3xl mx-auto rounded-extra-large border border-outline/10 bg-surface/30 backdrop-blur-xl overflow-hidden">
+      <div class="flex items-center gap-px-24 p-px-24 border-b border-outline/10 hover:bg-surface-variant-alpha-30 transition-colors">
+        <code class="text-primary font-mono text-sm font-bold min-w-[140px]">initialize</code>
+        <span class="text-body-medium text-on-surface-variant opacity-70">Returns protocol version, capabilities, server info.</span>
       </div>
-      <div class="api-row">
-        <code class="api-method">tools/list</code>
-        <span>Lists every tool with its JSON schema.</span>
+      <div class="flex items-center gap-px-24 p-px-24 border-b border-outline/10 hover:bg-surface-variant-alpha-30 transition-colors">
+        <code class="text-primary font-mono text-sm font-bold min-w-[140px]">tools/list</code>
+        <span class="text-body-medium text-on-surface-variant opacity-70">Lists every tool with its JSON schema.</span>
       </div>
-      <div class="api-row">
-        <code class="api-method">tools/call</code>
-        <span>Invokes a tool by name; result is text content.</span>
+      <div class="flex items-center gap-px-24 p-px-24 hover:bg-surface-variant-alpha-30 transition-colors">
+        <code class="text-primary font-mono text-sm font-bold min-w-[140px]">tools/call</code>
+        <span class="text-body-medium text-on-surface-variant opacity-70">Invokes a tool by name; result is text content.</span>
       </div>
     </div>
   </section>
 </main>
 
-<footer>
-  <div class="footer-right">
-    <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">MCP spec ↗</a>
-    <a id="status-link" href="/api/mcp" target="_blank" rel="noopener">Endpoint status ↗</a>
+<!-- Footer -->
+<footer class="mt-px-96 py-px-48 border-t border-outline/10 bg-surface-container-low/50">
+  <div class="max-w-7xl mx-auto px-px-24 flex flex-col md:flex-row items-center justify-between gap-px-24">
+    <div class="flex flex-col gap-px-8 items-center md:items-start">
+      <span class="text-label-medium text-on-surface-variant opacity-50">© 2026 Ora Design System. All rights reserved.</span>
+      <span class="text-label-small text-on-surface-variant opacity-30">Model Context Protocol 1.0.0</span>
+    </div>
+    <div class="flex items-center gap-px-24">
+      <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener" class="text-label-medium text-on-surface-variant hover:text-primary transition-colors opacity-60">MCP Spec ↗</a>
+      <a id="status-link" href="/api/mcp" target="_blank" rel="noopener" class="text-label-medium text-on-surface-variant hover:text-primary transition-colors opacity-60">Endpoint Status ↗</a>
+      <a href="https://ora-components.com" class="text-label-medium text-on-surface-variant hover:text-primary transition-colors opacity-60">Ora Components ↗</a>
+    </div>
   </div>
 </footer>
 
-<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<div id="toast" class="fixed bottom-px-32 left-1/2 -translate-x-1/2 px-px-24 py-px-12 rounded-large bg-on-surface text-surface text-label-large shadow-level-5 transition-all duration-300 opacity-0 pointer-events-none translate-y-px-12 z-[100]" role="status" aria-live="polite"></div>
 
 <script src="app.js"></script>
+
+<style>
+  #toast.show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+</style>
+
 </body>
 </html>

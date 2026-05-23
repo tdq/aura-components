@@ -1,0 +1,169 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --md-sys-color-primary: #4f46e5;
+    --md-sys-color-on-primary: #FFFFFF;
+    --md-sys-color-primary-container: #e0e7ff;
+    --md-sys-color-on-primary-container: #1e1b4b;
+    --md-sys-color-secondary: #4338ca;
+    --md-sys-color-on-secondary: #FFFFFF;
+    --md-sys-color-secondary-container: #c7d2fe;
+    --md-sys-color-on-secondary-container: #1e1b4b;
+    --md-sys-color-tertiary: #6366f1;
+    --md-sys-color-on-tertiary: #FFFFFF;
+    --md-sys-color-tertiary-container: #e0e7ff;
+    --md-sys-color-on-tertiary-container: #1e1b4b;
+    --md-sys-color-error: #B3261E;
+    --md-sys-color-on-error: #FFFFFF;
+    --md-sys-color-error-container: #F9DEDC;
+    --md-sys-color-on-error-container: #410E0B;
+    --md-sys-color-background: #FFFFFF;
+    --md-sys-color-on-background: #0f172a;
+    --md-sys-color-surface: #FFFFFF;
+    --md-sys-color-on-surface: #0f172a;
+    --md-sys-color-surface-variant: #e0e7ff;
+    --md-sys-color-on-surface-variant: #1e1b4b;
+    --md-sys-color-outline: #a5b4fc;
+    --md-sys-color-surface-container-low: #eef2ff;
+    --subscribe-panel-bg: rgba(50, 50, 255, 0.05);
+  }
+
+  [data-theme="dark"] {
+    --md-sys-color-primary: #D0BCFF;
+    --md-sys-color-on-primary: #381E72;
+    --md-sys-color-primary-container: #4F378B;
+    --md-sys-color-on-primary-container: #EADDFF;
+    --md-sys-color-secondary: #CCC2DC;
+    --md-sys-color-on-secondary: #332D41;
+    --md-sys-color-secondary-container: #4A4458;
+    --md-sys-color-on-secondary-container: #E8DEF8;
+    --md-sys-color-tertiary: #EFB8C8;
+    --md-sys-color-on-tertiary: #492532;
+    --md-sys-color-tertiary-container: #633B48;
+    --md-sys-color-on-tertiary-container: #FFD8E4;
+    --md-sys-color-error: #F2B8B5;
+    --md-sys-color-on-error: #601410;
+    --md-sys-color-error-container: #8C1D18;
+    --md-sys-color-on-error-container: #F9DEDC;
+    --md-sys-color-background: #141218;
+    --md-sys-color-on-background: #E6E1E5;
+    --md-sys-color-surface: #141218;
+    --md-sys-color-on-surface: #E6E1E5;
+    --md-sys-color-surface-variant: #49454F;
+    --md-sys-color-on-surface-variant: #CAC4D0;
+    --md-sys-color-outline: #938F99;
+    --md-sys-color-surface-container-low: #1D1B20;
+    --subscribe-panel-bg: rgba(50, 50, 255, 0.1);
+
+    /* Theme Accents */
+    --logo-gradient: linear-gradient(135deg, #4F378B, #633B48);
+    --accent-blob-1: linear-gradient(to right, rgba(103, 80, 164, 0.35), rgba(125, 82, 96, 0.35));
+    --accent-blob-2: linear-gradient(to right, rgba(125, 82, 96, 0.35), rgba(103, 80, 164, 0.35));
+    --accent-gradient-text-1: linear-gradient(135deg, #ffffff, #dbeafe, #e9d5ff);
+    --accent-gradient-text-2: linear-gradient(135deg, #60a5fa, #c084fc);
+    --accent-badge-bg: rgba(103, 80, 164, 0.9);
+    --accent-badge-border: rgba(103, 80, 164, 0.9);
+    --accent-badge-text: #ffffff;
+    --accent-primary: #D0BCFF;
+    --accent-secondary: #CCC2DC;
+  }
+
+  [data-theme="pink"] {
+    --md-sys-color-primary: #FFB3D1;
+    --md-sys-color-on-primary: #5F1138;
+    --md-sys-color-primary-container: #7D2950;
+    --md-sys-color-on-primary-container: #FFD9E2;
+    --md-sys-color-secondary: #E5BBD0;
+    --md-sys-color-on-secondary: #442737;
+    --md-sys-color-secondary-container: #5D3D4E;
+    --md-sys-color-on-secondary-container: #FFD8E9;
+    --md-sys-color-tertiary: #FFB3D1;
+    --md-sys-color-on-tertiary: #5F1138;
+    --md-sys-color-tertiary-container: #7D2950;
+    --md-sys-color-on-tertiary-container: #FFD9E2;
+    --md-sys-color-error: #BA1A1A;
+    --md-sys-color-on-error: #FFFFFF;
+    --md-sys-color-error-container: #FFDAD6;
+    --md-sys-color-on-error-container: #410002;
+    --md-sys-color-background: #FFF0F5;
+    --md-sys-color-on-background: #201A1C;
+    --md-sys-color-surface: #FFF0F5;
+    --md-sys-color-on-surface: #201A1C;
+    --md-sys-color-surface-variant: #F2DDE2;
+    --md-sys-color-on-surface-variant: #514347;
+    --md-sys-color-outline: #837377;
+    --md-sys-color-surface-container-low: #FFF5F8;
+    --subscribe-panel-bg: rgba(255, 100, 100, 0.1);
+
+    /* Theme Accents */
+    --logo-gradient: linear-gradient(135deg, #7D2950, #5F1138);
+    --accent-blob-1: linear-gradient(to right, rgba(244, 114, 182, 0.2), rgba(251, 113, 133, 0.2));
+    --accent-blob-2: linear-gradient(to right, rgba(251, 113, 133, 0.2), rgba(244, 114, 182, 0.2));
+    --accent-gradient-text-1: linear-gradient(135deg, #0f172a, #9d174d, #0f172a);
+    --accent-gradient-text-2: linear-gradient(135deg, #db2777, #e11d48);
+    --accent-badge-bg: rgba(255, 179, 209, 0.2);
+    --accent-badge-border: rgba(255, 179, 209, 0.3);
+    --accent-badge-text: #7d2950;
+    --accent-primary: #FFB3D1;
+    --accent-secondary: #E5BBD0;
+  }
+
+  :root:not([data-theme="dark"]):not([data-theme="pink"]) {
+    /* Default Light Theme Accents */
+    --logo-gradient: linear-gradient(135deg, #4f46e5, #6366f1);
+    --accent-blob-1: linear-gradient(to right, rgba(79, 70, 229, 0.2), rgba(99, 102, 241, 0.2));
+    --accent-blob-2: linear-gradient(to right, rgba(99, 102, 241, 0.2), rgba(79, 70, 229, 0.2));
+    --accent-gradient-text-1: linear-gradient(135deg, #0f172a, #3730a3, #0f172a);
+    --accent-gradient-text-2: linear-gradient(135deg, #4f46e5, #6366f1);
+    --accent-badge-bg: rgba(79, 70, 229, 0.1);
+    --accent-badge-border: rgba(79, 70, 229, 0.2);
+    --accent-badge-text: #4338ca;
+    --accent-primary: #4f46e5;
+    --accent-secondary: #4338ca;
+  }
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+button {
+  user-select: none;
+}
+
+@layer utilities {
+  .text-gradient-1 {
+    background: var(--accent-gradient-text-1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-2 {
+    background: var(--accent-gradient-text-2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .bg-accent-blob-1 {
+    background: var(--accent-blob-1);
+  }
+
+  .bg-accent-blob-2 {
+    background: var(--accent-blob-2);
+  }
+
+  .badge-accent {
+    background: var(--accent-badge-bg);
+    border: 1px solid var(--accent-badge-border);
+    color: var(--accent-badge-text);
+  }
+}

@@ -13,9 +13,9 @@
 
   const grid = document.getElementById('tool-grid');
   grid.innerHTML = TOOLS.map(t => `
-    <article class="tool">
-      <code class="tool-name">${t.name}</code>
-      <p class="tool-desc">${t.desc}</p>
+    <article class="p-px-24 rounded-extra-large border border-outline/10 bg-surface/40 backdrop-blur-md hover:bg-surface-variant-alpha-30 transition-all hover:-translate-y-px-4 group">
+      <code class="text-primary font-mono text-sm font-bold block mb-px-8 group-hover:text-primary-alpha-80">${t.name}</code>
+      <p class="text-body-medium text-on-surface-variant opacity-70 leading-relaxed">${t.desc}</p>
     </article>
   `).join('');
 
