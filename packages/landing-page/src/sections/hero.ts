@@ -18,6 +18,7 @@ interface JournalEntry {
     id: string;
     date: string;
     account: string;
+    currency: string;
     memo: string;
     debit: number;
     credit: number;
@@ -31,8 +32,18 @@ interface FxRate {
 
 // ---------- Helpers ----------
 
+const CURRENCY_SYMBOLS: Record<string, string> = {
+    EUR: '€', USD: '$', GBP: '£', JPY: '¥', CHF: 'Fr',
+};
+
 const fmtEUR = (n: number): string =>
-    '€ ' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    '€ ' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+const fmtAmount = (n: number, currency: string): string => {
+    const sym = CURRENCY_SYMBOLS[currency] ?? currency;
+    const decimals = currency === 'JPY' ? 0 : 2;
+    return sym + ' ' + n.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+};
 
 const fmtRate = (n: number): string => n.toFixed(4);
 
@@ -43,23 +54,27 @@ function randAround(base: number, jitter: number): number {
 }
 
 function nextJournalEntry(now: Date, seq: number): JournalEntry {
-    const accounts: Array<{ account: string; memo: string }> = [
-        { account: '1100 · Cash',                 memo: 'Customer payment · INV-' },
-        { account: '1200 · Accounts Receivable',  memo: 'Invoice issued · INV-' },
-        { account: '4000 · Revenue',              memo: 'Service revenue · SO-' },
-        { account: '2100 · Accounts Payable',     memo: 'Vendor bill · BIL-' },
-        { account: '6500 · Operating Expense',    memo: 'SaaS subscription · ' },
-        { account: '5000 · COGS',                 memo: 'Materials issued · ' },
-        { account: '1300 · Prepaid Expenses',     memo: 'Insurance premium · ' },
+    const accounts: Array<{ account: string; currency: string; memo: string }> = [
+        { account: '1100 · Cash',                 currency: 'EUR', memo: 'Customer payment · INV-' },
+        { account: '1200 · Accounts Receivable',  currency: 'USD', memo: 'Invoice issued · INV-' },
+        { account: '4000 · Revenue',              currency: 'EUR', memo: 'Service revenue · SO-' },
+        { account: '2100 · Accounts Payable',     currency: 'GBP', memo: 'Vendor bill · BIL-' },
+        { account: '6500 · Operating Expense',    currency: 'USD', memo: 'SaaS subscription · ' },
+        { account: '5000 · COGS',                 currency: 'JPY', memo: 'Materials issued · ' },
+        { account: '1300 · Prepaid Expenses',     currency: 'CHF', memo: 'Insurance premium · ' },
     ];
     const pick = accounts[seq % accounts.length];
-    const amt = Math.round((200 + Math.random() * 9800) * 100) / 100;
+    const isJPY = pick.currency === 'JPY';
+    const amt = isJPY
+        ? Math.round(20000 + Math.random() * 980000)
+        : Math.round((200 + Math.random() * 9800) * 100) / 100;
     const isDebit = seq % 2 === 0;
     const ref = (10000 + seq).toString();
     return {
         id: `je-${now.getTime()}-${seq}`,
         date: `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`,
         account: pick.account,
+        currency: pick.currency,
         memo: pick.memo + ref,
         debit: isDebit ? amt : 0,
         credit: isDebit ? 0 : amt,
@@ -80,14 +95,14 @@ function buildCashOnHandTile(cash$: BehaviorSubject<number>, sub: Subscription):
             </span>
         </div>
         <div class="flex items-baseline gap-1 tabular-nums">
-            <span class="text-on-surface opacity-70 text-2xl font-semibold">€</span>
+            <span class="text-on-surface opacity-70 text-2xl font-semibold">&euro;</span>
             <span data-cash-int class="text-on-surface text-4xl font-bold leading-none">0</span>
             <span class="text-on-surface opacity-70 text-2xl font-semibold">.</span>
             <span data-cash-cents class="text-on-surface text-2xl font-semibold leading-none inline-block min-w-[2ch] text-left">00</span>
         </div>
         <div class="mt-px-12 flex items-center gap-px-8 text-label-small text-on-surface-variant opacity-60">
             <span class="inline-block w-1.5 h-1.5 rounded-full bg-kpi-green animate-pulse"></span>
-            <span>live · reconciled to the cent</span>
+            <span>live &middot; reconciled to the cent</span>
         </div>
     `;
     const intEl = root.querySelector('[data-cash-int]') as HTMLElement;
@@ -99,7 +114,6 @@ function buildCashOnHandTile(cash$: BehaviorSubject<number>, sub: Subscription):
         intEl.textContent = intPart.toLocaleString('en-US');
         centsEl.textContent = pad2(cents);
         centsEl.classList.remove('roll-digit');
-        // Re-trigger animation
         void centsEl.offsetWidth;
         centsEl.classList.add('roll-digit');
         root.classList.remove('flash-green');
@@ -119,19 +133,19 @@ function buildArAgingTile(): HTMLElement {
         { label: '0–30',  pct: 62.1, color: '#10B981' },
         { label: '31–60', pct: 22.4, color: '#0EA5E9' },
         { label: '61–90', pct: 10.3, color: '#F59E0B' },
-        { label: '90+',   pct: 5.2,  color: '#EF4444' },
+        { label: '90+',        pct: 5.2,  color: '#EF4444' },
     ];
     root.innerHTML = `
         <div class="flex items-center justify-between mb-px-12">
             <span class="text-label-medium text-on-surface-variant opacity-70 uppercase tracking-wide">AR Aging</span>
-            <span class="inline-flex items-center gap-1 text-label-small font-semibold px-px-8 py-px-4 rounded-full text-trend-positive bg-trend-positive-bg">↑ 1.2 pp</span>
+            <span class="inline-flex items-center gap-1 text-label-small font-semibold px-px-8 py-px-4 rounded-full text-trend-positive bg-trend-positive-bg">&uarr; 1.2 pp</span>
         </div>
         <div class="flex items-baseline gap-1 tabular-nums">
             <span class="text-on-surface text-4xl font-bold leading-none">92.4</span>
             <span class="text-on-surface opacity-70 text-xl font-semibold">% &lt; 30d</span>
         </div>
         <div class="mt-px-16 flex h-1.5 w-full overflow-hidden rounded-full" style="background: color-mix(in srgb, var(--md-sys-color-on-surface) 8%, transparent);">
-            ${buckets.map(b => `<div style="width: ${b.pct}%; background: ${b.color};" title="${b.label}d · ${b.pct}%"></div>`).join('')}
+            ${buckets.map(b => `<div style="width: ${b.pct}%; background: ${b.color};" title="${b.label}d &middot; ${b.pct}%"></div>`).join('')}
         </div>
         <div class="mt-px-8 grid grid-cols-4 gap-px-8 text-label-small text-on-surface-variant opacity-70 tabular-nums">
             ${buckets.map(b => `<div class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full" style="background:${b.color};"></span><span>${b.label}</span></div>`).join('')}
@@ -148,7 +162,7 @@ function buildFxTicker(rates$: BehaviorSubject<FxRate[]>, sub: Subscription): HT
     root.className = 'relative overflow-hidden rounded-large border border-outline-alpha-20 backdrop-blur-md bg-surface-variant-alpha-30 shadow-level-1';
     root.innerHTML = `
         <div class="flex items-center">
-            <div class="px-px-12 py-px-8 text-label-small font-semibold uppercase tracking-widest text-on-surface-variant opacity-70 border-r border-outline-alpha-20 whitespace-nowrap">FX · live</div>
+            <div class="px-px-12 py-px-8 text-label-small font-semibold uppercase tracking-widest text-on-surface-variant opacity-70 border-r border-outline-alpha-20 whitespace-nowrap">FX &middot; live</div>
             <div class="flex-1 overflow-hidden">
                 <div data-marquee class="flex marquee-track whitespace-nowrap will-change-transform"></div>
             </div>
@@ -157,7 +171,6 @@ function buildFxTicker(rates$: BehaviorSubject<FxRate[]>, sub: Subscription): HT
     const track = root.querySelector('[data-marquee]') as HTMLElement;
 
     const render = (rates: FxRate[]) => {
-        // Duplicate for seamless scroll
         const items = [...rates, ...rates];
         track.innerHTML = items.map(r => {
             const diff = r.rate - r.prev;
@@ -171,7 +184,6 @@ function buildFxTicker(rates$: BehaviorSubject<FxRate[]>, sub: Subscription): HT
                 </div>
             `;
         }).join('');
-        // Flash newly updated rates
         const rateEls = track.querySelectorAll('[data-rate]');
         rateEls.forEach((el, i) => {
             const r = items[i];
@@ -225,20 +237,19 @@ export function createHero(): HTMLElement {
                 <div class="grid lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-12 items-center min-h-[80vh]">
                     <div class="space-y-8 min-w-0">
                         <div class="space-y-6">
-                            <div id="hero-badge" class="inline-flex items-center gap-px-8 px-px-16 py-px-8 rounded-full text-label-medium mb-px-16 transition-all duration-500 badge-accent">
-                                <span class="relative flex h-2 w-2">
-                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style="background: currentColor;"></span>
-                                    <span class="relative inline-flex rounded-full h-2 w-2" style="background: currentColor;"></span>
-                                </span>
-                                <span>Stream-native · TypeScript · Material 3</span>
+                            <div id="hero-badge" class="inline-flex items-center gap-px-8 px-px-16 py-px-8 rounded-full text-label-medium mb-px-32 transition-all duration-500 badge-accent">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                    <path d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                </svg>
+                                <span>RxJS native &middot; TypeScript &middot; Material 3</span>
                             </div>
-                            <h1 id="hero-heading" class="text-5xl sm:text-6xl md:text-7xl font-bold leading-[1.05] tracking-tight">
-                                <span id="hero-title-1" class="text-gradient-1 transition-all duration-500">The ledger that</span><br />
-                                <span id="hero-title-2" class="text-gradient-2 transition-all duration-500">closes itself.</span>
+                            <h1 id="hero-heading" class="text-4xl sm:text-5xl md:text-7xl font-bold leading-tight">
+                                <span id="hero-title-1" class="text-gradient-1 transition-all duration-500">Components for</span><br />
+                                <span id="hero-title-2" class="text-gradient-2 transition-all duration-500">Financial Applications</span>
                             </h1>
-                            <p id="hero-description" class="text-lg md:text-xl max-w-xl leading-relaxed transition-colors duration-500 text-on-surface opacity-80">
-                                Pipe an RxJS stream into any prop — balances reconcile, journals post, totals tick.
-                                Your observable in, reactive DOM out. No framework. No Shadow DOM. No wrappers.
+                            <p id="hero-description" class="text-xl max-w-lg leading-relaxed transition-colors duration-500 text-on-surface opacity-80">
+                                Pass an RxJS stream to any prop. No framework, no Shadow DOM, no wrappers &mdash; your
+                                observable in, reactive DOM out.
                             </p>
                         </div>
                         <div id="hero-stats" class="mt-px-32 flex items-stretch gap-0 transition-colors duration-500">
@@ -350,7 +361,6 @@ export function createHero(): HTMLElement {
     ]);
     sub.add(interval(1500).subscribe(() => {
         const updated = fxRates$.value.map(r => {
-            // Update ~half the rates each tick
             if (Math.random() < 0.55) {
                 const jitter = r.rate > 10 ? 0.18 : 0.0018;
                 const newRate = Math.round(randAround(r.rate, jitter) * 10000) / 10000;
@@ -368,7 +378,6 @@ export function createHero(): HTMLElement {
         const exploreBtnEl = section.querySelector('#explore-dashboard-btn') as HTMLElement;
         if (exploreBtnEl) exploreBtnEl.style.display = 'none';
 
-        // Surface a single live tile below the CTAs so mobile users see reactivity
         const mobileTile = document.createElement('div');
         mobileTile.className = 'mt-px-24';
         mobileTile.appendChild(buildCashOnHandTile(cash$, sub));
@@ -420,7 +429,6 @@ export function createHero(): HTMLElement {
     const chartWrap = document.createElement('div');
     chartWrap.className = 'relative overflow-hidden rounded-large h-full [&>*]:h-full';
     chartWrap.appendChild(chartPanel.build());
-    // Live cursor sweep overlay
     const sweep = document.createElement('div');
     sweep.className = 'absolute top-0 bottom-0 w-px pointer-events-none cursor-sweep';
     sweep.style.cssText = 'left: 0; background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--md-sys-color-primary) 60%, transparent), transparent);';
@@ -436,18 +444,18 @@ export function createHero(): HTMLElement {
     // 3. Journal entries — live grid (full width)
     const journalPanel = new PanelBuilder().asGlass();
     const journalLayout = new LayoutBuilder().asVertical();
+
     const journalHeader = document.createElement('div');
-    journalHeader.className = 'flex items-center justify-between mb-px-8';
+    journalHeader.className = 'flex w-full items-center justify-between gap-px-16 mb-px-8';
     journalHeader.innerHTML = `
-        <span class="text-label-large font-semibold text-on-surface">Journal Entries — Live</span>
+        <span class="text-label-large font-semibold text-on-surface">Journal Entries &mdash; Live</span>
         <span class="inline-flex items-center gap-px-8 text-label-small text-on-surface-variant opacity-70">
             <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-kpi-green opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-kpi-green"></span></span>
-            <span>posting · auto-balanced</span>
+            <span>posting &middot; auto-balanced</span>
         </span>
     `;
     journalLayout.addSlot().withContent({ build: () => journalHeader });
 
-    // Seed initial entries
     const now = new Date();
     const seed: JournalEntry[] = Array.from({ length: 5 }, (_, i) => nextJournalEntry(now, i));
     const journal$ = new BehaviorSubject<JournalEntry[]>(seed);
@@ -455,8 +463,7 @@ export function createHero(): HTMLElement {
     sub.add(interval(3000).subscribe(() => {
         const next = nextJournalEntry(new Date(), seq++);
         const cur = journal$.value;
-        const trimmed = [next, ...cur].slice(0, 6);
-        journal$.next(trimmed);
+        journal$.next([next, ...cur].slice(0, 6));
     }));
 
     const journalGrid = new GridBuilder()
@@ -469,24 +476,24 @@ export function createHero(): HTMLElement {
     jcols.addTextColumn('memo').withHeader('Memo').asResizable();
     jcols.addCustomColumn()
         .withHeader('Debit')
-        .withWidth('120px')
+        .withWidth('130px')
         .asResizable()
         .withRenderer((item: any) => {
             const span = document.createElement('span');
             span.className = 'tabular-nums';
             span.style.cssText = 'color: var(--md-sys-color-on-surface); opacity: ' + (item.debit > 0 ? '1' : '0.25') + ';';
-            span.textContent = item.debit > 0 ? fmtEUR(item.debit) : '—';
+            span.textContent = item.debit > 0 ? fmtAmount(item.debit, item.currency) : '—';
             return span;
         });
     jcols.addCustomColumn()
         .withHeader('Credit')
-        .withWidth('120px')
+        .withWidth('130px')
         .asResizable()
         .withRenderer((item: any) => {
             const span = document.createElement('span');
             span.className = 'tabular-nums';
             span.style.cssText = 'color: var(--md-sys-color-on-surface); opacity: ' + (item.credit > 0 ? '1' : '0.25') + ';';
-            span.textContent = item.credit > 0 ? fmtEUR(item.credit) : '—';
+            span.textContent = item.credit > 0 ? fmtAmount(item.credit, item.currency) : '—';
             return span;
         });
     jcols.addCustomColumn()
@@ -502,16 +509,15 @@ export function createHero(): HTMLElement {
 
     journalLayout.addSlot().withContent(journalGrid);
 
-    // Totals footer — recomputes off the stream
     const totalsRow = document.createElement('div');
     totalsRow.setAttribute('aria-live', 'polite');
-    totalsRow.className = 'mt-px-12 flex items-center justify-between px-px-12 py-px-8 rounded-large border border-outline-alpha-20 bg-surface-variant-alpha-30 tabular-nums';
+    totalsRow.className = 'mt-px-12 flex w-full items-center justify-between gap-px-16 px-px-12 py-px-8 rounded-large border border-outline-alpha-20 bg-surface-variant-alpha-30 tabular-nums';
     totalsRow.innerHTML = `
         <span class="text-label-medium font-semibold text-on-surface opacity-70 uppercase tracking-wide">Totals</span>
         <div class="flex items-center gap-px-24">
-            <div class="flex items-baseline gap-1"><span class="text-label-small text-on-surface-variant opacity-60">Dr</span><span data-tot-dr class="text-title-medium font-bold text-on-surface">€ 0.00</span></div>
-            <div class="flex items-baseline gap-1"><span class="text-label-small text-on-surface-variant opacity-60">Cr</span><span data-tot-cr class="text-title-medium font-bold text-on-surface">€ 0.00</span></div>
-            <span data-bal class="inline-flex items-center gap-1 text-label-small font-semibold px-px-8 py-px-4 rounded-full text-trend-positive bg-trend-positive-bg">⚖ balanced</span>
+            <div class="flex items-baseline gap-1"><span class="text-label-small text-on-surface-variant opacity-60">Dr</span><span data-tot-dr class="text-title-medium font-bold text-on-surface">&euro; 0.00</span></div>
+            <div class="flex items-baseline gap-1"><span class="text-label-small text-on-surface-variant opacity-60">Cr</span><span data-tot-cr class="text-title-medium font-bold text-on-surface">&euro; 0.00</span></div>
+            <span data-bal class="inline-flex items-center gap-1 text-label-small font-semibold px-px-8 py-px-4 rounded-full text-trend-positive bg-trend-positive-bg">&#9878; balanced</span>
         </div>
     `;
     sub.add(journal$.subscribe(entries => {
@@ -522,9 +528,7 @@ export function createHero(): HTMLElement {
         const balanced = Math.abs(dr - cr) < 0.005;
         const badge = totalsRow.querySelector('[data-bal]') as HTMLElement;
         badge.className = 'inline-flex items-center gap-1 text-label-small font-semibold px-px-8 py-px-4 rounded-full ' +
-            (balanced
-                ? 'text-trend-positive bg-trend-positive-bg'
-                : 'text-trend-negative bg-trend-negative-bg');
+            (balanced ? 'text-trend-positive bg-trend-positive-bg' : 'text-trend-negative bg-trend-negative-bg');
         badge.textContent = balanced ? '⚖ balanced' : '⚠ out of balance';
     }));
     journalLayout.addSlot().withContent({ build: () => totalsRow });
