@@ -11,6 +11,7 @@ import {
 import { KPICardBuilder } from '../demo/dashboard/kpi-card';
 import { of } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { isMobileViewport } from '../utils/viewport';
 
 export function createHero(): HTMLElement {
     const section = document.createElement('section');
@@ -28,7 +29,7 @@ export function createHero(): HTMLElement {
             </div>
             <div class="relative z-10 container mx-auto px-4 py-20">
                 <div class="grid lg:grid-cols-2 gap-12 items-center min-h-[80vh]">
-                    <div class="space-y-8">
+                    <div class="space-y-8 min-w-0">
                         <div class="space-y-6">
                             <div id="hero-badge" class="inline-flex items-center gap-px-8 px-px-16 py-px-8 rounded-full text-label-medium mb-px-32 transition-all duration-500 badge-accent">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -36,7 +37,7 @@ export function createHero(): HTMLElement {
                                 </svg>
                                 <span>RxJS native · TypeScript · Material 3</span>
                             </div>
-                            <h1 id="hero-heading" class="text-5xl md:text-7xl font-bold leading-tight">
+                            <h1 id="hero-heading" class="text-4xl sm:text-5xl md:text-7xl font-bold leading-tight">
                                 <span id="hero-title-1"
                                     class="text-gradient-1 transition-all duration-500">Components for</span><br /><span id="hero-title-2"
                                     class="text-gradient-2 transition-all duration-500">Financial Applications</span>
@@ -68,7 +69,7 @@ export function createHero(): HTMLElement {
                         <div class="flex flex-row gap-4">
                             <button
                                 id="explore-dashboard-btn"
-                                class="ring-offset-background focus-visible:outline-hidden focus-visible:ring-ring inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-11 rounded-md text-white border-0 px-8 py-6 text-lg font-semibold group" style="background: linear-gradient(to right, #4f46e5, #818cf8);">
+                                class="ring-offset-background focus-visible:outline-hidden focus-visible:ring-ring inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-11 rounded-md text-white border-0 px-8 py-6 text-lg font-semibold group hero-explore-btn" style="background: linear-gradient(to right, #4f46e5, #818cf8);">
                                 Explore Live Dashboard<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                     stroke-linecap="round" stroke-linejoin="round"
@@ -77,12 +78,12 @@ export function createHero(): HTMLElement {
                                     <path d="m12 5 7 7-7 7"></path>
                                 </svg></button><button
                                 id="install-btn"
-                                class="ring-offset-background focus-visible:outline-hidden focus-visible:ring-ring inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-all focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-11 rounded-md backdrop-blur-md px-8 py-6 text-lg border-outline-alpha-20 bg-surface-variant-alpha-30 text-on-surface hover:bg-surface-variant-alpha-50">
+                                class="ring-offset-background focus-visible:outline-hidden focus-visible:ring-ring inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-all focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 h-11 rounded-md backdrop-blur-md px-8 py-6 text-lg border-outline-alpha-20 bg-surface-variant-alpha-30 text-on-surface hover:bg-surface-variant-alpha-50 w-full sm:w-auto">
                                 Install in 60 seconds
                             </button>
                         </div>
                     </div>
-                    <div class="relative transform rotate-2">
+                    <div id="hero-visual-panel" class="relative transform rotate-2">
                         <div class="grid grid-cols-2 gap-6" id="hero-visual-grid">
                             <!-- Interactive components will be injected here -->
                         </div>
@@ -129,8 +130,27 @@ export function createHero(): HTMLElement {
 
     registerDestroy(section, () => sub.unsubscribe());
 
+    const exploreBtn = section.querySelector('#explore-dashboard-btn');
+    if (exploreBtn) {
+        exploreBtn.addEventListener('click', () => router.navigate('/dashboard'));
+    }
+
+    const installBtn = section.querySelector('#install-btn');
+    if (installBtn) {
+        installBtn.addEventListener('click', () => {
+            document.getElementById('get-started')?.scrollIntoView({ behavior: 'smooth' });
+        });
+    }
+
+    const visualPanel = section.querySelector('#hero-visual-panel') as HTMLElement;
     const visualGrid = section.querySelector('#hero-visual-grid')!;
 
+    if (isMobileViewport()) {
+        visualPanel.style.display = 'none';
+        const exploreBtnEl = section.querySelector('#explore-dashboard-btn') as HTMLElement;
+        if (exploreBtnEl) exploreBtnEl.style.display = 'none';
+        return section;
+    }
 
     // 1. Portfolio Performance Chart (glass panel, col-span-2)
     const portfolioData$ = of([
@@ -255,19 +275,6 @@ export function createHero(): HTMLElement {
     positionsLayout.addSlot().withContent(positionsGrid);
     positionsPanel.withContent(positionsLayout);
     visualGrid.appendChild(positionsPanel.build());
-
-    // Add event listeners
-    const exploreBtn = section.querySelector('#explore-dashboard-btn');
-    if (exploreBtn) {
-        exploreBtn.addEventListener('click', () => router.navigate('/dashboard'));
-    }
-
-    const installBtn = section.querySelector('#install-btn');
-    if (installBtn) {
-        installBtn.addEventListener('click', () => {
-            document.getElementById('get-started')?.scrollIntoView({ behavior: 'smooth' });
-        });
-    }
 
     return section;
 }

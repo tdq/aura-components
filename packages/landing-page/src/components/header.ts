@@ -1,6 +1,7 @@
 import { router } from '../routes';
 import { ThemeManager } from '@tdq/ora-components';
 import { createLogo, getThemeAccents } from './logo';
+import { isMobileViewport } from '../utils/viewport';
 
 export function createHeader(): HTMLElement {
     const header = document.createElement('header');
@@ -12,7 +13,7 @@ export function createHeader(): HTMLElement {
         const theme = document.documentElement.getAttribute('data-theme');
         const accents = getThemeAccents(theme);
         header.style.cssText = `background: ${accents.bg}; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(121, 116, 126, 0.12);`;
-        ctaBtn.style.cssText = `background: ${accents.gradient}; box-shadow: 0 2px 12px ${accents.shadow};`;
+        ctaBtn.style.cssText = `background: ${accents.gradient}; box-shadow: 0 2px 12px ${accents.shadow};${isMobileViewport() ? ' display: none;' : ''}`;
         mobileDemoBtn.style.cssText = `background: ${accents.gradient};`;
     };
 

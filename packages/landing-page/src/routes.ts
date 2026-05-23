@@ -14,7 +14,13 @@ router.addRoute()
     .withContent(() => ({ build: () => createLandingPage() }))
     .withOnEnter(() => applyHeadToDocument(ROUTE_METADATA['/'], siteOrigin));
 
+import { isMobileViewport } from './utils/viewport';
+
 const dashboardFactory = async () => {
+    if (isMobileViewport()) {
+        const { createDashboardMobileFallback } = await import('./sections/dashboard-mobile-fallback');
+        return { build: () => createDashboardMobileFallback() };
+    }
     const { createDashboardDemo } = await import('./demo/dashboard');
     return { build: () => createDashboardDemo() };
 };

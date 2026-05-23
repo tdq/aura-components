@@ -1,4 +1,5 @@
 import { router } from '../routes';
+import { isMobileViewport } from '../utils/viewport';
 
 const INSTALL_CODE = `npm install @tdq/ora-components rxjs`;
 
@@ -255,6 +256,7 @@ function createBottomCTA(): HTMLElement {
             };
         }
         if (demoBtn) {
+            if (isMobileViewport()) demoBtn.style.display = 'none';
             demoBtn.onclick = () => router.navigate('/dashboard');
         }
     });
