@@ -310,6 +310,34 @@ button {
   .tabular-nums { font-variant-numeric: tabular-nums; }
   .font-mono-code { font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, monospace; }
 
+  /* Hero visual stack — responsive layout at the 1280px breakpoint.
+     Below 1280px: chart full-width with KPI cards in a single row below.
+     At/above 1280px: chart left (7fr), KPI cards stacked vertically right (5fr), journal entries shown. */
+  .hero-middle-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+  .hero-kpi-stack {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    min-width: 0;
+  }
+  .hero-kpi-stack > * { flex: 1 1 0%; min-width: 0; overflow: hidden; }
+  .hero-journal { display: none; }
+
+  @media (min-width: 1280px) {
+    .hero-middle-row {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    }
+    .hero-kpi-stack {
+      flex-direction: column;
+      height: 100%;
+    }
+    .hero-journal { display: block; }
+  }
+
   /* Opacity-modified color utilities — replaces broken Tailwind color/opacity notation
      (e.g. bg-primary/10) which silently no-ops when colors are defined as CSS var hex values. */
   .bg-primary-alpha-10 {
