@@ -207,7 +207,7 @@ function buildFxConverter(): HTMLElement {
     const target$ = new BehaviorSubject<Money | null>({ amount: 924.50, currencyId: 'EUR' });
 
     const row = document.createElement('div');
-    row.className = 'grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] gap-px-12 items-center';
+    row.className = 'grid grid-cols-1 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] gap-px-12 items-center';
 
     row.appendChild(buildFxColumn('You send',
         new MoneyFieldBuilder()
@@ -286,7 +286,9 @@ function buildFxConverter(): HTMLElement {
         .withMarkers(false)
         .withTooltip(p => `${p.rate.toFixed(4)}  (${p.y >= 0 ? '+' : ''}${p.y.toFixed(2)}%)`);
     chart.withYAxis()
-        .withTicks(4)
+        .withTicks(5)
+        .withMin(-4)
+        .withMax(4)
         .withGridLines(true)
         .withFormat(v => `${v >= 0 ? '+' : ''}${Number(v).toFixed(1)}%`);
     chart.withXAxis().withTicks(6);
@@ -302,7 +304,25 @@ function buildFxConverter(): HTMLElement {
     const pairEl = chartHeader.querySelector('[data-pair]') as HTMLElement;
     seriesLabel$.subscribe(label => { pairEl.textContent = label; });
     chartWrap.appendChild(chartHeader);
-    chartWrap.appendChild(chart.build());
+
+    const chartEl = chart.build();
+    chartEl.style.height = '180px';
+    chartWrap.appendChild(chartEl);
+
+    // Empty state for same-currency pairs (chart of constant 0% is meaningless)
+    const emptyState = document.createElement('div');
+    emptyState.className = 'flex items-center justify-center text-label-medium text-on-surface-variant';
+    emptyState.style.cssText = 'height: 180px; opacity: 0.6;';
+    emptyState.textContent = 'Same currency — exchange rate is fixed at 1.0000';
+    emptyState.style.display = 'none';
+    chartWrap.appendChild(emptyState);
+
+    pair$.subscribe(([src, tgt]) => {
+        const same = src === tgt;
+        chartEl.style.display = same ? 'none' : '';
+        emptyState.style.display = same ? 'flex' : 'none';
+    });
+
     container.appendChild(chartWrap);
 
     return container;
@@ -315,6 +335,15 @@ interface RatePoint {
 }
 
 function buildRateHistory(src: string, tgt: string): RatePoint[] {
+    if (src === tgt) {
+        const today = new Date();
+        return Array.from({ length: 26 }, (_, i) => {
+            const d = new Date(today);
+            d.setDate(today.getDate() - (25 - i) * 7);
+            return { x: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }), y: 0, rate: 1 };
+        });
+    }
+
     const srcRate = FX_RATES[src] ?? 1;
     const tgtRate = FX_RATES[tgt] ?? 1;
     const endRate = tgtRate / srcRate;
