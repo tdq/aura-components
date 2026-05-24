@@ -62,12 +62,10 @@ jobs:
           echo "OK: api + landing artifacts present"
 
       - name: Install api runtime deps (Functions host needs node_modules)
-        if: steps.detect.outputs.should_deploy == 'true'
         run: npm install --omit=dev --no-audit --no-fund --no-package-lock
         working-directory: packages/mcp-server/api
 
       - name: Deploy to Azure Static Web Apps
-        if: steps.detect.outputs.should_deploy == 'true'
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
