@@ -5,9 +5,9 @@ export interface LogoOptions {
 }
 
 export function getThemeAccents(theme: string | null) {
-  if (theme === 'dark') return { bg: 'rgba(20, 18, 24, 0.75)', gradient: 'linear-gradient(135deg, #4F378B, #633B48)', shadow: 'rgba(79,55,139,0.3)' };
-  if (theme === 'pink') return { bg: 'rgba(255, 240, 245, 0.75)', gradient: 'linear-gradient(135deg, #7D2950, #5F1138)', shadow: 'rgba(125,41,80,0.3)' };
-  return { bg: 'rgba(255, 255, 255, 0.75)', gradient: 'linear-gradient(135deg, #4f46e5, #6366f1)', shadow: 'rgba(79,70,229,0.3)' };
+  if (theme === 'dark') return { bg: 'rgba(20, 18, 24, 0.92)', gradient: 'linear-gradient(135deg, #4F378B, #633B48)', shadow: 'rgba(79,55,139,0.3)' };
+  if (theme === 'pink') return { bg: 'rgba(255, 240, 245, 0.92)', gradient: 'linear-gradient(135deg, #7D2950, #5F1138)', shadow: 'rgba(125,41,80,0.3)' };
+  return { bg: 'rgba(255, 255, 255, 0.92)', gradient: 'linear-gradient(135deg, #4f46e5, #6366f1)', shadow: 'rgba(79,70,229,0.3)' };
 }
 
 export function createLogo(options: LogoOptions = {}): HTMLElement {

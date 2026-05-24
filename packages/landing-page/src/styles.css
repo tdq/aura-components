@@ -241,40 +241,6 @@ button {
     }
   }
 
-  @keyframes float {
-
-    0%,
-    100% {
-      transform: translateY(0px);
-    }
-
-    50% {
-      transform: translateY(-12px);
-    }
-  }
-
-  @keyframes shimmer {
-    0% {
-      background-position: -200% center;
-    }
-
-    100% {
-      background-position: 200% center;
-    }
-  }
-
-  @keyframes pulseGlow {
-
-    0%,
-    100% {
-      box-shadow: 0 0 20px rgba(103, 80, 164, 0.3), 0 0 40px rgba(103, 80, 164, 0.1);
-    }
-
-    50% {
-      box-shadow: 0 0 30px rgba(103, 80, 164, 0.5), 0 0 60px rgba(103, 80, 164, 0.2);
-    }
-  }
-
   .animate-fade-in {
     animation: fadeInUp 0.6s ease-out both;
   }
@@ -283,17 +249,12 @@ button {
     animation: fadeInUpDelay 0.9s ease-out both;
   }
 
-  .animate-float {
-    animation: float 6s ease-in-out infinite;
-  }
-
-  .animate-shimmer {
-    background-size: 200% auto;
-    animation: shimmer 3s linear infinite;
-  }
-
-  .animate-pulse-glow {
-    animation: pulseGlow 2s ease-in-out infinite;
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 
   /* --- Hero ledger redesign --- */

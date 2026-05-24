@@ -95,7 +95,7 @@ function buildCashOnHandTile(cash$: BehaviorSubject<number>, sub: Subscription):
             <span data-cash-cents class="text-on-surface text-2xl font-semibold leading-none inline-block min-w-[2ch] text-left">00</span>
         </div>
         <div class="mt-px-12 flex items-center gap-px-8 text-label-small text-on-surface-variant opacity-60">
-            <span class="inline-block w-1.5 h-1.5 rounded-full bg-kpi-green animate-pulse"></span>
+            <span class="js-pulse-badge inline-block w-1.5 h-1.5 rounded-full bg-kpi-green animate-pulse"></span>
             <span>live &middot; reconciled to the cent</span>
         </div>
     `;
@@ -158,7 +158,7 @@ export function createHero(): HTMLElement {
         <div id="hero-container" class="min-h-screen relative overflow-hidden transition-colors duration-500">
             <div class="absolute inset-0 ledger-grid-bg opacity-40 pointer-events-none"></div>
             <div class="absolute inset-0 pointer-events-none">
-                <div id="hero-blob-anchor" class="absolute top-1/3 right-[8%] w-[28rem] h-[28rem] rounded-full blur-3xl transition-all duration-700 bg-accent-blob-1 opacity-70"></div>
+                <div id="hero-blob-anchor" class="absolute top-1/3 right-[8%] w-[20rem] h-[20rem] rounded-full blur-2xl bg-accent-blob-1 opacity-70" style="transition: opacity 700ms ease;"></div>
             </div>
             <div class="relative z-10 container mx-auto px-4 pt-px-96 pb-px-64">
                 <div class="grid xl:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-12 items-center min-h-[80vh]">
@@ -381,7 +381,7 @@ export function createHero(): HTMLElement {
     journalHeader.innerHTML = `
         <span class="text-label-large font-semibold text-on-surface">Journal Entries &mdash; Live</span>
         <span class="inline-flex items-center gap-px-8 text-label-small text-on-surface-variant opacity-70">
-            <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-kpi-green opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-kpi-green"></span></span>
+            <span class="relative flex h-2 w-2"><span class="js-pulse-badge animate-ping absolute inline-flex h-full w-full rounded-full bg-kpi-green opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-kpi-green"></span></span>
             <span>posting &middot; auto-balanced</span>
         </span>
     `;
