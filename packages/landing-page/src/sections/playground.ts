@@ -624,7 +624,7 @@ function createPlaygroundCard(
             <span class="text-body-small text-on-surface-variant" style="opacity: 0.65;">${description}</span>
         </div>
         <div class="flex items-center gap-px-8 px-px-12 py-px-4 rounded-full text-label-small badge-accent">
-            <span class="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></span>
+            <span class="js-pulse-badge w-1.5 h-1.5 rounded-full bg-current animate-pulse"></span>
             Live Preview
         </div>
     `;

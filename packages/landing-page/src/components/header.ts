@@ -6,13 +6,13 @@ import { isMobileViewport } from '../utils/viewport';
 export function createHeader(): HTMLElement {
     const header = document.createElement('header');
     header.className = 'sticky top-0 z-50 px-px-24 py-px-16 flex flex-wrap items-center justify-between';
-    header.style.cssText = 'background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(121, 116, 126, 0.12);';
+    header.style.cssText = 'background: rgba(255, 255, 255, 0.92); border-bottom: 1px solid rgba(121, 116, 126, 0.12);';
 
     // Update glass background + accent colors when theme changes
     const updateGlass = () => {
         const theme = document.documentElement.getAttribute('data-theme');
         const accents = getThemeAccents(theme);
-        header.style.cssText = `background: ${accents.bg}; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-bottom: 1px solid rgba(121, 116, 126, 0.12);`;
+        header.style.cssText = `background: ${accents.bg}; border-bottom: 1px solid rgba(121, 116, 126, 0.12);`;
         ctaBtn.style.cssText = `background: ${accents.gradient}; box-shadow: 0 2px 12px ${accents.shadow};${isMobileViewport() ? ' display: none;' : ''}`;
         mobileDemoBtn.style.cssText = `background: ${accents.gradient};`;
     };
@@ -90,7 +90,7 @@ export function createHeader(): HTMLElement {
     // Mobile menu drawer
     const mobileMenu = document.createElement('div');
     mobileMenu.className = 'absolute top-full left-0 right-0 md:hidden overflow-hidden';
-    mobileMenu.style.cssText = 'max-height: 0; transition: max-height 0.3s ease; background: var(--md-sys-color-surface); border-bottom: 1px solid rgba(121, 116, 126, 0.12); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);';
+    mobileMenu.style.cssText = 'max-height: 0; transition: max-height 0.3s ease; background: var(--md-sys-color-surface); border-bottom: 1px solid rgba(121, 116, 126, 0.12);';
 
     const mobileNav = document.createElement('nav');
     mobileNav.className = 'flex flex-col px-px-16 py-px-8';
