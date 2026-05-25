@@ -1,28 +1,11 @@
 import { router } from '../routes';
 import { ThemeManager } from '@tdq/ora-components';
-import { createLogo, getThemeAccents } from './logo';
+import { createLogo } from './logo';
 import { isMobileViewport } from '../utils/viewport';
 
 export function createHeader(): HTMLElement {
     const header = document.createElement('header');
-    header.className = 'sticky top-0 z-50 px-px-24 py-px-16 flex flex-wrap items-center justify-between';
-    header.style.cssText = 'background: rgba(255, 255, 255, 0.92); border-bottom: 1px solid rgba(121, 116, 126, 0.12);';
-
-    let ctaBtn: HTMLButtonElement | undefined;
-    let mobileDemoBtn: HTMLButtonElement | undefined;
-
-    // Update glass background + accent colors when theme changes
-    const updateGlass = () => {
-        const theme = document.documentElement.getAttribute('data-theme');
-        const accents = getThemeAccents(theme);
-        header.style.cssText = `background: ${accents.bg}; border-bottom: 1px solid rgba(121, 116, 126, 0.12);`;
-        if (ctaBtn) {
-            ctaBtn.style.cssText = `background: ${accents.gradient}; box-shadow: 0 2px 12px ${accents.shadow};${isMobileViewport() ? ' display: none;' : ''}`;
-        }
-        if (mobileDemoBtn) {
-            mobileDemoBtn.style.cssText = `background: ${accents.gradient};`;
-        }
-    };
+    header.className = 'sticky top-0 z-50 px-px-24 py-px-16 flex flex-wrap items-center justify-between bg-[var(--header-bg)] border-b border-[rgba(121,116,126,0.12)]';
 
     // Logo
     const logo = createLogo({ text: 'Ora Components', onClick: () => router.navigate('/') });
@@ -43,7 +26,7 @@ export function createHeader(): HTMLElement {
         a.className = 'relative px-px-16 py-px-8 text-label-large text-on-surface-variant hover:text-on-surface transition-colors duration-200 rounded-medium hover:bg-surface-variant-alpha-40 group';
         a.innerHTML = `
             ${link.label}
-            <span class="absolute bottom-1 left-1/2 -translate-x-1/2 w-0 group-hover:w-3/5 h-0.5 rounded-full bg-primary transition-all duration-300" style=""></span>
+            <span class="absolute bottom-1 left-1/2 -translate-x-1/2 w-0 group-hover:w-3/5 h-0.5 rounded-full bg-primary transition-all duration-300"></span>
         `;
         nav.appendChild(a);
     });
@@ -52,52 +35,37 @@ export function createHeader(): HTMLElement {
     const actions = document.createElement('div');
     actions.className = 'flex items-center gap-px-12';
 
-    const themeToggle = createThemeToggle(updateGlass);
+    const themeToggle = createThemeToggle();
 
     const githubBtn = document.createElement('a');
     githubBtn.href = 'https://github.com/tdq/ora-components';
     githubBtn.target = '_blank';
     githubBtn.rel = 'noopener';
+    githubBtn.setAttribute('aria-label', 'GitHub Repository');
     githubBtn.className = 'hidden md:flex items-center justify-center w-9 h-9 rounded-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-variant-alpha-40 transition-all duration-200';
     githubBtn.innerHTML = `
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
         </svg>
     `;
 
-    const storybookUrl = `https://storybook.${window.location.hostname.replace(/^www\./, '')}`;
+    const storybookUrl = 'https://storybook.ora-components.com';
 
     const storybookBtn = document.createElement('a');
     storybookBtn.href = storybookUrl;
     storybookBtn.target = '_blank';
     storybookBtn.rel = 'noopener';
+    storybookBtn.setAttribute('aria-label', 'Storybook Documentation');
     storybookBtn.className = 'hidden md:flex items-center justify-center w-9 h-9 rounded-medium text-on-surface-variant hover:text-on-surface hover:bg-surface-variant-alpha-40 transition-all duration-200';
     storybookBtn.innerHTML = `
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1zm0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5v11.5z"/>
         </svg>
     `;
 
-    ctaBtn = document.createElement('button');
-    ctaBtn.className = 'px-px-16 py-px-8 text-label-large text-white rounded-large font-medium transition-all duration-200 hover:shadow-level-3 hover:scale-105 active:scale-95';
-    ctaBtn.style.cssText = 'background: linear-gradient(135deg, #4f46e5, #6366f1); box-shadow: 0 2px 12px rgba(79,70,229,0.3);';
-    ctaBtn.textContent = 'View Demo';
-    ctaBtn.onmouseenter = () => {
-        const theme = document.documentElement.getAttribute('data-theme');
-        const { gradient, shadow } = getThemeAccents(theme);
-        ctaBtn.style.cssText = `background: ${gradient}; box-shadow: 0 4px 20px ${shadow.replace('0.3', '0.45')}; transform: scale(1.05);`;
-    };
-    ctaBtn.onmouseleave = () => {
-        const theme = document.documentElement.getAttribute('data-theme');
-        const { gradient, shadow } = getThemeAccents(theme);
-        ctaBtn.style.cssText = `background: ${gradient}; box-shadow: 0 2px 12px ${shadow}; transform: scale(1);`;
-    };
-    ctaBtn.onclick = () => router.navigate('/dashboard');
-
     // Mobile menu drawer
     const mobileMenu = document.createElement('div');
-    mobileMenu.className = 'absolute top-full left-0 right-0 md:hidden overflow-hidden';
-    mobileMenu.style.cssText = 'max-height: 0; transition: max-height 0.3s ease; background: var(--md-sys-color-surface); border-bottom: 1px solid rgba(121, 116, 126, 0.12);';
+    mobileMenu.className = 'absolute top-full left-0 right-0 md:hidden overflow-hidden bg-surface border-b border-[rgba(121,116,126,0.12)] max-h-0 transition-[max-height] duration-300 ease';
 
     const mobileNav = document.createElement('nav');
     mobileNav.className = 'flex flex-col px-px-16 py-px-8';
@@ -128,74 +96,36 @@ export function createHeader(): HTMLElement {
     mobileStorybook.textContent = 'Storybook';
     mobileNav.appendChild(mobileStorybook);
 
-    // Mobile "View Demo" CTA
-    const mobileDemoBtnWrap = document.createElement('div');
-    mobileDemoBtnWrap.className = 'px-px-16 py-px-12';
-    mobileDemoBtn = document.createElement('button');
-    mobileDemoBtn.className = 'w-full py-px-12 text-label-large text-white rounded-large font-medium transition-all duration-200';
-    mobileDemoBtn.style.cssText = 'background: linear-gradient(135deg, #4f46e5, #6366f1);';
-    mobileDemoBtn.textContent = 'View Demo';
-    mobileDemoBtn.onclick = () => router.navigate('/dashboard');
-    mobileDemoBtnWrap.appendChild(mobileDemoBtn);
-    mobileNav.appendChild(mobileDemoBtnWrap);
-
-    mobileMenu.appendChild(mobileNav);
-
     actions.appendChild(themeToggle);
     actions.appendChild(githubBtn);
     actions.appendChild(storybookBtn);
-    actions.appendChild(ctaBtn);
+    
+
+    if(!isMobileViewport()) {
+        const ctaBtn = document.createElement('button');
+        ctaBtn.className = 'cta-btn px-px-16 py-px-8 text-label-large text-white rounded-large font-medium transition-all duration-200 hover:shadow-level-3 hover:scale-105 active:scale-95';
+        ctaBtn.textContent = 'View Demo';
+        ctaBtn.onclick = () => router.navigate('/dashboard');
+
+        actions.appendChild(ctaBtn);
+    }
 
     header.appendChild(logo);
     header.appendChild(nav);
     header.appendChild(actions);
     header.appendChild(mobileMenu);
 
-    updateGlass();
-
     return header;
 }
 
-function getToggleColors(theme: string | null) {
-    if (theme === 'dark') {
-        return {
-            containerBg: 'rgba(40, 35, 50, 0.7)',
-            containerBorder: 'rgba(208, 188, 255, 0.18)',
-            indicatorBg: 'rgba(208, 188, 255, 0.18)',
-            indicatorShadow: '0 1px 6px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(208, 188, 255, 0.3)',
-            inactiveColor: 'rgba(230, 224, 233, 0.65)',
-            activeColor: '#D0BCFF',
-        };
-    }
-    if (theme === 'pink') {
-        return {
-            containerBg: 'rgba(255, 217, 228, 0.55)',
-            containerBorder: 'rgba(125, 41, 80, 0.18)',
-            indicatorBg: '#FFF0F5',
-            indicatorShadow: '0 1px 4px rgba(125,41,80,0.18)',
-            inactiveColor: 'rgba(125, 41, 80, 0.55)',
-            activeColor: '#7D2950',
-        };
-    }
-    return {
-        containerBg: 'rgba(231, 224, 235, 0.6)',
-        containerBorder: 'rgba(121, 116, 126, 0.15)',
-        indicatorBg: '#ffffff',
-        indicatorShadow: '0 1px 4px rgba(0,0,0,0.15)',
-        inactiveColor: 'rgba(73, 69, 79, 0.7)',
-        activeColor: '#4f46e5',
-    };
-}
-
-function createThemeToggle(onThemeChange?: () => void): HTMLElement {
+function createThemeToggle(): HTMLElement {
     const container = document.createElement('div');
-    container.className = 'flex items-center rounded-full p-0.5 gap-0.5';
-    container.style.cssText = 'position: relative; background: rgba(231, 224, 235, 0.6); border: 1px solid rgba(121, 116, 126, 0.15); transition: background-color 200ms ease, border-color 200ms ease;';
+    container.className = 'flex items-center rounded-full p-0.5 gap-0.5 relative bg-[var(--toggle-container-bg)] border border-[var(--toggle-container-border)] transition-[background-color,border-color] duration-200 ease';
 
     // Sliding indicator pill
     const indicator = document.createElement('div');
-    indicator.className = 'theme-slider-indicator';
-    indicator.style.cssText = 'position: absolute; top: 2px; left: 2px; width: 28px; height: 28px; border-radius: 9999px; background: white; box-shadow: 0 1px 4px rgba(0,0,0,0.15); transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1), background-color 200ms ease, box-shadow 200ms ease; z-index: 0; pointer-events: none;';
+    indicator.className = 'theme-slider-indicator absolute rounded-full transition-[transform,background-color,box-shadow] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] z-0 pointer-events-none';
+    indicator.style.cssText = 'top: 2px; left: 2px; width: 28px; height: 28px; background: var(--toggle-indicator-bg); box-shadow: var(--toggle-indicator-shadow);'
     container.appendChild(indicator);
 
     const themes = [
@@ -210,13 +140,7 @@ function createThemeToggle(onThemeChange?: () => void): HTMLElement {
 
     const updateActive = () => {
         const theme = document.documentElement.getAttribute('data-theme') || 'light';
-        const colors = getToggleColors(theme);
-
-        container.style.background = colors.containerBg;
-        container.style.borderColor = colors.containerBorder;
-        indicator.style.background = colors.indicatorBg;
-        indicator.style.boxShadow = colors.indicatorShadow;
-
+        
         // Slide indicator to active position
         const activeIndex = themes.findIndex(t => t.name === theme);
         const safeIndex = activeIndex >= 0 ? activeIndex : 0;
@@ -224,21 +148,20 @@ function createThemeToggle(onThemeChange?: () => void): HTMLElement {
 
         // Active button gets accent icon color; inactive get muted default
         buttons.forEach((b, i) => {
-            b.style.color = themes[i].name === theme ? colors.activeColor : colors.inactiveColor;
+            b.style.color = themes[i].name === theme ? 'var(--toggle-active)' : 'var(--toggle-inactive)';
         });
     };
 
     themes.forEach(t => {
         const btn = document.createElement('button');
-        btn.className = 'w-7 h-7 flex items-center justify-center rounded-full transition-all duration-200 text-on-surface-variant';
-        btn.style.cssText = 'position: relative; z-index: 1; user-select: none;';
+        btn.className = 'w-7 h-7 flex items-center justify-center rounded-full transition-all duration-200 relative z-1 select-none';
         btn.innerHTML = t.icon;
+        btn.setAttribute('aria-label', `${t.label} theme`);
         btn.title = t.label;
 
         btn.onclick = () => {
             themeManager.setTheme(t.name as any);
             updateActive();
-            if (onThemeChange) onThemeChange();
         };
 
         buttons.push(btn);
@@ -251,7 +174,6 @@ function createThemeToggle(onThemeChange?: () => void): HTMLElement {
     // React to theme changes from anywhere (other toggles, system change)
     themeManager.theme$.subscribe(() => {
         updateActive();
-        if (onThemeChange) onThemeChange();
     });
 
     return container;
