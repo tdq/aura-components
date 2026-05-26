@@ -106,9 +106,20 @@ export class GridGroupRow {
         if (content) {
             const spans = content.querySelectorAll('span');
             if (spans.length >= 3) {
-                spans[0].textContent = `${this.header.field}:`;
-                spans[1].textContent = String(this.header.groupValue);
-                spans[2].textContent = `(${this.header.count})`;
+                const fieldText = `${this.header.field}:`;
+                if (spans[0].textContent !== fieldText) {
+                    spans[0].textContent = fieldText;
+                }
+                
+                const valueText = String(this.header.groupValue);
+                if (spans[1].textContent !== valueText) {
+                    spans[1].textContent = valueText;
+                }
+                
+                const countText = `(${this.header.count})`;
+                if (spans[2].textContent !== countText) {
+                    spans[2].textContent = countText;
+                }
             }
         }
     }

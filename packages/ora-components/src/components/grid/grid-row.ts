@@ -57,15 +57,19 @@ export class GridRow<ITEM> {
         return row;
     }
 
-    private populateRow(row: HTMLElement) {
+    private populateRow(row: HTMLElement, reuse: boolean = false) {
         this.listenerAbort = new AbortController();
         const { signal } = this.listenerAbort;
 
         let firstCell: HTMLElement | null = null;
+        let childIdx = 0;
 
         if (this.isMultiSelect) {
-            const checkCell = document.createElement('div');
-            checkCell.className = GridStyles.checkboxCell;
+            const checkCell = reuse ? (row.children[childIdx++] as HTMLElement) : document.createElement('div');
+            if (!reuse) {
+                checkCell.className = GridStyles.checkboxCell;
+            }
+            
             const value$ = new BehaviorSubject<CheckboxValue>(this.isSelected);
             const capturedItem = this.item;
             this.columnSubscriptions.push(
@@ -75,6 +79,13 @@ export class GridRow<ITEM> {
                     }
                 })
             );
+
+            // Re-creating the checkbox is safer as it involves complex RxJS bindings
+            // and we want to ensure fresh state.
+            while (checkCell.firstChild) {
+                checkCell.removeChild(checkCell.firstChild);
+            }
+
             const checkboxEl = new CheckboxBuilder()
                 .asGlass(this.isGlass)
                 .withValue(value$)
@@ -82,14 +93,14 @@ export class GridRow<ITEM> {
             
             this.checkboxValue$ = value$;
             checkCell.appendChild(checkboxEl);
-            row.appendChild(checkCell);
+            if (!reuse) row.appendChild(checkCell);
             firstCell = checkCell;
         }
 
         this.columns.forEach((col, index) => {
-            const cell = document.createElement('div');
+            const cell = reuse ? (row.children[childIdx++] as HTMLElement) : document.createElement('div');
             this.populateCell(cell, col, signal);
-            row.appendChild(cell);
+            if (!reuse) row.appendChild(cell);
             if (!firstCell && index === 0) {
                 firstCell = cell;
             }
@@ -97,16 +108,31 @@ export class GridRow<ITEM> {
 
         if (firstCell && this.level > 0) {
             firstCell.style.paddingLeft = `${(this.level * 24) + 16}px`;
+        } else if (firstCell) {
+            firstCell.style.paddingLeft = '';
         }
 
         if (this.actions.length > 0) {
-            const actionCell = document.createElement('div');
-            actionCell.className = cn(
-                GridStyles.actionCell,
-                this.isSelected ? GridStyles.actionCellSelected : (this.isGlass ? GridStyles.actionCellGlass : GridStyles.actionCellDefault),
-                !this.isGlass && 'group-hover:bg-surface-variant/20 dark:group-hover:bg-slate-800/60'
-            );
+            const actionCell = reuse ? (row.children[childIdx++] as HTMLElement) : document.createElement('div');
+            if (!reuse) {
+                actionCell.className = cn(
+                    GridStyles.actionCell,
+                    this.isSelected ? GridStyles.actionCellSelected : (this.isGlass ? GridStyles.actionCellGlass : GridStyles.actionCellDefault),
+                    !this.isGlass && 'group-hover:bg-surface-variant/20 dark:group-hover:bg-slate-800/60'
+                );
+            } else {
+                actionCell.className = cn(
+                    GridStyles.actionCell,
+                    this.isSelected ? GridStyles.actionCellSelected : (this.isGlass ? GridStyles.actionCellGlass : GridStyles.actionCellDefault),
+                    !this.isGlass && 'group-hover:bg-surface-variant/20 dark:group-hover:bg-slate-800/60'
+                );
+            }
             actionCell.style.width = `${this.actions.length * 40}px`;
+
+            // Always recreate action buttons for simplicity and correct state bindings
+            while (actionCell.firstChild) {
+                actionCell.removeChild(actionCell.firstChild);
+            }
 
             this.actions.forEach((action) => {
                 const wrapper = document.createElement('div');
@@ -160,7 +186,7 @@ export class GridRow<ITEM> {
             });
 
             this.actionCell = actionCell;
-            row.appendChild(actionCell);
+            if (!reuse) row.appendChild(actionCell);
         }
     }
 
@@ -174,19 +200,28 @@ export class GridRow<ITEM> {
         delete cell.dataset.editing;
         // Fully restore cell className (including alignment and cellClass)
         const alignClass = getAlignClass(col.align);
+        let targetClass = '';
         if (col.cellClass) {
             const cls = col.cellClass(this.item);
-            cell.className = cn(GridStyles.cell, alignClass, cls);
+            targetClass = cn(GridStyles.cell, alignClass, cls);
         } else {
-            cell.className = cn(GridStyles.cell, alignClass);
+            targetClass = cn(GridStyles.cell, alignClass);
         }
+        
+        if (cell.className !== targetClass) {
+            cell.className = targetClass;
+        }
+
         // Re-apply width
         applyColumnWidth(cell, col);
-        // Clear editor content and render display value
+
+        const content = col.render(this.item);
+        (cell as any).__prevContent = content;
+
         while (cell.firstChild) {
             cell.removeChild(cell.firstChild);
         }
-        const content = col.render(this.item);
+        
         if (content instanceof HTMLElement) {
             cell.appendChild(content);
         } else {
@@ -325,26 +360,31 @@ export class GridRow<ITEM> {
             abort.abort();
             delete (cell as any).__editorAbort;
         }
-        while (cell.firstChild) {
-            cell.removeChild(cell.firstChild);
-        }
+
         applyColumnWidth(cell, col);
 
         const alignClass = getAlignClass(col.align);
-
+        let targetClass = '';
         if (col.cellClass) {
             const cls = col.cellClass(this.item);
-            cell.className = cn(GridStyles.cell, alignClass, cls);
+            targetClass = cn(GridStyles.cell, alignClass, cls);
         } else {
-            cell.className = cn(GridStyles.cell, alignClass);
+            targetClass = cn(GridStyles.cell, alignClass);
+        }
+
+        if (cell.className !== targetClass) {
+            cell.className = targetClass;
         }
 
         if (this.isEditable && col.editable && col.renderEditor) {
             cell.style.cursor = 'text';
             cell.tabIndex = 0;
 
-            this.showCellDisplay(cell, col);
+            if (!cell.dataset.editing) {
+                this.showCellDisplay(cell, col);
+            }
 
+            // Always re-add listeners on update because signal/abort might be new
             cell.addEventListener('click', () => {
                 if (!cell.dataset.editing) {
                     this.enterEditMode(cell, col, signal);
@@ -389,11 +429,20 @@ export class GridRow<ITEM> {
                 }
             }, { signal });
         } else {
+            // Display mode
             const content = col.render(this.item);
-            if (content instanceof HTMLElement) {
-                cell.appendChild(content);
-            } else {
-                cell.textContent = content != null ? String(content) : '';
+            const prevContent = (cell as any).__prevContent;
+            
+            if (content !== prevContent) {
+                (cell as any).__prevContent = content;
+                while (cell.firstChild) {
+                    cell.removeChild(cell.firstChild);
+                }
+                if (content instanceof HTMLElement) {
+                    cell.appendChild(content);
+                } else {
+                    cell.textContent = content != null ? String(content) : '';
+                }
             }
         }
     }
@@ -448,23 +497,23 @@ export class GridRow<ITEM> {
         return this.item;
     }
 
-    update(item: ITEM, index: number, isSelected: boolean, level: number = 0) {
+    update(item: ITEM, index: number, isSelected: boolean, level: number = 0, forceRebuild: boolean = false) {
         this.item = item;
         this.index = index;
         this.isSelected = isSelected;
         this.level = level;
         this.actionCell = undefined;
         this.checkboxValue$ = undefined;
+        
         this.element.querySelectorAll('[popover]').forEach(el => {
             const htmlEl = el as HTMLElement;
             if (htmlEl.matches(':popover-open')) htmlEl.hidePopover();
         });
+        
         this.columnSubscriptions.forEach(s => s.unsubscribe());
         this.columnSubscriptions = [];
         this.listenerAbort?.abort();
-        while (this.element.firstChild) {
-            this.element.removeChild(this.element.firstChild);
-        }
+
         this.element.className = cn(
             GridStyles.row,
             !this.isGlass && this.index % 2 === 1 && GridStyles.rowOdd,
@@ -473,7 +522,18 @@ export class GridRow<ITEM> {
             this.isSelected && GridStyles.rowSelected
         );
         this.element.style.transform = `translateY(${this.index * this.rowHeight}px)`;
-        this.populateRow(this.element);
+
+        // Reuse existing cells if the structure is compatible
+        const expectedChildrenCount = (this.isMultiSelect ? 1 : 0) + this.columns.length + (this.actions.length > 0 ? 1 : 0);
+        
+        if (!forceRebuild && this.element.children.length === expectedChildrenCount) {
+            this.populateRow(this.element, true);
+        } else {
+            while (this.element.firstChild) {
+                this.element.removeChild(this.element.firstChild);
+            }
+            this.populateRow(this.element, false);
+        }
     }
 
     updateSelection(isSelected: boolean) {

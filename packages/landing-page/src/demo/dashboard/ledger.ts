@@ -1,5 +1,5 @@
 import { PanelBuilder, PanelGap, GridBuilder, LabelBuilder, LayoutBuilder, LayoutGap, SlotSize, Money } from '@tdq/ora-components';
-import { of } from 'rxjs';
+import { animationFrames, BehaviorSubject, map, of } from 'rxjs';
 import { KPICardBuilder } from './kpi-card';
 
 interface LedgerEntry {
@@ -12,61 +12,115 @@ interface LedgerEntry {
     balance: Money;
 }
 
-const LEDGER_DATA: LedgerEntry[] = [
-    { date: '2026-04-01', account: 'Cash & Bank',                    description: 'Opening balance',                 reference: 'OB-001',  debit: { amount: 81400.00, currencyId: 'EUR' }, credit: { amount:     0.00, currencyId: 'EUR' }, balance: { amount:  81400.00, currencyId: 'EUR' } },
-    { date: '2026-04-01', account: 'Revenue / SaaS Subscriptions',   description: 'Subscription — Pinnacle SaaS',    reference: 'INV-031', debit: { amount:     0.00, currencyId: 'EUR' }, credit: { amount:  2490.00, currencyId: 'EUR' }, balance: { amount:  83890.00, currencyId: 'EUR' } },
-    { date: '2026-04-01', account: 'Accounts Receivable',            description: 'Subscription — Pinnacle SaaS',    reference: 'INV-031', debit: { amount:  2490.00, currencyId: 'EUR' }, credit: { amount:     0.00, currencyId: 'EUR' }, balance: { amount:  86380.00, currencyId: 'EUR' } },
-    { date: '2026-04-02', account: 'Expenses / Payroll',             description: 'Payroll advance — April',         reference: 'PAY-004', debit: { amount: 18400.00, currencyId: 'EUR' }, credit: { amount:     0.00, currencyId: 'EUR' }, balance: { amount:  67980.00, currencyId: 'EUR' } },
-    { date: '2026-04-02', account: 'Cash & Bank',                    description: 'Payroll advance — April',         reference: 'PAY-004', debit: { amount:     0.00, currencyId: 'EUR' }, credit: { amount: 18400.00, currencyId: 'EUR' }, balance: { amount:  49580.00, currencyId: 'EUR' } },
-    { date: '2026-04-03', account: 'Revenue / SaaS Subscriptions',   description: 'Subscription — TechNova Corp',    reference: 'INV-032', debit: { amount:     0.00, currencyId: 'EUR' }, credit: { amount:  1190.00, currencyId: 'EUR' }, balance: { amount:  50770.00, currencyId: 'EUR' } },
-    { date: '2026-04-03', account: 'Accounts Receivable',            description: 'Subscription — TechNova Corp',    reference: 'INV-032', debit: { amount:  1190.00, currencyId: 'EUR' }, credit: { amount:     0.00, currencyId: 'EUR' }, balance: { amount:  51960.00, currencyId: 'EUR' } },
-    { date: '2026-04-04', account: 'Expenses / Office Rent',         description: 'Office rent — April',             reference: 'RENT-04', debit: { amount:  2800.00, currencyId: 'EUR' }, credit: { amount:     0.00, currencyId: 'EUR' }, balance: { amount:  49160.00, currencyId: 'EUR' } },
-    { date: '2026-04-04', account: 'Cash & Bank',                    description: 'Office rent — April',             reference: 'RENT-04', debit: { amount:     0.00, currencyId: 'EUR' }, credit: { amount:  2800.00, currencyId: 'EUR' }, balance: { amount:  46360.00, currencyId: 'EUR' } },
-    { date: '2026-04-05', account: 'Revenue / Professional Services', description: 'Consulting — Cascade Ventures',  reference: 'INV-033', debit: { amount:     0.00, currencyId: 'EUR' }, credit: { amount:  4200.00, currencyId: 'EUR' }, balance: { amount:  50560.00, currencyId: 'EUR' } },
-    { date: '2026-04-05', account: 'Accounts Receivable',            description: 'Consulting — Cascade Ventures',   reference: 'INV-033', debit: { amount:  4200.00, currencyId: 'EUR' }, credit: { amount:     0.00, currencyId: 'EUR' }, balance: { amount:  54760.00, currencyId: 'EUR' } },
-    { date: '2026-04-07', account: 'Expenses / SaaS Tools',          description: 'AWS invoice — March',             reference: 'EXP-011', debit: { amount:   420.00, currencyId: 'EUR' }, credit: { amount:     0.00, currencyId: 'EUR' }, balance: { amount:  54340.00, currencyId: 'EUR' } },
-    { date: '2026-04-07', account: 'Accounts Payable',               description: 'AWS invoice — March',             reference: 'EXP-011', debit: { amount:     0.00, currencyId: 'EUR' }, credit: { amount:   420.00, currencyId: 'EUR' }, balance: { amount:  53920.00, currencyId: 'EUR' } },
-    { date: '2026-04-08', account: 'Revenue / SaaS Subscriptions',   description: 'Subscription — DataStream Inc',   reference: 'INV-034', debit: { amount:     0.00, currencyId: 'EUR' }, credit: { amount:   490.00, currencyId: 'EUR' }, balance: { amount:  54410.00, currencyId: 'EUR' } },
-    { date: '2026-04-08', account: 'Accounts Receivable',            description: 'Subscription — DataStream Inc',   reference: 'INV-034', debit: { amount:   490.00, currencyId: 'EUR' }, credit: { amount:     0.00, currencyId: 'EUR' }, balance: { amount:  54900.00, currencyId: 'EUR' } },
-    { date: '2026-04-09', account: 'Revenue / Add-ons',              description: 'Add-on — Enterprise feature',     reference: 'INV-035', debit: { amount:     0.00, currencyId: 'EUR' }, credit: { amount:   299.00, currencyId: 'EUR' }, balance: { amount:  55199.00, currencyId: 'EUR' } },
-    { date: '2026-04-09', account: 'Accounts Receivable',            description: 'Add-on — Enterprise feature',     reference: 'INV-035', debit: { amount:   299.00, currencyId: 'EUR' }, credit: { amount:     0.00, currencyId: 'EUR' }, balance: { amount:  55498.00, currencyId: 'EUR' } },
-    { date: '2026-04-10', account: 'Expenses / Marketing',           description: 'Marketing campaign — Q2',         reference: 'EXP-012', debit: { amount:  1100.00, currencyId: 'EUR' }, credit: { amount:     0.00, currencyId: 'EUR' }, balance: { amount:  54398.00, currencyId: 'EUR' } },
-    { date: '2026-04-10', account: 'Accounts Payable',               description: 'Marketing campaign — Q2',         reference: 'EXP-012', debit: { amount:     0.00, currencyId: 'EUR' }, credit: { amount:  1100.00, currencyId: 'EUR' }, balance: { amount:  53298.00, currencyId: 'EUR' } },
-    { date: '2026-04-12', account: 'Revenue / SaaS Subscriptions',   description: 'Subscription — Quantum Insights', reference: 'INV-036', debit: { amount:     0.00, currencyId: 'EUR' }, credit: { amount:  1190.00, currencyId: 'EUR' }, balance: { amount:  54488.00, currencyId: 'EUR' } },
-    { date: '2026-04-12', account: 'Accounts Receivable',            description: 'Subscription — Quantum Insights', reference: 'INV-036', debit: { amount:  1190.00, currencyId: 'EUR' }, credit: { amount:     0.00, currencyId: 'EUR' }, balance: { amount:  55678.00, currencyId: 'EUR' } },
-    { date: '2026-04-15', account: 'Cash & Bank',                    description: 'Payment received — INV-031',      reference: 'PMT-021', debit: { amount:  2490.00, currencyId: 'EUR' }, credit: { amount:     0.00, currencyId: 'EUR' }, balance: { amount:  58168.00, currencyId: 'EUR' } },
-    { date: '2026-04-15', account: 'Accounts Receivable',            description: 'Payment received — INV-031',      reference: 'PMT-021', debit: { amount:     0.00, currencyId: 'EUR' }, credit: { amount:  2490.00, currencyId: 'EUR' }, balance: { amount:  55678.00, currencyId: 'EUR' } },
-];
+const generateInitialData = (count: number): LedgerEntry[] => {
+    const data: LedgerEntry[] = [];
+    let runningBalance = 81400.00;
+    const accounts = ['Cash & Bank', 'Revenue / SaaS Subscriptions', 'Accounts Receivable', 'Expenses / Payroll', 'Expenses / Office Rent', 'Revenue / Professional Services', 'Expenses / SaaS Tools', 'Accounts Payable', 'Revenue / Add-ons', 'Expenses / Marketing'];
+
+    for (let i = 0; i < count; i++) {
+        const amount = Math.floor(Math.random() * 500000) / 100;
+        const isDebit = Math.random() > 0.5;
+        data.push({
+            date: `2026-04-${String((i % 30) + 1).padStart(2, '0')}`,
+            account: accounts[i % accounts.length],
+            description: `Auto-generated entry ${i + 1}`,
+            reference: `AUTO-${i + 1}`,
+            debit: { amount: isDebit ? amount : 0, currencyId: 'EUR' },
+            credit: { amount: isDebit ? 0 : amount, currencyId: 'EUR' },
+            balance: { amount: runningBalance += (isDebit ? -amount : amount), currencyId: 'EUR' }
+        });
+    }
+    return data;
+};
+
+const ledgerDataSubject = new BehaviorSubject<LedgerEntry[]>([]);
+
+function startLocalSimulation() {
+    const initialData = generateInitialData(10000);
+    ledgerDataSubject.next(initialData);
+
+    // Update 100 random entries every frame
+    animationFrames().subscribe(() => {
+        const current = [...ledgerDataSubject.getValue()];
+        if (current.length === 0) return;
+        for (let i = 0; i < 100; i++) {
+            const index = Math.floor(Math.random() * current.length);
+            const amount = Math.floor(Math.random() * 500000) / 100;
+            const isDebit = Math.random() > 0.5;
+            current[index] = {
+                ...current[index],
+                debit: { amount: isDebit ? amount : 0, currencyId: 'EUR' },
+                credit: { amount: isDebit ? 0 : amount, currencyId: 'EUR' }
+            };
+        }
+        ledgerDataSubject.next(current);
+    });
+}
+
+function connectToBackend() {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const ws = new WebSocket(`${protocol}//${window.location.host}/api/ledger-stream`);
+    let hasReceivedData = false;
+
+    ws.onmessage = (event) => {
+        const message = JSON.parse(event.data);
+        if (message.type === 'initial') {
+            hasReceivedData = true;
+            ledgerDataSubject.next(message.data);
+        } else if (message.type === 'update') {
+            const updates = message.data;
+            const current = [...ledgerDataSubject.getValue()];
+            updates.forEach((u: { index: number, entry: LedgerEntry }) => {
+                current[u.index] = u.entry;
+            });
+            ledgerDataSubject.next(current);
+        }
+    };
+
+    ws.onerror = () => {
+        ws.close();
+        if (!hasReceivedData) {
+            startLocalSimulation();
+        }
+    };
+
+    ws.onclose = () => {
+        if (!hasReceivedData) {
+            startLocalSimulation();
+        }
+    };
+}
+
+connectToBackend();
+
 
 function fmt(amount: number): string {
     return `€${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
 function createSummaryStats(): HTMLElement {
-    const totalDebits  = LEDGER_DATA.reduce((s, e) => s + e.debit.amount, 0);
-    const totalCredits = LEDGER_DATA.reduce((s, e) => s + e.credit.amount, 0);
-    const netBalance   = totalCredits - totalDebits;
+    const container = document.createElement('div');
+    container.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px-16 mb-px-24';
 
     const stats = [
-        { label: 'Total Debits',  value: fmt(totalDebits) },
-        { label: 'Total Credits', value: fmt(totalCredits) },
-        { label: 'Net Balance',   value: fmt(Math.abs(netBalance)) },
-        { label: 'Entries',       value: String(LEDGER_DATA.length) },
+        { label: 'Total Debits',  getValue: (d: LedgerEntry[]) => fmt(d.reduce((s, e) => s + e.debit.amount, 0)) },
+        { label: 'Total Credits', getValue: (d: LedgerEntry[]) => fmt(d.reduce((s, e) => s + e.credit.amount, 0)) },
+        { label: 'Net Balance',   getValue: (d: LedgerEntry[]) => fmt(Math.abs(d.reduce((s, e) => s + e.credit.amount, 0) - d.reduce((s, e) => s + e.debit.amount, 0))) },
+        { label: 'Entries',       getValue: (d: LedgerEntry[]) => String(d.length) },
     ];
 
-    const grid = document.createElement('div');
-    grid.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px-16 mb-px-24';
-
     stats.forEach(s => {
+        const value$ = ledgerDataSubject.pipe(map(s.getValue));
         const card = new KPICardBuilder()
             .withLabel(of(s.label))
-            .withValue(of(s.value))
+            .withValue(value$)
             .build();
-        grid.appendChild(card);
+        container.appendChild(card);
     });
 
-    return grid;
+    return container;
 }
+
 
 export function createLedger(): HTMLElement {
     const container = document.createElement('div');
@@ -75,7 +129,7 @@ export function createLedger(): HTMLElement {
     container.appendChild(createSummaryStats());
 
     const grid = new GridBuilder<LedgerEntry>()
-        .withItems(of(LEDGER_DATA));
+        .withItems(ledgerDataSubject);
     const cols = grid.withColumns();
     cols.addTextColumn('date').withHeader('Date').withWidth('110px');
     cols.addTextColumn('account').withHeader('Account').withWidth('1fr');
@@ -101,3 +155,4 @@ export function createLedger(): HTMLElement {
 
     return container;
 }
+

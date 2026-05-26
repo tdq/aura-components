@@ -1935,7 +1935,7 @@ describe('GridRow — isConnected fallback when onCommit rebuilds the row', () =
             onRequestNextRow,
             onCommit: () => {
                 // Simulate row rebuild: update() wipes children and re-populates
-                row.update(item, 0, false);
+                row.update(item, 0, false, 0, true);
             },
         });
         document.body.appendChild(row.getElement());
@@ -1966,7 +1966,7 @@ describe('GridRow — isConnected fallback when onCommit rebuilds the row', () =
             rowIndex: 1,
             onRequestNextRow,
             onCommit: () => {
-                row.update(item, 1, false);
+                row.update(item, 1, false, 0, true);
             },
         });
         document.body.appendChild(row.getElement());
