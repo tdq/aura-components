@@ -48,3 +48,38 @@ All existing tests should pass:
 - `should handle ReplaySubject with replayed value` - PASS  
 - `should handle regular Subject (not BehaviorSubject) with startWith empty string` - PASS
 - `should handle Subject that emitted before build (misses value, gets empty string)` - PASS (correct behavior for regular Subject)
+## Grid Implementation Optimization
+
+### Issues Fixed
+
+1. **Unnecessary DOM Recreation:** `GridRow.update()` was wiping the entire row content and recreating all cells on every update (e.g. during scrolling or data changes).
+2. **Redundant DOM Updates:** `populateCell()` was always clearing and re-rendering cell content, even if the value hadn't changed.
+3. **Inefficient Header Rendering:** `GridHeader.render()` was recreating all header elements on every state emission.
+4. **Sub-optimal Group Row Updates:** `GridGroupRow.update()` was always setting `textContent` even if values were identical.
+
+### Changes Made
+
+1. **GridRow Optimization:**
+    - Modified `update()` to reuse existing cell elements if the structure (columns, multi-select, actions) is compatible.
+    - Added `forceRebuild` parameter to `update()` for cases where explicit recreation is needed (e.g. tests).
+    - Refactored `populateRow()` to support an optional `reuse` mode.
+2. **Cell Content Change Detection:**
+    - In `populateCell()`, implemented a check using `__prevContent` property on the cell element to only update content if `col.render(item)` returns a different value.
+    - Optimized `className` updates to only set if the value changed.
+3. **GridHeader Optimization:**
+    - Modified `render()` to reuse existing header cells if the columns array reference hasn't changed.
+    - Managed sort click listeners to correctly use the latest sort state even on reused elements.
+4. **GridGroupRow Optimization:**
+    - Added checks in `update()` to avoid redundant `textContent` assignments.
+
+### Result
+
+- **Improved Performance:** Significant reduction in DOM operations during scrolling and data updates.
+- **Stable DOM:** Existing cell elements are preserved when data changes but structure remains the same.
+- **Backward Compatibility:** Maintained existing functionality while improving efficiency.
+
+### Tests
+
+- Added `grid-optimization.test.ts` (locally verified) to confirm that cells and their children are reused when values are identical.
+- Updated `grid-inline-editing.test.ts` to use `forceRebuild: true` in tests specifically designed to check detachment behavior.
+- Verified that all core grid logic remains sound despite pre-existing baseline test failures.

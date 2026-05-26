@@ -36,7 +36,7 @@ const generateInitialData = (count: number): LedgerEntry[] => {
 const ledgerDataSubject = new BehaviorSubject<LedgerEntry[]>(generateInitialData(10000));
 
 // Update 100 random entries every 10ms
-interval(10).subscribe(() => {
+interval(16).subscribe(() => {
     const current = [...ledgerDataSubject.getValue()];
     for (let i = 0; i < 100; i++) {
         const index = Math.floor(Math.random() * current.length);
