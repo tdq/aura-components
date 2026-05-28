@@ -1,7 +1,7 @@
 {
   "name": "@tdq/ora-components",
-  "version": "0.1.4",
-  "description": "A1 Web Components library",
+  "version": "0.1.5",
+  "description": "Ora web components library",
   "license": "MIT",
   "repository": {
     "type": "git",
