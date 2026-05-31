@@ -34,7 +34,7 @@ export function createHero(): HTMLElement {
                                 <span id="hero-title-1" class="text-gradient-1 transition-all duration-500">Components for</span><br />
                                 <span id="hero-title-2" class="text-gradient-2 transition-all duration-500">Financial Applications</span>
                             </h1>
-                            <p id="hero-description" class="text-xl max-w-lg leading-relaxed transition-colors duration-500 text-on-surface opacity-80">
+                            <p id="hero-description" class="text-lg max-w-lg leading-relaxed transition-colors duration-500 text-on-surface opacity-80">
                                 Pass an RxJS stream to any prop. No framework, no Shadow DOM, no wrappers &mdash; your
                                 observable in, reactive DOM out.
                             </p>
