@@ -1,11 +1,12 @@
 import {
     PanelBuilder,
     FxTickerBuilder,
-    FxRate
+    FxRate,
+    MoneyKPICardBuilder
 } from '@tdq/ora-components';
-import { BehaviorSubject, interval, Subscription } from 'rxjs';
+import { BehaviorSubject, interval, of, Subscription } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { isMobileViewport } from '../../utils/viewport';
-import { buildCashOnHandTile } from './cash-on-hand-tile';
 import { buildArAgingTile } from './ar-aging-tile';
 import { buildCashflowChart } from './cashflow-chart';
 import { buildJournalEntries } from './journal-entries';
@@ -26,9 +27,18 @@ export function createDashboardDemo(sub: Subscription): DashboardDemoResult {
         cash$.next(Math.round(randAround(cur, 380) * 100) / 100);
     }));
 
+    const cashMoney$ = cash$.pipe(map(amount => ({ amount, currencyId: 'EUR' })));
+    const cashKpi = new MoneyKPICardBuilder()
+        .withValue(cashMoney$)
+        .withLabel(of('Cash on Hand'))
+        .withTrend(of({ value: 0.4, period: 'today' }))
+        .withDescription(of('live · reconciled to the cent'))
+        .asGlass()
+        .build();
+
     if (isMobileViewport()) {
         return {
-            mobileElement: buildCashOnHandTile(cash$, sub)
+            mobileElement: cashKpi
         };
     }
 
@@ -71,7 +81,7 @@ export function createDashboardDemo(sub: Subscription): DashboardDemoResult {
 
     const kpiStack = document.createElement('div');
     kpiStack.className = 'hero-kpi-stack';
-    kpiStack.appendChild(buildCashOnHandTile(cash$, sub));
+    kpiStack.appendChild(cashKpi);
     kpiStack.appendChild(buildArAgingTile());
     middleRow.appendChild(kpiStack);
 
@@ -80,6 +90,6 @@ export function createDashboardDemo(sub: Subscription): DashboardDemoResult {
 
     return {
         desktopElement: stack,
-        mobileElement: buildCashOnHandTile(cash$, sub)
+        mobileElement: cashKpi
     };
 }

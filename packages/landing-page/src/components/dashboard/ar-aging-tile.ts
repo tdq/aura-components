@@ -1,6 +1,6 @@
 export function buildArAgingTile(): HTMLElement {
     const root = document.createElement('div');
-    root.className = 'rounded-large p-px-24 backdrop-blur-md border border-outline-alpha-20 bg-surface-variant-alpha-30 shadow-level-2';
+    root.className = 'rounded-large p-px-24 backdrop-blur-md border border-outline-alpha-20 glass-effect shadow-level-2';
     const buckets = [
         { label: '0–30',  pct: 62.1, color: '#10B981' },
         { label: '31–60', pct: 22.4, color: '#0EA5E9' },
